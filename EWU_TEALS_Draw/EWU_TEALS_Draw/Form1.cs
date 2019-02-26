@@ -17,62 +17,32 @@ namespace EWU_TEALS_Draw
 {
     public partial class Form1 : Form
     {
-        Timer timer;
 
         
         public Form1()
         {
             InitializeComponent();
 
-            //Startup();
             RunIdle();
         }
 
         private void RunIdle()
         {
-            ImageViewer viewer = new ImageViewer(); //create an image viewer
             VideoCapture capture = new VideoCapture(); //create a camera captue
             Application.Idle += new EventHandler(delegate (object sender, EventArgs e)
             {  //run this until application closed (close button click on image viewer)
-                viewer.Image = capture.QueryFrame(); //draw the image obtained from camera
+                //viewer.Image = capture.QueryFrame(); //draw the image obtained from camera
+                imageBox1.Image = capture.QueryFrame();
+                imageBox1.Show();
+
+               
+
+                Point point1 = new Point(50, 50);
+                Point point2 = new Point(100, 300);
+
+                // Draw Line
+                CvInvoke.Line(imageBox1.Image, point1, point2, new MCvScalar(), 10, Emgu.CV.CvEnum.LineType.AntiAlias, 0);
             });
-            //viewer.ShowDialog();
-            viewer.Show();
-        }
-
-        private void Startup()
-        {
-            using (VideoCapture videoCapture = new VideoCapture())
-            {
-                Emgu.CV.Image<Bgr, Byte> image = videoCapture.QueryFrame().ToImage<Bgr, Byte>();
-
-                imageBox1.Image = image;
-                imageBox1.Refresh();
-
-                image.Dispose();
-            }
-        }
-
-        private Timer CreateTimer(int millis)
-        {
-            Timer timer = new Timer();
-            timer.Interval = millis;
-            timer.Tick += Timer_Tick;
-
-            return timer;
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            using (VideoCapture videoCapture = new VideoCapture())
-            {
-                Emgu.CV.Image<Bgr, Byte> image = videoCapture.QueryFrame().ToImage<Bgr, Byte>();
-
-                imageBox1.Image = image;
-                imageBox1.Refresh();
-
-                image.Dispose();
-            }
         }
     }
 }
