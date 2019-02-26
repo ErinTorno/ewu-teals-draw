@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EWU_TEALS_Draw", "EWU_TEALS_Draw\EWU_TEALS_Draw.csproj", "{892D970B-D81C-4F2A-9FCE-7B0F7C9B9838}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EWU_TEALS_Draw_WinForms", "..\EWU_TEALS_Draw_WinForms\EWU_TEALS_Draw_WinForms.csproj", "{2180CDE7-43F6-4631-AAF3-38DC25DFAE03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{892D970B-D81C-4F2A-9FCE-7B0F7C9B9838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{892D970B-D81C-4F2A-9FCE-7B0F7C9B9838}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{892D970B-D81C-4F2A-9FCE-7B0F7C9B9838}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{892D970B-D81C-4F2A-9FCE-7B0F7C9B9838}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2180CDE7-43F6-4631-AAF3-38DC25DFAE03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2180CDE7-43F6-4631-AAF3-38DC25DFAE03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2180CDE7-43F6-4631-AAF3-38DC25DFAE03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2180CDE7-43F6-4631-AAF3-38DC25DFAE03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AE234123-20F8-4AB2-BF97-D23807D36405}
+	EndGlobalSection
+EndGlobal
