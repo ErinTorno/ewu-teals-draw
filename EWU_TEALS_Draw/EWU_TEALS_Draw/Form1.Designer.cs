@@ -1,4 +1,4 @@
-﻿namespace EWU_TEALS_Draw_WinForms
+﻿namespace EWU_TEALS_Draw
 {
     partial class Form1
     {
@@ -35,9 +35,9 @@
             // 
             // imageBox1
             // 
-            this.imageBox1.Location = new System.Drawing.Point(108, 76);
+            this.imageBox1.Location = new System.Drawing.Point(12, 12);
             this.imageBox1.Name = "imageBox1";
-            this.imageBox1.Size = new System.Drawing.Size(393, 264);
+            this.imageBox1.Size = new System.Drawing.Size(356, 302);
             this.imageBox1.TabIndex = 2;
             this.imageBox1.TabStop = false;
             // 

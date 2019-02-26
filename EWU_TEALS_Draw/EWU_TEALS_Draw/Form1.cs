@@ -13,13 +13,13 @@ using Emgu.CV;
 using Emgu.CV.UI;
 using Emgu.CV.Structure;
 
-namespace EWU_TEALS_Draw_WinForms
+namespace EWU_TEALS_Draw
 {
     public partial class Form1 : Form
     {
         Timer timer;
 
-
+        
         public Form1()
         {
             InitializeComponent();
@@ -36,7 +36,8 @@ namespace EWU_TEALS_Draw_WinForms
             {  //run this until application closed (close button click on image viewer)
                 viewer.Image = capture.QueryFrame(); //draw the image obtained from camera
             });
-            viewer.ShowDialog();
+            //viewer.ShowDialog();
+            viewer.Show();
         }
 
         private void Startup()
@@ -73,5 +74,5 @@ namespace EWU_TEALS_Draw_WinForms
                 image.Dispose();
             }
         }
-    }   
+    }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace EWU_TEALS_Draw_WinForms
+namespace EWU_TEALS_Draw
 {
     static class Program
     {
