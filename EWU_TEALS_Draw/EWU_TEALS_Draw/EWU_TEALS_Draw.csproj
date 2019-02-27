@@ -92,7 +92,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HaarCascades\Hand.xml" />
     <Content Include="HaarCascades\HandHaarCascade.xml" />
+    <Content Include="HaarCascades\Handy.xml" />
     <Content Include="License-LGPL.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

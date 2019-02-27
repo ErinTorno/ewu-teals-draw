@@ -47,6 +47,7 @@ namespace EWU_TEALS_Draw
 
             //HaarCascade = new CascadeClassifier(@"../../HaarCascades/HandHaarCascade.xml");
             HaarCascade = new CascadeClassifier(@"../../HaarCascades/Hand.xml");
+            //HaarCascade = new CascadeClassifier(@"../../HaarCascades/Handy.xml");
             Disposables.Add(HaarCascade);
             
 
@@ -78,8 +79,23 @@ namespace EWU_TEALS_Draw
 
                 DrawLine(points[0], points[1], color);
 
+                //DrawContours();
                 OutlineHand();
             }
+        }
+
+        private void DrawContours()
+        {
+            Point[] points1 = new Point[] { new Point(10, 10), new Point(150, 150) };
+            Point[] points2 = new Point[] { new Point(150, 150 ), new Point(10, 150) };
+
+            Emgu.CV.Util.VectorOfPoint vector1 = new Emgu.CV.Util.VectorOfPoint(points1);
+            Emgu.CV.Util.VectorOfPoint vector2 = new Emgu.CV.Util.VectorOfPoint(points2);
+
+            Emgu.CV.Util.VectorOfPoint[] vectors = new Emgu.CV.Util.VectorOfPoint[2];
+            vectors[0] = vector1;
+
+            //CvInvoke.DrawContours(ImageBox_VideoCapture.Image, vector1, -1, new MCvScalar(), 3);
         }
 
         private void OutlineHand()
