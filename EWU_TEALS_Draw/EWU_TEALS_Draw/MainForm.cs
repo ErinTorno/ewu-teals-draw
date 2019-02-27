@@ -12,6 +12,7 @@ using Emgu;
 using Emgu.CV;
 using Emgu.CV.UI;
 using Emgu.CV.Structure;
+using System.IO;
 
 namespace EWU_TEALS_Draw
 {
@@ -20,7 +21,12 @@ namespace EWU_TEALS_Draw
         private VideoCapture VideoCapture;
         public CascadeClassifier HaarCascade = null;
 
+        
+        private const int ImageWidth = 1920 / 4;
+        private const int ImageHeight = 1080 / 4;
         private const int CameraToUse = 0; // Default Camera: 0
+
+        private List<IDisposable> Disposables;
 
         public MainForm()
         {
@@ -37,6 +43,13 @@ namespace EWU_TEALS_Draw
 
         private void Startup()
         {
+            Disposables = new List<IDisposable>();
+
+            //HaarCascade = new CascadeClassifier(@"../../HaarCascades/HandHaarCascade.xml");
+            HaarCascade = new CascadeClassifier(@"../../HaarCascades/Hand.xml");
+            Disposables.Add(HaarCascade);
+            
+
             SetupVideoCapture();
 
             Application.Idle += ProcessFrame;
@@ -45,11 +58,11 @@ namespace EWU_TEALS_Draw
         private void SetupVideoCapture()
         {
             VideoCapture = new VideoCapture(CameraToUse);
-            // HaarCascade = new CascadeClassifier("Downloads\\hand.xml");
+            Disposables.Add(VideoCapture);
 
             VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30);
-            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080/4);
-            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920/4);
+            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, ImageHeight);
+            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, ImageWidth);
         }
 
         private void ProcessFrame(object sender, EventArgs e)
@@ -57,14 +70,28 @@ namespace EWU_TEALS_Draw
             if (VideoCapture != null)
             {
                 ImageBox_VideoCapture.Image = VideoCapture.QueryFrame();
-                ImageBox_VideoCapture.Show();
 
-                ImageBox_Drawing.Image = new Image<Bgr, byte>(1920/4, 1080/4, new Bgr(255,255,255));
+                ImageBox_Drawing.Image = new Image<Bgr, byte>(ImageWidth,ImageHeight, new Bgr(255,255,255));
                 
                 MCvScalar color = GetColor();
                 List<Point> points = GetPoints();
 
                 DrawLine(points[0], points[1], color);
+
+                OutlineHand();
+            }
+        }
+
+        private void OutlineHand()
+        {
+            Image<Bgr, byte> imageFrame = new Image<Bgr, byte>(ImageBox_VideoCapture.Image.Bitmap);
+            Image<Gray, byte> grayFrame = imageFrame.Convert<Gray, byte>();
+
+            Rectangle[] rectangles = HaarCascade.DetectMultiScale(grayFrame);
+
+            foreach (Rectangle rectangle in rectangles)
+            {
+                CvInvoke.Rectangle(ImageBox_VideoCapture.Image, rectangle, new MCvScalar(240, 140, 0), 3, Emgu.CV.CvEnum.LineType.FourConnected, 0);
             }
         }
 
@@ -99,10 +126,14 @@ namespace EWU_TEALS_Draw
 
         private void ReleaseResources()
         {
-            if (VideoCapture != null)
+            if (Disposables != null)
             {
-                VideoCapture.Dispose();
-                MessageBox.Show("Resources Released");
+                foreach (IDisposable disposable in Disposables)
+                {
+                    disposable.Dispose();
+                }
+
+                Disposables = null;
             }
         }
     }

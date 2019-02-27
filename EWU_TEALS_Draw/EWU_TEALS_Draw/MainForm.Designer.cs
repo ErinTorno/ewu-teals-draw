@@ -47,10 +47,11 @@
             // 
             // ImageBox_Drawing
             // 
-            this.ImageBox_Drawing.Location = new System.Drawing.Point(25, 338);
+            this.ImageBox_Drawing.Location = new System.Drawing.Point(25, 340);
             this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(10);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
             this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 260);
+            this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_Drawing.TabIndex = 2;
             this.ImageBox_Drawing.TabStop = false;
             // 
@@ -58,12 +59,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(903, 623);
             this.Controls.Add(this.ImageBox_Drawing);
             this.Controls.Add(this.ImageBox_VideoCapture);
             this.Name = "MainForm";
             this.Padding = new System.Windows.Forms.Padding(15);
-            this.Text = "Form1";
+            this.Text = "EWU TEALS Draw";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_VideoCapture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_Drawing)).EndInit();
