@@ -92,9 +92,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HaarCascades\haarcascade_frontalface_alt.xml" />
+    <Content Include="HaarCascades\haarcascade_frontalface_default.xml" />
+    <Content Include="HaarCascades\haarcascade_profileface.xml" />
     <Content Include="HaarCascades\Hand.xml" />
-    <Content Include="HaarCascades\HandHaarCascade.xml" />
-    <Content Include="HaarCascades\Handy.xml" />
+    <Content Include="HaarCascades\HandHaarCascade.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="HaarCascades\Handy.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="HaarCascades\Hand_haar_cascade.xml" />
     <Content Include="License-LGPL.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
