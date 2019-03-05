@@ -13,6 +13,7 @@ using Emgu.CV;
 using Emgu.CV.UI;
 using Emgu.CV.Util;
 using Emgu.CV.Structure;
+using Emgu.CV.CvEnum;
 using System.IO;
 
 namespace EWU_TEALS_Draw
@@ -28,11 +29,20 @@ namespace EWU_TEALS_Draw
 
         private List<IDisposable> Disposables;
 
-
         private int LastTime = DateTime.Now.Millisecond;
         private int Now;
         private DateTime NowDateTime;
         private DateTime LastDateTime = DateTime.Now;
+
+
+        private IInputArray HsvThreshMin = new ScalarArray(new MCvScalar(100, 150, 100));
+        private IInputArray HsvThreshMax = new ScalarArray(new MCvScalar(135, 255, 255));
+        private Mat Hsv_image;
+        private Mat ThreshLow_image;
+        private Mat ThreshHigh_image;
+        private Mat Thresh_image;
+
+
 
         private Drawing drawing = new Drawing(1280, 720);
 
@@ -61,7 +71,16 @@ namespace EWU_TEALS_Draw
             Disposables.Add(ImageBox_VideoCapture.Image);
 
             SetupVideoCapture();
-            
+
+
+
+            Mat color_image = VideoCapture.QueryFrame();
+            Hsv_image = new Mat(color_image.Size, DepthType.Cv8U, 3);
+            ThreshLow_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
+            ThreshHigh_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
+            Thresh_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
+
+
             Application.Idle += ProcessFrame;
         }
 
@@ -70,31 +89,49 @@ namespace EWU_TEALS_Draw
             VideoCapture = new VideoCapture(CameraToUse);
             Disposables.Add(VideoCapture);
 
-            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps, 30); // These things don't actually work...
-            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, ImageHeight);
-            VideoCapture.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, ImageWidth);
+            VideoCapture.SetCaptureProperty(CapProp.Fps, 30); // These things don't actually work...
+            VideoCapture.SetCaptureProperty(CapProp.FrameHeight, ImageHeight);
+            VideoCapture.SetCaptureProperty(CapProp.FrameWidth, ImageWidth);
         }
 
         private void ProcessFrame(object sender, EventArgs e)
         {
             if (VideoCapture != null)
             {
-                //using (ImageBox_VideoCapture.Image = VideoCapture.QueryFrame())
-                //{
-                    ImageBox_VideoCapture.Image = VideoCapture.QueryFrame();
-
-                    //MCvScalar color = GetColor();
-                    //List<Point> points = GetPoints();
-                    //DrawLine(points[0], points[1], color);
-
-                    DetectHand();
-                //}
+                DetectColor();
+                //DetectHand();   
             }
+        }
+
+        private void DetectColor()
+        {
+            Mat color_image = VideoCapture.QueryFrame();
+
+            CvInvoke.CvtColor(color_image, Hsv_image, ColorConversion.Bgr2Hsv);
+
+            
+            // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
+            CvInvoke.InRange(Hsv_image, HsvThreshMin, HsvThreshMax, Thresh_image);
+
+            // Find average of white pixels
+            Mat points = new Mat(color_image.Size, DepthType.Cv8U, 1);
+            CvInvoke.FindNonZero(Thresh_image, points);
+            MCvScalar avg = CvInvoke.Mean(points);
+            Point avgPoint = new Point((int)avg.V0, (int)avg.V1);
+
+            // Draw circle on camera feed
+            CvInvoke.Circle(color_image, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
+            // Draw circle on canvas
+            CvInvoke.Circle(ImageBox_Drawing.Image, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
+            ImageBox_Drawing.Refresh();
+
+            ImageBox_VideoCapture.Image = color_image;
+            ImageBox_VideoCapture_Gray.Image = Thresh_image;
         }
 
         private void DetectHand()
         {
-            var color_image = new Image<Bgr, byte>(ImageBox_VideoCapture.Image.Bitmap);
+            var color_image = VideoCapture.QueryFrame();
             //color_image._EqualizeHist();
             //color_image._GammaCorrect(1.2d);
             var gray_image = GetGrayImage(color_image);
@@ -118,9 +155,10 @@ namespace EWU_TEALS_Draw
             drawing.Update(ImageBox_Drawing.Image);
             ImageBox_VideoCapture_Gray.Image = gray_image;
             ImageBox_Drawing.Refresh();
+            ImageBox_VideoCapture.Image = color_image;
         }
 
-        private IImage GetGrayImage(Image<Bgr, byte> color_image)
+        private IImage GetGrayImage(Mat color_image)
         {
             var image = new Image<Gray, byte>(color_image.Bitmap);
 
@@ -129,7 +167,7 @@ namespace EWU_TEALS_Draw
 
         private void DrawLine(Point point1, Point point2, MCvScalar color)
         {   
-            CvInvoke.Line(ImageBox_VideoCapture_Gray.Image, point1, point2, color, 10, Emgu.CV.CvEnum.LineType.AntiAlias);
+            CvInvoke.Line(ImageBox_VideoCapture_Gray.Image, point1, point2, color, 10, LineType.AntiAlias);
             ImageBox_VideoCapture_Gray.Refresh();
         }
 
