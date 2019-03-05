@@ -34,7 +34,7 @@ namespace EWU_TEALS_Draw
         private DateTime NowDateTime;
         private DateTime LastDateTime = DateTime.Now;
 
-        
+        private Drawing drawing = new Drawing(1280, 720);
 
         public MainForm()
         {
@@ -47,7 +47,8 @@ namespace EWU_TEALS_Draw
         {
             Disposables = new List<IDisposable>();
 
-            CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/Hand.xml");
+            //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_eye.xml");
+            CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_lefteye_2splits.xml");
             //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/Hand_haar_cascade.xml");
             //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_profileface.xml");
             //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_frontalface_alt.xml");
@@ -94,6 +95,8 @@ namespace EWU_TEALS_Draw
         private void DetectHand()
         {
             var color_image = new Image<Bgr, byte>(ImageBox_VideoCapture.Image.Bitmap);
+            //color_image._EqualizeHist();
+            //color_image._GammaCorrect(1.2d);
             var gray_image = GetGrayImage(color_image);
 
             Rectangle[] hands = CascadeClassifier.DetectMultiScale(gray_image);
@@ -103,14 +106,16 @@ namespace EWU_TEALS_Draw
                 CvInvoke.Rectangle(gray_image, hand, new MCvScalar(240, 140, 0), 2);
                 handCenter.X = hand.X + (hand.Width / 2);
                 handCenter.Y = hand.Y + (hand.Height / 2);
-                CvInvoke.Circle(gray_image, handCenter, 4, new MCvScalar(255,255,255),2);
+                //CvInvoke.Circle(gray_image, handCenter, 4, new MCvScalar(255,255,255),2);
 
                 // Draw center on drawing
-                handCenter.X = handCenter.X * 2; // scale to drawing size
-                handCenter.Y = handCenter.Y * 2;
-                CvInvoke.Circle(ImageBox_Drawing.Image, handCenter, 4, new MCvScalar(240,140,0), 2);
+                drawing.AddPoint(ImageBox_VideoCapture, handCenter.X, handCenter.Y);
+                //handCenter.X = ImageBox_Drawing.Width - handCenter.X * 2; // scale to drawing size
+                //handCenter.Y = handCenter.Y * 2;
+                //CvInvoke.Circle(ImageBox_Drawing.Image, handCenter, 4, new MCvScalar(240,140,0), 2);
             }
 
+            drawing.Update(ImageBox_Drawing.Image);
             ImageBox_VideoCapture_Gray.Image = gray_image;
             ImageBox_Drawing.Refresh();
         }
