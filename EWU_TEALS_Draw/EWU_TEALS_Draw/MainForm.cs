@@ -98,43 +98,50 @@ namespace EWU_TEALS_Draw
         {
             if (VideoCapture != null)
             {
-                DetectColor();
-                //DetectHand();   
+                Mat flippedVideoFrame = FlipImage(VideoCapture.QueryFrame());
+                ImageBox_VideoCapture.Image = flippedVideoFrame;
+                
+
+                DetectColor(flippedVideoFrame);
+                //DetectHand(flippedVideoFrame);   
             }
         }
 
-        private void DetectColor()
+        private Mat FlipImage(Mat input)
         {
-            Mat color_image = VideoCapture.QueryFrame();
+            Mat flippedImage = new Mat(input.Size, DepthType.Cv8U, input.NumberOfChannels);
+            CvInvoke.Flip(input, flippedImage, FlipType.Horizontal);
+            return flippedImage;
+        }
 
-            CvInvoke.CvtColor(color_image, Hsv_image, ColorConversion.Bgr2Hsv);
-
+        private void DetectColor(Mat input)
+        {
+            CvInvoke.CvtColor(input, Hsv_image, ColorConversion.Bgr2Hsv);
             
             // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
             CvInvoke.InRange(Hsv_image, HsvThreshMin, HsvThreshMax, Thresh_image);
 
             // Find average of white pixels
-            Mat points = new Mat(color_image.Size, DepthType.Cv8U, 1);
+            Mat points = new Mat(input.Size, DepthType.Cv8U, 1);
             CvInvoke.FindNonZero(Thresh_image, points);
             MCvScalar avg = CvInvoke.Mean(points);
             Point avgPoint = new Point((int)avg.V0, (int)avg.V1);
 
             // Draw circle on camera feed
-            CvInvoke.Circle(color_image, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
+            CvInvoke.Circle(input, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
             // Draw circle on canvas
             CvInvoke.Circle(ImageBox_Drawing.Image, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
             ImageBox_Drawing.Refresh();
 
-            ImageBox_VideoCapture.Image = color_image;
+            //ImageBox_VideoCapture.Image = input;
             ImageBox_VideoCapture_Gray.Image = Thresh_image;
         }
 
-        private void DetectHand()
+        private void DetectHand(Mat input)
         {
-            var color_image = VideoCapture.QueryFrame();
             //color_image._EqualizeHist();
             //color_image._GammaCorrect(1.2d);
-            var gray_image = GetGrayImage(color_image);
+            var gray_image = GetGrayImage(input);
 
             Rectangle[] hands = CascadeClassifier.DetectMultiScale(gray_image);
             Point handCenter = new Point();
@@ -155,7 +162,7 @@ namespace EWU_TEALS_Draw
             drawing.Update(ImageBox_Drawing.Image);
             ImageBox_VideoCapture_Gray.Image = gray_image;
             ImageBox_Drawing.Refresh();
-            ImageBox_VideoCapture.Image = color_image;
+            ImageBox_VideoCapture.Image = input;
         }
 
         private IImage GetGrayImage(Mat color_image)
