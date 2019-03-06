@@ -42,28 +42,27 @@
             this.ImageBox_VideoCapture.Location = new System.Drawing.Point(25, 25);
             this.ImageBox_VideoCapture.Margin = new System.Windows.Forms.Padding(10);
             this.ImageBox_VideoCapture.Name = "ImageBox_VideoCapture";
-            this.ImageBox_VideoCapture.Size = new System.Drawing.Size(480, 260);
+            this.ImageBox_VideoCapture.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_VideoCapture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_VideoCapture.TabIndex = 2;
             this.ImageBox_VideoCapture.TabStop = false;
             // 
             // ImageBox_VideoCapture_Gray
             // 
-            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(550, 25);
+            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(500, 25);
             this.ImageBox_VideoCapture_Gray.Margin = new System.Windows.Forms.Padding(10);
             this.ImageBox_VideoCapture_Gray.Name = "ImageBox_VideoCapture_Gray";
-            this.ImageBox_VideoCapture_Gray.Size = new System.Drawing.Size(480, 260);
+            this.ImageBox_VideoCapture_Gray.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_VideoCapture_Gray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_VideoCapture_Gray.TabIndex = 2;
             this.ImageBox_VideoCapture_Gray.TabStop = false;
             // 
             // ImageBox_Drawing
             // 
-            this.ImageBox_Drawing.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ImageBox_Drawing.Location = new System.Drawing.Point(25, 331);
+            this.ImageBox_Drawing.Location = new System.Drawing.Point(58, 285);
             this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(10);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
-            this.ImageBox_Drawing.Size = new System.Drawing.Size(960, 520);
+            this.ImageBox_Drawing.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_Drawing.TabIndex = 3;
             this.ImageBox_Drawing.TabStop = false;
