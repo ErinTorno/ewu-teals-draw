@@ -29,6 +29,7 @@ namespace EWU_TEALS_Draw
 
         // Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
+        private const int FPS = 30;
         private const int ActualCameraWidth = 1280;
         private const int ActualCameraHeight = 720;
 
@@ -102,7 +103,7 @@ namespace EWU_TEALS_Draw
             VideoCapture = new VideoCapture(CameraToUse); // Webcam is 1280x720
             Disposables.Add(VideoCapture);
 
-            VideoCapture.SetCaptureProperty(CapProp.Fps, 30); // The FPS property doesn't actually work...
+            VideoCapture.SetCaptureProperty(CapProp.Fps, FPS); // The FPS property doesn't actually work...
             VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);  // 1280, 640, 320
             VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight); // 720, 360, 180
         }
@@ -179,12 +180,9 @@ namespace EWU_TEALS_Draw
                 int dx = canvasScaledPoint.X - LastHandPosition.X;
                 int dy = canvasScaledPoint.Y - LastHandPosition.Y;
                 double travelDistance = Math.Sqrt(dx * dx + dy * dy);
-                double maxTravelDistance = Math.Sqrt(CanvasWidth * CanvasWidth + CanvasHeight * CanvasHeight);
 
-                double speed = travelDistance / maxTravelDistance; // Speed as a ratio of maximum travel possible
+                double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/ms
                 int colorAllotment = (int)(speed * (maxIntensity * 3));
-
-                colorAllotment = colorAllotment * 25;
 
                 int r = 0;
                 int g = 0;
