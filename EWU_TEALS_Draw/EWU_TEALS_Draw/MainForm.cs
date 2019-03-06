@@ -355,6 +355,27 @@ namespace EWU_TEALS_Draw
             }
         }
 
+        private void btnPlay_Click(object sender, EventArgs e)
+        {
+            Application.Idle += ProcessFrame;
+        }
+
+        private void btnPause_Click(object sender, EventArgs e)
+        {
+            Application.Idle -= ProcessFrame;
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
+
+        }
+
         /*
         private bool NextTimeSlice()
         {
