@@ -363,6 +363,10 @@ namespace EWU_TEALS_Draw
         private void btnPause_Click(object sender, EventArgs e)
         {
             Application.Idle -= ProcessFrame;
+            ImageBox_VideoCapture_Gray.Image = new Image<Bgr, byte>(DisplayedCameraWidth, DisplayedCameraHeight, new Bgr(255, 255, 255));
+            LastHandPosition.X = 0;
+            LastHandPosition.Y = 0;
+
         }
 
         private void btnExit_Click(object sender, EventArgs e)
