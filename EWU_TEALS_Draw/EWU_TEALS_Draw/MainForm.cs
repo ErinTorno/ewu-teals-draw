@@ -371,7 +371,11 @@ namespace EWU_TEALS_Draw
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            DialogResult result = MessageBox.Show("Do you want to exit the beautiful application?",
+                    "Important Question",
+                    MessageBoxButtons.YesNo);
+            if(result == DialogResult.Yes)
+                Application.Exit();
         }
 
         private void btnReset_Click(object sender, EventArgs e)
