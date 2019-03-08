@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EwuTeals.Draw;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,8 +25,7 @@ namespace EWU_TEALS_Draw
         private VideoCapture VideoCapture;
         public CascadeClassifier CascadeClassifier = null;
         private Point LastHandPosition;
-        private Drawing drawing = new Drawing(1280, 720);
-
+        private Drawing drawing = new Drawing(1280, 720, FPS);
 
         // Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
@@ -39,9 +39,6 @@ namespace EWU_TEALS_Draw
         private const int CanvasWidth = DisplayedCameraWidth * 2;
         private const int CanvasHeight = DisplayedCameraHeight * 2;
 
-
-        
-
         // Thresholding Properties
         private IInputArray HsvThreshMin = new ScalarArray(new MCvScalar(100, 150, 100)); // Blue min
         private IInputArray HsvThreshMax = new ScalarArray(new MCvScalar(135, 255, 255)); // Blue max
@@ -53,8 +50,6 @@ namespace EWU_TEALS_Draw
         
         // TimeSlicing Properties
         private int LastTime = DateTime.Now.Millisecond;
-        private int Now;
-        private DateTime NowDateTime;
         private DateTime LastDateTime = DateTime.Now;
 
 
@@ -154,82 +149,13 @@ namespace EWU_TEALS_Draw
                 CvInvoke.Circle(inputImage, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
 
                 // Draw on canvas
-                avgPoint = ScaleToCanvas(avgPoint);
-                MCvScalar color = GetColorBySpeed(avgPoint);
-                DrawLineTo(avgPoint, color);
-            }
-            // If not enough pixels to count as an object, reset LastHandPosition to 0 so it will be 
-            // updated when we do find it.
-            else
-            {
-                LastHandPosition.X = 0;
-                LastHandPosition.Y = 0;
+                drawing.AddPoint(ImageBox_VideoCapture, avgPoint.X, avgPoint.Y);
             }
 
             ImageBox_VideoCapture_Gray.Image = Thresh_image;
+            drawing.Update(ImageBox_Drawing);
         }
-
-        private MCvScalar GetColorBySpeed(Point canvasScaledPoint)
-        {
-            MCvScalar color = new MCvScalar(255, 255, 255);
-
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0) // We are moving
-            {
-                int maxIntensity = 255;
-
-                int dx = canvasScaledPoint.X - LastHandPosition.X;
-                int dy = canvasScaledPoint.Y - LastHandPosition.Y;
-                double travelDistance = Math.Sqrt(dx * dx + dy * dy);
-
-                double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/ms
-                int colorAllotment = (int)(speed * (maxIntensity * 3));
-
-                int r = 0;
-                int g = 0;
-                int b = 0;
-                if (colorAllotment <= (1 * maxIntensity)) // r:0, g:0, b:+
-                {
-                    b = colorAllotment;
-                }
-
-                else if (colorAllotment > (1 * maxIntensity) && colorAllotment <= (2 * maxIntensity)) // r:0, g:+, b:max
-                {
-                    b = maxIntensity;
-                    g = colorAllotment - maxIntensity;
-
-                }
-
-                else if (colorAllotment > (2 * maxIntensity) && colorAllotment <= (3 * maxIntensity)) // r:0, g:max, b:-
-                {
-                    g = maxIntensity;
-                    b = maxIntensity - (colorAllotment - maxIntensity);
-                }
-
-                else if (colorAllotment > (3 * maxIntensity) && colorAllotment <= (4 * maxIntensity)) // r:+, g:max, b:0
-                {
-                    g = maxIntensity;
-                    r = colorAllotment - maxIntensity;
-                }
-
-                else if (colorAllotment > (4 * maxIntensity) && colorAllotment <= (5 * maxIntensity)) // r:max, g:-, b:0
-                {
-                    r = maxIntensity;
-                    g = maxIntensity - (colorAllotment - maxIntensity);
-                }
-
-                else if (colorAllotment > 5)
-                {
-                    r = maxIntensity;
-                }
-
-                color.V0 = b;
-                color.V1 = g;
-                color.V2 = r;
-            }
-
-            return color;
-        }
-
+        
         private Point ScaleToCanvas(Point point)
         {
             double widthMultiplier = (CanvasWidth * 1.0) / DisplayedCameraWidth;
@@ -241,17 +167,7 @@ namespace EWU_TEALS_Draw
             return point;
         }
 
-        private void DrawLineTo(Point point, MCvScalar color)
-        {
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0)
-            {
-                CvInvoke.Line(ImageBox_Drawing.Image, LastHandPosition, point, color, 8, LineType.AntiAlias);
-                ImageBox_Drawing.Refresh();
-            }
-
-            LastHandPosition = new Point(point.X, point.Y);
-        }
-
+        [Obsolete("This works for a previous version, where new changes to the canvas might prevent it from working properly")]
         private void DetectHand(Mat inputImage)
         {
             //color_image._EqualizeHist();
@@ -288,8 +204,7 @@ namespace EWU_TEALS_Draw
                 LastHandPosition.Y = 0;
             }
             
-
-            drawing.Update(ImageBox_Drawing.Image);
+            
             ImageBox_VideoCapture_Gray.Image = gray_image;
             ImageBox_Drawing.Refresh();
             ImageBox_VideoCapture.Image = inputImage;
