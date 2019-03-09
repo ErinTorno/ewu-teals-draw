@@ -24,14 +24,4 @@ namespace EwuTeals.Draw {
             return new WPoint(xscale * X, yscale * Y, wscale * Width);
         }
     }
-
-    public struct Line {
-        public List<WPoint> Points { get; set; }
-        public MCvScalar Color { get; set; }
-
-        public Line(List<WPoint> p, MCvScalar c) {
-            Points = p;
-            Color = c;
-        }
-    }
 }

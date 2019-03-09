@@ -10,42 +10,48 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
+    using Line = List<WPoint>;
+
     class Drawing {
         // once the movement is this far in one jump, we will show the fast color fully
         private const double PercentOfWidthToReachMin = 0.15;
         // default color to draw; in future we will change this to whatever the user is holding
-        private static readonly MCvScalar DefaultColor = new MCvScalar(120, 140, 0);
+        private static readonly MCvScalar DefaultColor = new MCvScalar(0, 0, 0);
         // the minimum and maximum widths, relative to total page width, of the thickness of the line
         private const double MinLineWidthPercent = 0.005, MaxLineWidthPercent = 0.015;
 
-        private List<Line> lines = new List<Line>();
-        private Line LatestLine { get => lines.Last(); }
+        private Dictionary<MCvScalar, List<Line>> lineMap = new Dictionary<MCvScalar, List<Line>>();
+        private Line LatestLine(MCvScalar color) { return lineMap[color].Last(); }
 
         public int RefreshRate { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-
+        
         public Drawing(int width, int height, int refreshRate) {
             Width = width;
             Height = height;
             RefreshRate = refreshRate;
         }
 
-        public void AddPoint(ImageBox image, int x, int y) {
+        public void AddPoint(ImageBox image, MCvScalar color, int x, int y) {
+            if (!lineMap.ContainsKey(color))
+                lineMap.Add(color, new List<List<WPoint>>());
+
+            var lines = lineMap[color];
             // ensure there is a line currently being worked on
             if (lines.Count == 0) {
                 // we'll change this later to take colors, but for now we won't deal with that
-                lines.Add(new Line(new List<WPoint>(), DefaultColor));
+                lines.Add(new List<WPoint>());
             }
-            var last = LatestLine;
+            var last = LatestLine(color);
 
             var xscale = (double)image.Width / (double)Width;
             var yscale = (double)image.Height / (double)Height;
             var nx = (int)(x / xscale);
             var ny = (int)(y / yscale);
-            var width = last.Points.Count == 0 ? MinLineWidthPercent : GetWidthBySpeed(last.Points.Last(), nx, ny);
+            var width = last.Count == 0 ? MinLineWidthPercent : GetWidthBySpeed(last.Last(), nx, ny);
             
-            last.Points.Add(new WPoint(nx, ny, width));
+            last.Add(new WPoint(nx, ny, width));
         }
 
         /// <summary>
@@ -54,26 +60,29 @@ namespace EwuTeals.Draw {
         /// <param name="imageBox">The canvas to be drawn to</param>
         public void Update(ImageBox imageBox) {
             var image = imageBox.Image;
-            foreach (var line in lines) {
-                // scales in each direction
-                var xscale = (double)image.Bitmap.Width / (double)Width;
-                var yscale = (double)image.Bitmap.Height / (double)Height;
-                var avgScale = (xscale + yscale) / 2.0;
-                var color = line.Color;
+            foreach (var pair in lineMap) {
+                var color = pair.Key;
+                var lines = pair.Value;
+                foreach (var line in lines) {
+                    // scales in each direction
+                    var xscale = (double)image.Bitmap.Width / (double)Width;
+                    var yscale = (double)image.Bitmap.Height / (double)Height;
+                    var avgScale = (xscale + yscale) / 2.0;
 
-                if (line.Points.Count > 0) {
-                    // we need a point to start drawing from
-                    var lastPoint = line.Points[0].ToRelative(xscale, yscale, avgScale);
-                    for (var i = 1; i < line.Points.Count; ++i) {
-                        var relativePoint = line.Points[i].ToRelative(xscale, yscale, avgScale);
-                        // it will throw an exception if by change width is rounded down to 0
-                        var width = (int)relativePoint.Width == 0 ? 1 : (int)relativePoint.Width;
-                        CvInvoke.Line(image, lastPoint.ToStandardPoint(), relativePoint.ToStandardPoint(), color, width, LineType.AntiAlias);
-                        //CvInvoke.Circle(image, relativePoint.ToStandardPoint(), radius: (int)(CircleScale * avgScale), color: line.Color);
-                        lastPoint = relativePoint;
-                    };
+                    if (line.Count > 0) {
+                        // we need a point to start drawing from
+                        var lastPoint = line[0].ToRelative(xscale, yscale, avgScale);
+                        for (var i = 1; i < line.Count; ++i) {
+                            var relativePoint = line[i].ToRelative(xscale, yscale, avgScale);
+                            // it will throw an exception if by change width is rounded down to 0
+                            var width = (int)relativePoint.Width == 0 ? 1 : (int)relativePoint.Width;
+                            CvInvoke.Line(image, lastPoint.ToStandardPoint(), relativePoint.ToStandardPoint(), color, width, LineType.AntiAlias);
+                            //CvInvoke.Circle(image, relativePoint.ToStandardPoint(), radius: (int)(CircleScale * avgScale), color: line.Color);
+                            lastPoint = relativePoint;
+                        };
+                    }
+                    imageBox.Refresh();
                 }
-                imageBox.Refresh();
             }
         }
 
@@ -99,6 +108,12 @@ namespace EwuTeals.Draw {
                 var distPerc = (distToReachThinnest - travelDistance) / distToReachThinnest;
                 return distPerc * (MaxLineWidthPercent - MinLineWidthPercent) * Width;
             }
+        }
+
+        // Interactions
+
+        public void Reset() {
+            lineMap = new Dictionary<MCvScalar, List<Line>>();
         }
     }
 }

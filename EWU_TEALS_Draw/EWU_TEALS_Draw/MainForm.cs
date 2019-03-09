@@ -40,8 +40,11 @@ namespace EWU_TEALS_Draw
         private const int CanvasHeight = DisplayedCameraHeight * 2;
 
         // Thresholding Properties
-        private IInputArray HsvThreshMin = new ScalarArray(new MCvScalar(100, 150, 100)); // Blue min
-        private IInputArray HsvThreshMax = new ScalarArray(new MCvScalar(135, 255, 255)); // Blue max
+        private MCvScalar CurrentColor { get; set; }
+        private static MCvScalar HsvThreshMinColor = new MCvScalar(100, 150, 100), HsvThreshMaxColor = new MCvScalar(135, 255, 255);
+
+        private IInputArray HsvThreshMin = new ScalarArray(HsvThreshMinColor); // Blue min
+        private IInputArray HsvThreshMax = new ScalarArray(HsvThreshMaxColor); // Blue max
         private Mat Hsv_image;
         private Mat ThreshLow_image;
         private Mat ThreshHigh_image;
@@ -62,6 +65,7 @@ namespace EWU_TEALS_Draw
 
         private void Startup()
         {
+            CurrentColor = new MCvScalar(255, 135, 135);
             Disposables = new List<IDisposable>();
 
             //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_upperbody.xml");
@@ -110,7 +114,6 @@ namespace EWU_TEALS_Draw
                 Mat flippedVideoFrame = FlipImage(VideoCapture.QueryFrame());
                 ImageBox_VideoCapture.Image = flippedVideoFrame;
                 
-
                 DetectColor(flippedVideoFrame);
                 //DetectHand(flippedVideoFrame);   
             }
@@ -143,13 +146,12 @@ namespace EWU_TEALS_Draw
 
             // Now we check if there are more than x pixels of detected color, since we don't want to draw
             // if all we detect is noise.
-            if (sumWhitePixels > 100)
-            {
+            if (sumWhitePixels > 100) {
                 // Draw circle on camera feed
                 CvInvoke.Circle(inputImage, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
 
                 // Draw on canvas
-                drawing.AddPoint(ImageBox_VideoCapture, avgPoint.X, avgPoint.Y);
+                drawing.AddPoint(ImageBox_VideoCapture, CurrentColor, avgPoint.X, avgPoint.Y);
             }
 
             ImageBox_VideoCapture_Gray.Image = Thresh_image;
@@ -234,14 +236,6 @@ namespace EWU_TEALS_Draw
             ImageBox_VideoCapture_Gray.Refresh();
         }
 
-        private MCvScalar GetColor()
-        {
-            // Logic to determine what color to draw with...
-
-            // MCvScalar is a Color object, that takes rgb values but in the order of bgr !!!!!!
-            return new MCvScalar(125, 125, 200);
-        }
-
         private List<Point> GetPoints()
         {
             // Logic to determine the points from hand movement...
@@ -296,7 +290,7 @@ namespace EWU_TEALS_Draw
         private void btnReset_Click(object sender, EventArgs e)
         {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-
+            drawing.Reset();
         }
 
         /*
