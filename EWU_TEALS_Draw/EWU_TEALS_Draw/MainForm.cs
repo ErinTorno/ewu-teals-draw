@@ -80,7 +80,7 @@ namespace EWU_TEALS_Draw
             SetupVideoCapture();
             
             Mat color_image = VideoCapture.QueryFrame();
-            colorDetector = new ColorDetector(color_image.Size, DefaultColorRange);
+            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange);
 
             Application.Idle += ProcessFrame;
         }
@@ -103,7 +103,7 @@ namespace EWU_TEALS_Draw
                 ImageBox_VideoCapture.Image = flippedVideoFrame;
 
                 // The canvases are checked for each color that the detect has been told, and then those points are added to the drawing
-                colorDetector.UpdateDrawing(flippedVideoFrame, drawing, ImageBox_VideoCapture, ImageBox_Drawing);
+                colorDetector.UpdateDrawing(flippedVideoFrame, drawing);
                 ImageBox_VideoCapture_Gray.Image = colorDetector.ThreshImage;
                 drawing.Update(ImageBox_Drawing);
             }

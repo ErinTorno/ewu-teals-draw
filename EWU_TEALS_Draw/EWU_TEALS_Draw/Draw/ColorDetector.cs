@@ -14,8 +14,12 @@ namespace EwuTeals.Draw {
         private List<ColorRange> detectedColors = new List<ColorRange>();
         private Mat hsvImage;
         public Mat ThreshImage { get; private set; }
+        public ImageBox VideoSource { get; set; }
+        public ImageBox CanvasBox { get; set; }
 
-        public ColorDetector(Size size, params ColorRange[] defColors) {
+        public ColorDetector(ImageBox source, ImageBox canvas, Size size, params ColorRange[] defColors) {
+            VideoSource = source;
+            CanvasBox = canvas;
             foreach (var c in defColors) detectedColors.Add(c);
             hsvImage = new Mat(size, DepthType.Cv8U, 3);
             ThreshImage = new Mat(size, DepthType.Cv8U, 1);
@@ -29,7 +33,7 @@ namespace EwuTeals.Draw {
             detectedColors.Where(val => val != c);
         }
 
-        public void UpdateDrawing(Mat input, Drawing drawing, ImageBox videoBox, ImageBox canvas) {
+        public void UpdateDrawing(Mat input, Drawing drawing) {
             foreach (var c in detectedColors) {
                 CvInvoke.CvtColor(input, hsvImage, ColorConversion.Bgr2Hsv);
 
@@ -51,10 +55,10 @@ namespace EwuTeals.Draw {
                     CvInvoke.Circle(input, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
 
                     // Draw on canvas
-                    drawing.AddPoint(videoBox, c.InkColor, avgPoint.X, avgPoint.Y);
+                    drawing.AddPoint(VideoSource, c.InkColor, avgPoint.X, avgPoint.Y);
                 }
 
-                drawing.Update(canvas);
+                drawing.Update(CanvasBox);
             }
         }
     }

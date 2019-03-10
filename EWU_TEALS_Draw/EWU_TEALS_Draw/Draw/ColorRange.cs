@@ -25,8 +25,12 @@ namespace EwuTeals.Draw {
                 && ScalarEq(this.MaxHsvColor, other.MaxHsvColor);
         }
 
-        private static bool ScalarEq(MCvScalar a, MCvScalar b) {
-            return a.V0 == b.V0 && a.V1 == b.V1 && a.V2 == b.V2 && a.V3 == b.V3;
+        public override bool Equals(object obj) {
+            return obj is ColorRange && this.Equals((ColorRange)obj);
+        }
+
+        public override int GetHashCode() {
+            return ScalarHash(InkColor) + ScalarHash(MinHsvColor) + ScalarHash(MaxHsvColor);
         }
 
         public static bool operator ==(ColorRange a, ColorRange b) {
@@ -35,6 +39,16 @@ namespace EwuTeals.Draw {
 
         public static bool operator !=(ColorRange a, ColorRange b) {
             return !a.Equals(b);
+        }
+
+        // Scalar utility functions
+
+        private static bool ScalarEq(MCvScalar a, MCvScalar b) {
+            return a.V0 == b.V0 && a.V1 == b.V1 && a.V2 == b.V2 && a.V3 == b.V3;
+        }
+
+        private static int ScalarHash(MCvScalar sc) {
+            return sc.V0.GetHashCode() + sc.V1.GetHashCode() + sc.V2.GetHashCode() + sc.V3.GetHashCode();
         }
     }
 }

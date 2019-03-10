@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EwuTeals.Draw.Properties {
+namespace EwuTeals.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
