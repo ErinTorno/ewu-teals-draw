@@ -25,7 +25,9 @@ namespace EWU_TEALS_Draw
         private VideoCapture VideoCapture;
         public CascadeClassifier CascadeClassifier = null;
         private Point LastHandPosition;
+
         private Drawing drawing = new Drawing(1280, 720, FPS);
+        private ColorDetector colorDetector;
 
         // Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
@@ -40,15 +42,11 @@ namespace EWU_TEALS_Draw
         private const int CanvasHeight = DisplayedCameraHeight * 2;
 
         // Thresholding Properties
-        private MCvScalar CurrentColor { get; set; }
-        private static MCvScalar HsvThreshMinColor = new MCvScalar(100, 150, 100), HsvThreshMaxColor = new MCvScalar(135, 255, 255);
-
-        private IInputArray HsvThreshMin = new ScalarArray(HsvThreshMinColor); // Blue min
-        private IInputArray HsvThreshMax = new ScalarArray(HsvThreshMaxColor); // Blue max
-        private Mat Hsv_image;
-        private Mat ThreshLow_image;
-        private Mat ThreshHigh_image;
-        private Mat Thresh_image;
+        private static readonly ColorRange DefaultColorRange = new ColorRange(
+            inkColor: new MCvScalar(255, 135, 135),
+            minHsvColor: new MCvScalar(100, 150, 100),
+            maxHsvColor: new MCvScalar(135, 255, 255)
+        );
 
         
         // TimeSlicing Properties
@@ -65,11 +63,8 @@ namespace EWU_TEALS_Draw
 
         private void Startup()
         {
-            CurrentColor = new MCvScalar(255, 135, 135);
             Disposables = new List<IDisposable>();
-
-            //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_upperbody.xml");
-            //CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_eye.xml");
+            
             CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_lefteye_2splits.xml");
 
             Disposables.Add(CascadeClassifier);
@@ -78,21 +73,14 @@ namespace EWU_TEALS_Draw
 
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             
-            
             Disposables.Add(ImageBox_VideoCapture_Gray.Image);
             Disposables.Add(ImageBox_Drawing.Image);
             Disposables.Add(ImageBox_VideoCapture.Image);
 
             SetupVideoCapture();
-
-
-
+            
             Mat color_image = VideoCapture.QueryFrame();
-            Hsv_image = new Mat(color_image.Size, DepthType.Cv8U, 3);
-            ThreshLow_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
-            ThreshHigh_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
-            Thresh_image = new Mat(color_image.Size, DepthType.Cv8U, 1);
-
+            colorDetector = new ColorDetector(color_image.Size, DefaultColorRange);
 
             Application.Idle += ProcessFrame;
         }
@@ -113,9 +101,11 @@ namespace EWU_TEALS_Draw
             {
                 Mat flippedVideoFrame = FlipImage(VideoCapture.QueryFrame());
                 ImageBox_VideoCapture.Image = flippedVideoFrame;
-                
-                DetectColor(flippedVideoFrame);
-                //DetectHand(flippedVideoFrame);   
+
+                // The canvases are checked for each color that the detect has been told, and then those points are added to the drawing
+                colorDetector.UpdateDrawing(flippedVideoFrame, drawing, ImageBox_VideoCapture, ImageBox_Drawing);
+                ImageBox_VideoCapture_Gray.Image = colorDetector.ThreshImage;
+                drawing.Update(ImageBox_Drawing);
             }
         }
 
@@ -124,38 +114,6 @@ namespace EWU_TEALS_Draw
             Mat flippedImage = new Mat(inputImage.Size, DepthType.Cv8U, inputImage.NumberOfChannels);
             CvInvoke.Flip(inputImage, flippedImage, FlipType.Horizontal);
             return flippedImage;
-        }
-
-        private void DetectColor(Mat inputImage)
-        {
-            CvInvoke.CvtColor(inputImage, Hsv_image, ColorConversion.Bgr2Hsv);
-            
-            // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
-            CvInvoke.InRange(Hsv_image, HsvThreshMin, HsvThreshMax, Thresh_image);
-
-            // Find average of white pixels
-            Mat points = new Mat(inputImage.Size, DepthType.Cv8U, 1);
-            CvInvoke.FindNonZero(Thresh_image, points);
-
-            // An alternative approach to averaging would be to use the K-means 
-            // algorithm to find clusters, since average is significantly influenced by outliers.
-            MCvScalar avg = CvInvoke.Mean(points);
-            Point avgPoint = new Point((int)avg.V0, (int)avg.V1);
-
-            int sumWhitePixels = CvInvoke.CountNonZero(Thresh_image);
-
-            // Now we check if there are more than x pixels of detected color, since we don't want to draw
-            // if all we detect is noise.
-            if (sumWhitePixels > 100) {
-                // Draw circle on camera feed
-                CvInvoke.Circle(inputImage, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
-
-                // Draw on canvas
-                drawing.AddPoint(ImageBox_VideoCapture, CurrentColor, avgPoint.X, avgPoint.Y);
-            }
-
-            ImageBox_VideoCapture_Gray.Image = Thresh_image;
-            drawing.Update(ImageBox_Drawing);
         }
         
         private Point ScaleToCanvas(Point point)
