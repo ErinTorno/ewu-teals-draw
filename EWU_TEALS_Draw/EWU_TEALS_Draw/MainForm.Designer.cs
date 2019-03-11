@@ -38,7 +38,7 @@
             // 
             // ImageBox_VideoCapture
             // 
-            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(676, 9);
+            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(1565, 9);
             this.ImageBox_VideoCapture.Margin = new System.Windows.Forms.Padding(8);
             this.ImageBox_VideoCapture.Name = "ImageBox_VideoCapture";
             this.ImageBox_VideoCapture.Size = new System.Drawing.Size(320, 180);
@@ -48,7 +48,7 @@
             // 
             // ImageBox_VideoCapture_Gray
             // 
-            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(676, 231);
+            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(1565, 240);
             this.ImageBox_VideoCapture_Gray.Margin = new System.Windows.Forms.Padding(8);
             this.ImageBox_VideoCapture_Gray.Name = "ImageBox_VideoCapture_Gray";
             this.ImageBox_VideoCapture_Gray.Size = new System.Drawing.Size(320, 180);
@@ -68,7 +68,7 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(676, 444);
+            this.btnPlay.Location = new System.Drawing.Point(1565, 456);
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(75, 23);
             this.btnPlay.TabIndex = 4;
@@ -78,7 +78,7 @@
             // 
             // btnPause
             // 
-            this.btnPause.Location = new System.Drawing.Point(757, 444);
+            this.btnPause.Location = new System.Drawing.Point(1646, 456);
             this.btnPause.Name = "btnPause";
             this.btnPause.Size = new System.Drawing.Size(75, 23);
             this.btnPause.TabIndex = 5;
@@ -88,7 +88,7 @@
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(838, 444);
+            this.btnReset.Location = new System.Drawing.Point(1727, 456);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 6;
@@ -98,7 +98,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(921, 444);
+            this.btnExit.Location = new System.Drawing.Point(1810, 456);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(75, 23);
             this.btnExit.TabIndex = 7;
@@ -111,7 +111,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1026, 609);
+            this.ClientSize = new System.Drawing.Size(1904, 1041);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnPause);

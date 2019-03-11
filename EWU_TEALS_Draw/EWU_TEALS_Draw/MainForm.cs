@@ -21,6 +21,8 @@ namespace EWU_TEALS_Draw
 {
     public partial class MainForm : Form
     {
+        private const bool IsFullscreen = true;
+
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
         private Point LastHandPosition;
@@ -37,8 +39,8 @@ namespace EWU_TEALS_Draw
         private const int DisplayedCameraWidth = ActualCameraWidth / 4;
         private const int DisplayedCameraHeight = ActualCameraHeight / 4;
 
-        private const int CanvasWidth = DisplayedCameraWidth * 2;
-        private const int CanvasHeight = DisplayedCameraHeight * 3;
+        private const int CanvasWidth = DisplayedCameraWidth * 3;
+        private const int CanvasHeight = DisplayedCameraHeight * 4;
 
         // Thresholding Properties
         private static readonly ColorRange DefaultColorRange = new ColorRange(
@@ -76,6 +78,11 @@ namespace EWU_TEALS_Draw
             colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange, DefaultColorRangeGreen);
 
             Application.Idle += ProcessFrame;
+
+            if (IsFullscreen) {
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.WindowState = FormWindowState.Maximized;
+            }
         }
 
         private void SetupVideoCapture()
