@@ -42,13 +42,18 @@ namespace EWU_TEALS_Draw
         private const int CanvasHeight = DisplayedCameraHeight * 3;
 
         // Thresholding Properties
-        private static readonly ColorRange DefaultColorRange = new ColorRange(
+        private static readonly ColorRange BlueColorRange = new ColorRange(
             inkColor: new MCvScalar(255, 135, 135),
             minHsvColor: new MCvScalar(100, 150, 100),
             maxHsvColor: new MCvScalar(135, 255, 255)
         );
 
-        
+        private static readonly ColorRange GreenColorRange = new ColorRange(
+         inkColor: new MCvScalar(120, 255, 130),
+         minHsvColor: new MCvScalar(40, 150, 100),
+         maxHsvColor: new MCvScalar(80, 255, 255)
+     );
+
         // TimeSlicing Properties
         private int LastTime = DateTime.Now.Millisecond;
         private DateTime LastDateTime = DateTime.Now;
@@ -80,7 +85,8 @@ namespace EWU_TEALS_Draw
             SetupVideoCapture();
             
             Mat color_image = VideoCapture.QueryFrame();
-            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange);
+            ColorRange[] colorRangesToDetect = new ColorRange[] { BlueColorRange, GreenColorRange};
+            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, colorRangesToDetect);
 
             Application.Idle += ProcessFrame;
         }
