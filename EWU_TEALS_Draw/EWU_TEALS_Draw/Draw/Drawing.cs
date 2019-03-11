@@ -90,9 +90,9 @@ namespace EwuTeals.Draw {
                             lastPoint = relativePoint;
                         };
                     }
-                    imageBox.Refresh();
                 }
             }
+            imageBox.Refresh();
         }
 
         // Misc methods
