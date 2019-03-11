@@ -39,7 +39,7 @@ namespace EWU_TEALS_Draw
         private const int DisplayedCameraHeight = ActualCameraHeight / 4;
 
         private const int CanvasWidth = DisplayedCameraWidth * 2;
-        private const int CanvasHeight = DisplayedCameraHeight * 2;
+        private const int CanvasHeight = DisplayedCameraHeight * 3;
 
         // Thresholding Properties
         private static readonly ColorRange DefaultColorRange = new ColorRange(

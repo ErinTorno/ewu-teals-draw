@@ -43,8 +43,8 @@
             // 
             // ImageBox_VideoCapture
             // 
-            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(19, 20);
-            this.ImageBox_VideoCapture.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(676, 9);
+            this.ImageBox_VideoCapture.Margin = new System.Windows.Forms.Padding(8);
             this.ImageBox_VideoCapture.Name = "ImageBox_VideoCapture";
             this.ImageBox_VideoCapture.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_VideoCapture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -53,8 +53,8 @@
             // 
             // ImageBox_VideoCapture_Gray
             // 
-            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(375, 20);
-            this.ImageBox_VideoCapture_Gray.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(676, 231);
+            this.ImageBox_VideoCapture_Gray.Margin = new System.Windows.Forms.Padding(8);
             this.ImageBox_VideoCapture_Gray.Name = "ImageBox_VideoCapture_Gray";
             this.ImageBox_VideoCapture_Gray.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_VideoCapture_Gray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -63,8 +63,8 @@
             // 
             // ImageBox_Drawing
             // 
-            this.ImageBox_Drawing.Location = new System.Drawing.Point(44, 232);
-            this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.ImageBox_Drawing.Location = new System.Drawing.Point(19, 9);
+            this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(8);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
             this.ImageBox_Drawing.Size = new System.Drawing.Size(320, 180);
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -73,7 +73,7 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(760, 30);
+            this.btnPlay.Location = new System.Drawing.Point(676, 444);
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(75, 23);
             this.btnPlay.TabIndex = 4;
@@ -83,7 +83,7 @@
             // 
             // btnPause
             // 
-            this.btnPause.Location = new System.Drawing.Point(760, 71);
+            this.btnPause.Location = new System.Drawing.Point(757, 444);
             this.btnPause.Name = "btnPause";
             this.btnPause.Size = new System.Drawing.Size(75, 23);
             this.btnPause.TabIndex = 5;
@@ -93,7 +93,7 @@
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(760, 113);
+            this.btnReset.Location = new System.Drawing.Point(838, 444);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 6;
@@ -103,7 +103,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(760, 154);
+            this.btnExit.Location = new System.Drawing.Point(921, 444);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(75, 23);
             this.btnExit.TabIndex = 7;
@@ -116,7 +116,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(915, 609);
+            this.ClientSize = new System.Drawing.Size(1026, 609);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnPause);
@@ -124,7 +124,7 @@
             this.Controls.Add(this.ImageBox_Drawing);
             this.Controls.Add(this.ImageBox_VideoCapture_Gray);
             this.Controls.Add(this.ImageBox_VideoCapture);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MainForm";
             this.Padding = new System.Windows.Forms.Padding(11, 12, 11, 12);
             this.Text = "EWU TEALS Draw";
