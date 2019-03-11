@@ -23,10 +23,9 @@ namespace EWU_TEALS_Draw
     {
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
-        public CascadeClassifier CascadeClassifier = null;
         private Point LastHandPosition;
 
-        private Drawing drawing = new Drawing(1280, 720, FPS);
+        private Drawing drawing = new Drawing(ActualCameraWidth, ActualCameraHeight, FPS);
         private ColorDetector colorDetector;
 
         // Resolution Properties
@@ -42,22 +41,16 @@ namespace EWU_TEALS_Draw
         private const int CanvasHeight = DisplayedCameraHeight * 3;
 
         // Thresholding Properties
-        private static readonly ColorRange BlueColorRange = new ColorRange(
+        private static readonly ColorRange DefaultColorRange = new ColorRange(
             inkColor: new MCvScalar(255, 135, 135),
             minHsvColor: new MCvScalar(100, 150, 100),
             maxHsvColor: new MCvScalar(135, 255, 255)
         );
-
-        private static readonly ColorRange GreenColorRange = new ColorRange(
-         inkColor: new MCvScalar(120, 255, 130),
-         minHsvColor: new MCvScalar(40, 150, 100),
-         maxHsvColor: new MCvScalar(80, 255, 255)
-     );
-
-        // TimeSlicing Properties
-        private int LastTime = DateTime.Now.Millisecond;
-        private DateTime LastDateTime = DateTime.Now;
-
+        private static readonly ColorRange DefaultColorRangeGreen = new ColorRange(
+            inkColor: new MCvScalar(135, 230, 135),
+            minHsvColor: new MCvScalar(65, 75, 100),
+            maxHsvColor: new MCvScalar(85, 255, 255)
+        );
 
         public MainForm()
         {
@@ -69,11 +62,6 @@ namespace EWU_TEALS_Draw
         private void Startup()
         {
             Disposables = new List<IDisposable>();
-            
-            CascadeClassifier = new CascadeClassifier(@"../../HaarCascades/haarcascade_lefteye_2splits.xml");
-
-            Disposables.Add(CascadeClassifier);
-
             ImageBox_VideoCapture_Gray.Image = new Image<Bgr, byte>(DisplayedCameraWidth, DisplayedCameraHeight, new Bgr(255, 255, 255));
 
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
@@ -85,8 +73,7 @@ namespace EWU_TEALS_Draw
             SetupVideoCapture();
             
             Mat color_image = VideoCapture.QueryFrame();
-            ColorRange[] colorRangesToDetect = new ColorRange[] { BlueColorRange, GreenColorRange};
-            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, colorRangesToDetect);
+            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange, DefaultColorRangeGreen);
 
             Application.Idle += ProcessFrame;
         }
@@ -133,81 +120,11 @@ namespace EWU_TEALS_Draw
             return point;
         }
 
-        [Obsolete("This works for a previous version, where new changes to the canvas might prevent it from working properly")]
-        private void DetectHand(Mat inputImage)
-        {
-            //color_image._EqualizeHist();
-            //color_image._GammaCorrect(1.2d);
-            var gray_image = GetGrayImage(inputImage);
-
-            Rectangle[] hands = CascadeClassifier.DetectMultiScale(gray_image);
-            Point handCenter = new Point();
-            if (hands.Length > 0)
-            {
-                foreach (Rectangle hand in hands)
-                {
-                    CvInvoke.Rectangle(gray_image, hand, new MCvScalar(240, 140, 0), 2);
-                    handCenter.X = hand.X + (hand.Width / 2);
-                    handCenter.Y = hand.Y + (hand.Height / 2);
-                    //CvInvoke.Circle(gray_image, handCenter, 4, new MCvScalar(255,255,255),2);
-
-                    // Draw center on drawing
-                    //drawing.AddPoint(ImageBox_VideoCapture, handCenter.X, handCenter.Y); // Draw with Drawing.cs
-
-                    //handCenter.X = ImageBox_Drawing.Width - handCenter.X * 2; // scale to drawing size
-                    //handCenter.Y = handCenter.Y * 2;
-                    //CvInvoke.Circle(ImageBox_Drawing.Image, handCenter, 4, new MCvScalar(240,140,0), 2);
-
-                    // Draw without Drawing.cs:
-                    handCenter = ScaleToCanvas(handCenter);
-                    MCvScalar color = new MCvScalar(240, 140, 0);
-                    DrawPoint(handCenter, color);
-                }
-            }
-            else if (hands.Length == 0)
-            {
-                LastHandPosition.X = 0;
-                LastHandPosition.Y = 0;
-            }
-            
-            
-            ImageBox_VideoCapture_Gray.Image = gray_image;
-            ImageBox_Drawing.Refresh();
-            ImageBox_VideoCapture.Image = inputImage;
-        }
-
-        private void DrawPoint(Point point, MCvScalar color)
-        {
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0)
-            {
-                CvInvoke.Circle(ImageBox_Drawing.Image, point, 5, color, -1); // -1 indicates filled circle
-                ImageBox_Drawing.Refresh();
-            }
-
-            LastHandPosition = new Point(point.X, point.Y);
-        }
-
         private IImage GetGrayImage(Mat color_image)
         {
             var image = new Image<Gray, byte>(color_image.Bitmap);
 
             return image;
-        }
-
-        private void DrawLine(Point point1, Point point2, MCvScalar color)
-        {   
-            CvInvoke.Line(ImageBox_VideoCapture_Gray.Image, point1, point2, color, 10, LineType.AntiAlias);
-            ImageBox_VideoCapture_Gray.Refresh();
-        }
-
-        private List<Point> GetPoints()
-        {
-            // Logic to determine the points from hand movement...
-
-            List<Point> points = new List<Point>();
-            points.Add(new Point(50, 50));
-            points.Add(new Point(100, 300));
-            return points;
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -256,81 +173,5 @@ namespace EWU_TEALS_Draw
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             drawing.Reset();
         }
-
-        /*
-        private bool NextTimeSlice()
-        {
-            double FPS = 30;
-            // 30FPS has a frame length of 1s/ 30 * 1000 ms
-            int frameLength = (int)((1.0 / FPS) * 1000);
-
-            NowDateTime = DateTime.Now;
-
-            TimeSpan timeSpan = NowDateTime - LastDateTime;
-            int msPassed = timeSpan.Seconds * 1000 + timeSpan.Milliseconds;
-
-            if (msPassed < frameLength) return false;
-            else
-            {
-                LastDateTime = DateTime.Now;
-                //MessageBox.Show("NextTimeSlice");
-                return true;
-            }
-        }
-        */
-        /*
-        private bool NextTimeSlice()
-        {
-            Now = DateTime.Now.Millisecond;
-
-            double FPS = 30;
-            // 30FPS has a frame length of 1s/ 30 * 1000 ms
-            int frameLength = (int)((1.0/FPS) * 1000);
-
-            int msPassed;
-            if (Now > LastTime)
-            {
-                msPassed = Now - LastTime;
-            }
-            else
-            {
-                msPassed = 1000 - LastTime + Now;
-            }
-            
-
-
-
-            if (msPassed < frameLength) return false;
-            else
-            {
-                LastTime = Now;
-                //MessageBox.Show("NextTimeSlice");
-                return true;
-            }
-
-        }
-        */
-
-        //
-        /*
-        // pre-using
-        private void ProcessFrame(object sender, EventArgs e)
-        {
-            if (VideoCapture != null)
-            {
-                ImageBox_VideoCapture.Image = VideoCapture.QueryFrame();
-                
-                MCvScalar color = GetColor();
-                List<Point> points = GetPoints();
-
-                DrawLine(points[0], points[1], color);
-
-                //DrawContours();
-                //OutlineHand();
-
-                ImageBox_VideoCapture.Image.Dispose();
-            }
-        }
-        */
     }
 }

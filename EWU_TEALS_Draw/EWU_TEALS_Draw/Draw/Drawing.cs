@@ -20,8 +20,13 @@ namespace EwuTeals.Draw {
         // the minimum and maximum widths, relative to total page width, of the thickness of the line
         private const double MinLineWidthPercent = 0.005, MaxLineWidthPercent = 0.015;
 
+        // after 15 ticks (at 30 ms) of not seeing the color, we decide that the next time we see it, it'll be the start of a new line
+        private const int UpdatesToStartNew = 15;
+
         private Dictionary<MCvScalar, List<Line>> lineMap = new Dictionary<MCvScalar, List<Line>>();
+        private Dictionary<MCvScalar, int> lastTick = new Dictionary<MCvScalar, int>();
         private Line LatestLine(MCvScalar color) { return lineMap[color].Last(); }
+        private int ticks = 0;
 
         public int RefreshRate { get; private set; }
         public int Width { get; private set; }
@@ -34,14 +39,17 @@ namespace EwuTeals.Draw {
         }
 
         public void AddPoint(ImageBox image, MCvScalar color, int x, int y) {
-            if (!lineMap.ContainsKey(color))
-                lineMap.Add(color, new List<List<WPoint>>());
+            if (!lineMap.ContainsKey(color)) {
+                lineMap[color] = new List<List<WPoint>>();
+                lastTick[color] = ticks;
+            }
 
             var lines = lineMap[color];
             // ensure there is a line currently being worked on
-            if (lines.Count == 0) {
+            if (lines.Count == 0 || ticks - lastTick[color] >= UpdatesToStartNew) {
                 // we'll change this later to take colors, but for now we won't deal with that
                 lines.Add(new List<WPoint>());
+                lastTick[color] = ticks;
             }
             var last = LatestLine(color);
 
@@ -59,6 +67,7 @@ namespace EwuTeals.Draw {
         /// </summary>
         /// <param name="imageBox">The canvas to be drawn to</param>
         public void Update(ImageBox imageBox) {
+            ++ticks;
             var image = imageBox.Image;
             foreach (var pair in lineMap) {
                 var color = pair.Key;
