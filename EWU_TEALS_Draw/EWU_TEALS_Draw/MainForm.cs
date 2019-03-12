@@ -104,6 +104,7 @@ namespace EWU_TEALS_Draw
 
                 // The canvases are checked for each color that the detect has been told, and then those points are added to the drawing
                 colorDetector.UpdateDrawing(flippedVideoFrame, drawing);
+                var c = colorDetector;
                 ImageBox_VideoCapture_Gray.Image = colorDetector.ThreshImage;
                 drawing.Update(ImageBox_Drawing);
             }

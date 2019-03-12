@@ -34,6 +34,8 @@ namespace EwuTeals.Draw {
         }
 
         public void UpdateDrawing(Mat input, Drawing drawing) {
+            Mat allPoints = null; // = new Mat(input.Size, DepthType.Cv8U, 1);
+
             foreach (var c in detectedColors) {
                 CvInvoke.CvtColor(input, hsvImage, ColorConversion.Bgr2Hsv);
 
@@ -42,7 +44,14 @@ namespace EwuTeals.Draw {
 
                 // Find average of white pixels
                 Mat points = new Mat(input.Size, DepthType.Cv8U, 1);
+                Mat combined = new Mat();
                 CvInvoke.FindNonZero(ThreshImage, points);
+                if (allPoints == null)
+                    allPoints = ThreshImage;
+                else {
+                    CvInvoke.Add(allPoints, ThreshImage, combined);
+                    allPoints = combined;
+                }
 
                 // An alternative approach to averaging would be to use the K-means 
                 // algorithm to find clusters, since average is significantly influenced by outliers.
@@ -60,6 +69,8 @@ namespace EwuTeals.Draw {
 
                 drawing.Update(CanvasBox);
             }
+
+            ThreshImage = allPoints;
         }
     }
 }
