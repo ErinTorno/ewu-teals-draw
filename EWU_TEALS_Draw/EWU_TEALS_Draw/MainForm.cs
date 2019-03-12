@@ -23,7 +23,7 @@ namespace EWU_TEALS_Draw
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
         public CascadeClassifier CascadeClassifier = null;
-        private Point LastHandPosition;
+        
         private Drawing drawing = new Drawing(1280, 720);
 
 
@@ -36,15 +36,24 @@ namespace EWU_TEALS_Draw
         private const int DisplayedCameraWidth = ActualCameraWidth / 4;
         private const int DisplayedCameraHeight = ActualCameraHeight / 4;
 
-        private const int CanvasWidth = DisplayedCameraWidth * 2;
-        private const int CanvasHeight = DisplayedCameraHeight * 2;
+        private const int CanvasWidth = DisplayedCameraWidth * 3;
+        private const int CanvasHeight = DisplayedCameraHeight * 3;
 
 
-        
+
 
         // Thresholding Properties
-        private IInputArray HsvThreshMin = new ScalarArray(new MCvScalar(100, 150, 100)); // Blue min
-        private IInputArray HsvThreshMax = new ScalarArray(new MCvScalar(135, 255, 255)); // Blue max
+        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(100, 150, 100)); // Blue min
+        private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(135, 255, 255)); // Blue max
+        private MCvScalar BlueDrawColor = new MCvScalar(255, 135, 135); // Blue draw
+        private Point BlueLastPosition;
+       
+
+        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(65, 75, 100)); // Green min
+        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(85, 255, 255)); // Green max
+        private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135); // Green draw
+        private Point GreenLastPosition;
+
         private Mat Hsv_image;
         private Mat ThreshLow_image;
         private Mat ThreshHigh_image;
@@ -61,7 +70,7 @@ namespace EWU_TEALS_Draw
         public MainForm()
         {
             InitializeComponent();
-
+            this.WindowState = FormWindowState.Maximized;
             Startup();
         }
 
@@ -114,10 +123,15 @@ namespace EWU_TEALS_Draw
             {
                 Mat flippedVideoFrame = FlipImage(VideoCapture.QueryFrame());
                 ImageBox_VideoCapture.Image = flippedVideoFrame;
-                
 
-                DetectColor(flippedVideoFrame);
-                //DetectHand(flippedVideoFrame);   
+
+                Mat blueThreshImage = DetectColor(flippedVideoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
+                Mat greenThreshImage = DetectColor(flippedVideoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
+
+                Mat combinedImage = new Mat();
+                CvInvoke.Add(blueThreshImage, greenThreshImage, combinedImage);
+                ImageBox_VideoCapture_Gray.Image = combinedImage;
+                //ImageBox_VideoCapture_Gray.Image = blueThreshImage;
             }
         }
 
@@ -128,57 +142,85 @@ namespace EWU_TEALS_Draw
             return flippedImage;
         }
 
-        private void DetectColor(Mat inputImage)
+        private Mat DetectColor(Mat inputImage, IInputArray hsvThreshMin, IInputArray hsvThreshMax, MCvScalar drawColor, Point thisColorLastPosition, string color)
         {
-            CvInvoke.CvtColor(inputImage, Hsv_image, ColorConversion.Bgr2Hsv);
-            
+            Mat hsvImage = new Mat();
+            Mat threshImage = new Mat();
+
+            CvInvoke.CvtColor(inputImage, hsvImage, ColorConversion.Bgr2Hsv);
+
             // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
-            CvInvoke.InRange(Hsv_image, HsvThreshMin, HsvThreshMax, Thresh_image);
+            CvInvoke.InRange(hsvImage, hsvThreshMin, hsvThreshMax, threshImage);
 
             // Find average of white pixels
             Mat points = new Mat(inputImage.Size, DepthType.Cv8U, 1);
-            CvInvoke.FindNonZero(Thresh_image, points);
+            CvInvoke.FindNonZero(threshImage, points);
 
             // An alternative approach to averaging would be to use the K-means 
             // algorithm to find clusters, since average is significantly influenced by outliers.
             MCvScalar avg = CvInvoke.Mean(points);
             Point avgPoint = new Point((int)avg.V0, (int)avg.V1);
 
-            int sumWhitePixels = CvInvoke.CountNonZero(Thresh_image);
+            int sumWhitePixels = CvInvoke.CountNonZero(threshImage);
 
             // Now we check if there are more than x pixels of detected color, since we don't want to draw
             // if all we detect is noise.
             if (sumWhitePixels > 100)
             {
                 // Draw circle on camera feed
-                CvInvoke.Circle(inputImage, avgPoint, 5, new MCvScalar(0, 10, 220), 2);
+                CvInvoke.Circle(inputImage, avgPoint, 5, drawColor, 2);
 
                 // Draw on canvas
                 avgPoint = ScaleToCanvas(avgPoint);
-                MCvScalar color = GetColorBySpeed(avgPoint);
-                DrawLineTo(avgPoint, color);
+                //MCvScalar color = GetColorBySpeed(avgPoint);
+
+                int width = GetWidthBySpeed(thisColorLastPosition, avgPoint);
+                DrawLineTo(avgPoint, drawColor, thisColorLastPosition, width);
+
+                switch (color)
+                {
+                    case "Blue":
+                        BlueLastPosition.X = avgPoint.X;
+                        BlueLastPosition.Y = avgPoint.Y;
+                        break;
+
+                    case "Green":
+                        GreenLastPosition.X = avgPoint.X;
+                        GreenLastPosition.Y = avgPoint.Y;
+                        break;
+                }
             }
             // If not enough pixels to count as an object, reset LastHandPosition to 0 so it will be 
             // updated when we do find it.
             else
             {
-                LastHandPosition.X = 0;
-                LastHandPosition.Y = 0;
+                switch (color)
+                {
+                    case "Blue":
+                        BlueLastPosition.X = 0;
+                        BlueLastPosition.Y = 0;
+                        break;
+
+                    case "Green":
+                        GreenLastPosition.X = 0;
+                        GreenLastPosition.Y = 0;
+                        break;
+                }
             }
 
-            ImageBox_VideoCapture_Gray.Image = Thresh_image;
+            return threshImage;
         }
 
         private MCvScalar GetColorBySpeed(Point canvasScaledPoint)
         {
             MCvScalar color = new MCvScalar(255, 255, 255);
 
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0) // We are moving
+            if (BlueLastPosition.X != 0 && BlueLastPosition.Y != 0) // We are moving
             {
                 int maxIntensity = 255;
 
-                int dx = canvasScaledPoint.X - LastHandPosition.X;
-                int dy = canvasScaledPoint.Y - LastHandPosition.Y;
+                int dx = canvasScaledPoint.X - BlueLastPosition.X;
+                int dy = canvasScaledPoint.Y - BlueLastPosition.Y;
                 double travelDistance = Math.Sqrt(dx * dx + dy * dy);
 
                 double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/ms
@@ -230,6 +272,23 @@ namespace EWU_TEALS_Draw
             return color;
         }
 
+        private int GetWidthBySpeed(Point colorLastPosition, Point colorDestination)
+        {
+            int dx = colorDestination.X - colorLastPosition.X;
+            int dy = colorDestination.Y - colorLastPosition.Y;
+
+            double travelDistance = Math.Sqrt(dx * dx + dy * dy);
+            double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/frame length in ms
+            double maxAssumedSpeed = 1; // found this number through testing...
+            double speedRatio = speed / maxAssumedSpeed;
+
+            if (speedRatio > 1.0) speedRatio = 1.0;
+            int maxWidth = 25;
+            int strokeWidth = (int)Math.Round(speedRatio * maxWidth);
+
+            return strokeWidth;
+        }
+
         private Point ScaleToCanvas(Point point)
         {
             double widthMultiplier = (CanvasWidth * 1.0) / DisplayedCameraWidth;
@@ -241,15 +300,14 @@ namespace EWU_TEALS_Draw
             return point;
         }
 
-        private void DrawLineTo(Point point, MCvScalar color)
+        private void DrawLineTo(Point point, MCvScalar color, Point thisColorLastPosition, int strokeWidth)
         {
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0)
+            if (strokeWidth <= 0) strokeWidth = 1;
+            if (thisColorLastPosition.X != 0 && thisColorLastPosition.Y != 0)
             {
-                CvInvoke.Line(ImageBox_Drawing.Image, LastHandPosition, point, color, 8, LineType.AntiAlias);
+                CvInvoke.Line(ImageBox_Drawing.Image, thisColorLastPosition, point, color, strokeWidth, LineType.AntiAlias);
                 ImageBox_Drawing.Refresh();
             }
-
-            LastHandPosition = new Point(point.X, point.Y);
         }
 
         private void DetectHand(Mat inputImage)
@@ -284,8 +342,8 @@ namespace EWU_TEALS_Draw
             }
             else if (hands.Length == 0)
             {
-                LastHandPosition.X = 0;
-                LastHandPosition.Y = 0;
+                BlueLastPosition.X = 0;
+                BlueLastPosition.Y = 0;
             }
             
 
@@ -297,13 +355,13 @@ namespace EWU_TEALS_Draw
 
         private void DrawPoint(Point point, MCvScalar color)
         {
-            if (LastHandPosition.X != 0 && LastHandPosition.Y != 0)
+            if (BlueLastPosition.X != 0 && BlueLastPosition.Y != 0)
             {
                 CvInvoke.Circle(ImageBox_Drawing.Image, point, 5, color, -1); // -1 indicates filled circle
                 ImageBox_Drawing.Refresh();
             }
 
-            LastHandPosition = new Point(point.X, point.Y);
+            BlueLastPosition = new Point(point.X, point.Y);
         }
 
         private IImage GetGrayImage(Mat color_image)
@@ -317,24 +375,6 @@ namespace EWU_TEALS_Draw
         {   
             CvInvoke.Line(ImageBox_VideoCapture_Gray.Image, point1, point2, color, 10, LineType.AntiAlias);
             ImageBox_VideoCapture_Gray.Refresh();
-        }
-
-        private MCvScalar GetColor()
-        {
-            // Logic to determine what color to draw with...
-
-            // MCvScalar is a Color object, that takes rgb values but in the order of bgr !!!!!!
-            return new MCvScalar(125, 125, 200);
-        }
-
-        private List<Point> GetPoints()
-        {
-            // Logic to determine the points from hand movement...
-
-            List<Point> points = new List<Point>();
-            points.Add(new Point(50, 50));
-            points.Add(new Point(100, 300));
-            return points;
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -364,9 +404,8 @@ namespace EWU_TEALS_Draw
         {
             Application.Idle -= ProcessFrame;
             ImageBox_VideoCapture_Gray.Image = new Image<Bgr, byte>(DisplayedCameraWidth, DisplayedCameraHeight, new Bgr(255, 255, 255));
-            LastHandPosition.X = 0;
-            LastHandPosition.Y = 0;
-
+            BlueLastPosition.X = 0;
+            BlueLastPosition.Y = 0;
         }
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -383,81 +422,5 @@ namespace EWU_TEALS_Draw
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
 
         }
-
-        /*
-        private bool NextTimeSlice()
-        {
-            double FPS = 30;
-            // 30FPS has a frame length of 1s/ 30 * 1000 ms
-            int frameLength = (int)((1.0 / FPS) * 1000);
-
-            NowDateTime = DateTime.Now;
-
-            TimeSpan timeSpan = NowDateTime - LastDateTime;
-            int msPassed = timeSpan.Seconds * 1000 + timeSpan.Milliseconds;
-
-            if (msPassed < frameLength) return false;
-            else
-            {
-                LastDateTime = DateTime.Now;
-                //MessageBox.Show("NextTimeSlice");
-                return true;
-            }
-        }
-        */
-        /*
-        private bool NextTimeSlice()
-        {
-            Now = DateTime.Now.Millisecond;
-
-            double FPS = 30;
-            // 30FPS has a frame length of 1s/ 30 * 1000 ms
-            int frameLength = (int)((1.0/FPS) * 1000);
-
-            int msPassed;
-            if (Now > LastTime)
-            {
-                msPassed = Now - LastTime;
-            }
-            else
-            {
-                msPassed = 1000 - LastTime + Now;
-            }
-            
-
-
-
-            if (msPassed < frameLength) return false;
-            else
-            {
-                LastTime = Now;
-                //MessageBox.Show("NextTimeSlice");
-                return true;
-            }
-
-        }
-        */
-
-        //
-        /*
-        // pre-using
-        private void ProcessFrame(object sender, EventArgs e)
-        {
-            if (VideoCapture != null)
-            {
-                ImageBox_VideoCapture.Image = VideoCapture.QueryFrame();
-                
-                MCvScalar color = GetColor();
-                List<Point> points = GetPoints();
-
-                DrawLine(points[0], points[1], color);
-
-                //DrawContours();
-                //OutlineHand();
-
-                ImageBox_VideoCapture.Image.Dispose();
-            }
-        }
-        */
     }
 }
