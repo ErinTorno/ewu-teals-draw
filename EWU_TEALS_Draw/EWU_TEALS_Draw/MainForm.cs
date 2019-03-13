@@ -37,15 +37,45 @@ namespace EWU_TEALS_Draw
         #endregion
 
         #region Color Threshold Properties
-        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(100, 150, 100)); // Blue min
-        private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(135, 255, 255)); // Blue max
-        private MCvScalar BlueDrawColor = new MCvScalar(255, 135, 135); // Blue draw
+        // Blue
+        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(100, 150, 65)); // Blue min
+        private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(117, 255, 255)); // Blue max
+        private MCvScalar BlueDrawColor = new MCvScalar(255, 140, 85); // Blue draw color
         private Point BlueLastPosition;
 
-        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(65, 75, 100)); // Green min
-        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(85, 255, 255)); // Green max
-        private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135); // Green draw
+        // Green
+        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(50, 100, 50));
+        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(80, 255, 255));
+        private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135);
         private Point GreenLastPosition;
+
+        // Yellow
+        private IInputArray YellowHsvMin = new ScalarArray(new MCvScalar(25, 150, 65));
+        private IInputArray YellowHsvMax = new ScalarArray(new MCvScalar(35, 255, 255));
+        private MCvScalar YellowDrawColor = new MCvScalar(100, 240, 240);
+        private Point YellowLastPosition;
+
+        // Orange
+        private IInputArray OrangeHsvMin = new ScalarArray(new MCvScalar(12, 175, 65));
+        private IInputArray OrangeHsvMax = new ScalarArray(new MCvScalar(18, 255, 255));
+        private MCvScalar OrangeDrawColor = new MCvScalar(60, 140, 255);
+        private Point OrangeLastPosition;
+
+        // Purple
+        private IInputArray PurpleHsvMin = new ScalarArray(new MCvScalar(125, 100, 100));
+        private IInputArray PurpleHsvMax = new ScalarArray(new MCvScalar(140, 255, 255));
+        private MCvScalar PurpleDrawColor = new MCvScalar(255, 135, 135);
+        private Point PurpleLastPosition;
+
+        // Red Lower Threshold
+        private IInputArray RedHsvMin_Low = new ScalarArray(new MCvScalar(0, 175, 45));
+        private IInputArray RedHsvMax_Low = new ScalarArray(new MCvScalar(5, 255, 255));
+        // Red Upper Threshold
+        private IInputArray RedHsvMin_High = new ScalarArray(new MCvScalar(170, 175, 45));
+        private IInputArray RedHsvMax_High = new ScalarArray(new MCvScalar(180, 255, 255));
+
+        private MCvScalar RedDrawColor = new MCvScalar(60, 60, 230);
+        private Point RedLastPosition;
         #endregion
 
         public MainForm()
@@ -83,9 +113,20 @@ namespace EWU_TEALS_Draw
 
                 Mat blueThreshImage = DetectColor(flippedVideoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
                 Mat greenThreshImage = DetectColor(flippedVideoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
+                Mat yellowThreshImage = DetectColor(flippedVideoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
+                Mat orangeThreshImage = DetectColor(flippedVideoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
+                Mat purpleThreshImage = DetectColor(flippedVideoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
+                Mat redThreshImage_Low = DetectColor(flippedVideoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
+                Mat redThreshImage_High = DetectColor(flippedVideoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
 
                 Mat combinedImage = new Mat();
                 CvInvoke.Add(blueThreshImage, greenThreshImage, combinedImage);
+                CvInvoke.Add(yellowThreshImage, combinedImage, combinedImage);
+                CvInvoke.Add(orangeThreshImage, combinedImage, combinedImage);
+                CvInvoke.Add(purpleThreshImage, combinedImage, combinedImage);
+                CvInvoke.Add(redThreshImage_Low, combinedImage, combinedImage);
+                CvInvoke.Add(redThreshImage_High, combinedImage, combinedImage);
+
                 ImageBox_VideoCapture_Gray.Image = combinedImage;
             }
         }
@@ -124,38 +165,52 @@ namespace EWU_TEALS_Draw
                 int width = GetWidthBySpeed(thisColorLastPosition, avgPoint);
                 DrawLineTo(avgPoint, drawColor, thisColorLastPosition, width);
 
-                switch (color)
-                {
-                    case "Blue":
-                        BlueLastPosition.X = avgPoint.X;
-                        BlueLastPosition.Y = avgPoint.Y;
-                        break;
-
-                    case "Green":
-                        GreenLastPosition.X = avgPoint.X;
-                        GreenLastPosition.Y = avgPoint.Y;
-                        break;
-                }
+                UpdateColorLastPosition(color, avgPoint);
             }
             // If not enough pixels to count as an object, reset lastColorPosition to 0 so it will be 
             // updated when we do find it.
             else
             {
-                switch (color)
-                {
-                    case "Blue":
-                        BlueLastPosition.X = 0;
-                        BlueLastPosition.Y = 0;
-                        break;
-
-                    case "Green":
-                        GreenLastPosition.X = 0;
-                        GreenLastPosition.Y = 0;
-                        break;
-                }
+                UpdateColorLastPosition(color, new Point(0, 0));
             }
 
             return threshImage;
+        }
+
+        private void UpdateColorLastPosition(string color, Point currentPosition)
+        {
+            switch (color)
+            {
+                case "Blue":
+                    BlueLastPosition.X = currentPosition.X;
+                    BlueLastPosition.Y = currentPosition.Y;
+                    break;
+
+                case "Green":
+                    GreenLastPosition.X = currentPosition.X;
+                    GreenLastPosition.Y = currentPosition.Y;
+                    break;
+
+                case "Yellow":
+                    YellowLastPosition.X = currentPosition.X;
+                    YellowLastPosition.Y = currentPosition.Y;
+                    break;
+
+                case "Orange":
+                    OrangeLastPosition.X = currentPosition.X;
+                    OrangeLastPosition.Y = currentPosition.Y;
+                    break;
+
+                case "Purple":
+                    PurpleLastPosition.X = currentPosition.X;
+                    PurpleLastPosition.Y = currentPosition.Y;
+                    break;
+
+                case "Red":
+                    RedLastPosition.X = currentPosition.X;
+                    RedLastPosition.Y = currentPosition.Y;
+                    break;
+            }
         }
 
         private MCvScalar GetColorBySpeed(Point canvasScaledPoint)
