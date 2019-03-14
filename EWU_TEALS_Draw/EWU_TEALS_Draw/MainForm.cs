@@ -106,7 +106,6 @@ namespace EWU_TEALS_Draw
                 colorDetector.UpdateDrawing(flippedVideoFrame, drawing);
                 var c = colorDetector;
                 ImageBox_VideoCapture_Gray.Image = colorDetector.ThreshImage;
-                drawing.Update(ImageBox_Drawing);
             }
         }
 

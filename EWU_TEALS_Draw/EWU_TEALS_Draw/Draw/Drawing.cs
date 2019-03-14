@@ -88,7 +88,6 @@ namespace EwuTeals.Draw {
                             // it will throw an exception if by change width is rounded down to 0
                             var width = (int)relativePoint.Width == 0 ? 1 : (int)relativePoint.Width;
                             CvInvoke.Line(image, lastPoint.ToStandardPoint(), relativePoint.ToStandardPoint(), color, width, LineType.AntiAlias);
-                            //CvInvoke.Circle(image, relativePoint.ToStandardPoint(), radius: (int)(CircleScale * avgScale), color: line.Color);
                             lastPoint = relativePoint;
                         };
                     }

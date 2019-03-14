@@ -34,7 +34,7 @@ namespace EwuTeals.Draw {
         }
 
         public void UpdateDrawing(Mat input, Drawing drawing) {
-            Mat allPoints = null; // = new Mat(input.Size, DepthType.Cv8U, 1);
+            Mat allPoints = null;
 
             foreach (var c in detectedColors) {
                 CvInvoke.CvtColor(input, hsvImage, ColorConversion.Bgr2Hsv);
@@ -43,6 +43,9 @@ namespace EwuTeals.Draw {
                 CvInvoke.InRange(hsvImage, new ScalarArray(c.MinHsvColor), new ScalarArray(c.MaxHsvColor), ThreshImage);
 
                 // Find average of white pixels
+
+                // These two matrices are the next things to be looked at for optimization
+                // Is there a way to reuse them? The size doesn't change, maybe we can just clear them
                 Mat points = new Mat(input.Size, DepthType.Cv8U, 1);
                 Mat combined = new Mat();
                 CvInvoke.FindNonZero(ThreshImage, points);
@@ -66,11 +69,10 @@ namespace EwuTeals.Draw {
                     // Draw on canvas
                     drawing.AddPoint(VideoSource, c.InkColor, avgPoint.X, avgPoint.Y);
                 }
-
-                drawing.Update(CanvasBox);
             }
 
             ThreshImage = allPoints;
+            drawing.Update(CanvasBox);
         }
     }
 }
