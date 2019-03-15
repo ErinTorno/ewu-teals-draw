@@ -213,65 +213,14 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private MCvScalar GetColorBySpeed(Point canvasScaledPoint)
+        private void DrawLineTo(Point point, MCvScalar color, Point thisColorLastPosition, int strokeWidth)
         {
-            MCvScalar color = new MCvScalar(255, 255, 255);
-
-            if (BlueLastPosition.X != 0 && BlueLastPosition.Y != 0) // We are moving
+            if (strokeWidth <= 0) strokeWidth = 1;
+            if (thisColorLastPosition.X != 0 && thisColorLastPosition.Y != 0)
             {
-                int maxIntensity = 255;
-
-                int dx = canvasScaledPoint.X - BlueLastPosition.X;
-                int dy = canvasScaledPoint.Y - BlueLastPosition.Y;
-                double travelDistance = Math.Sqrt(dx * dx + dy * dy);
-
-                double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/ms
-                int colorAllotment = (int)(speed * (maxIntensity * 3));
-
-                int r = 0;
-                int g = 0;
-                int b = 0;
-                if (colorAllotment <= (1 * maxIntensity)) // r:0, g:0, b:+
-                {
-                    b = colorAllotment;
-                }
-
-                else if (colorAllotment > (1 * maxIntensity) && colorAllotment <= (2 * maxIntensity)) // r:0, g:+, b:max
-                {
-                    b = maxIntensity;
-                    g = colorAllotment - maxIntensity;
-
-                }
-
-                else if (colorAllotment > (2 * maxIntensity) && colorAllotment <= (3 * maxIntensity)) // r:0, g:max, b:-
-                {
-                    g = maxIntensity;
-                    b = maxIntensity - (colorAllotment - maxIntensity);
-                }
-
-                else if (colorAllotment > (3 * maxIntensity) && colorAllotment <= (4 * maxIntensity)) // r:+, g:max, b:0
-                {
-                    g = maxIntensity;
-                    r = colorAllotment - maxIntensity;
-                }
-
-                else if (colorAllotment > (4 * maxIntensity) && colorAllotment <= (5 * maxIntensity)) // r:max, g:-, b:0
-                {
-                    r = maxIntensity;
-                    g = maxIntensity - (colorAllotment - maxIntensity);
-                }
-
-                else if (colorAllotment > 5)
-                {
-                    r = maxIntensity;
-                }
-
-                color.V0 = b;
-                color.V1 = g;
-                color.V2 = r;
+                CvInvoke.Line(ImageBox_Drawing.Image, thisColorLastPosition, point, color, strokeWidth, LineType.AntiAlias);
+                ImageBox_Drawing.Refresh();
             }
-
-            return color;
         }
 
         private int GetWidthBySpeed(Point colorLastPosition, Point colorDestination)
@@ -300,16 +249,6 @@ namespace EWU_TEALS_Draw
             point.Y = (int)(point.Y * heightMultiplier);
 
             return point;
-        }
-
-        private void DrawLineTo(Point point, MCvScalar color, Point thisColorLastPosition, int strokeWidth)
-        {
-            if (strokeWidth <= 0) strokeWidth = 1;
-            if (thisColorLastPosition.X != 0 && thisColorLastPosition.Y != 0)
-            {
-                CvInvoke.Line(ImageBox_Drawing.Image, thisColorLastPosition, point, color, strokeWidth, LineType.AntiAlias);
-                ImageBox_Drawing.Refresh();
-            }
         }
 
         private IImage GetGrayImage(Mat color_image)
@@ -369,7 +308,6 @@ namespace EWU_TEALS_Draw
         private void btnReset_Click(object sender, EventArgs e)
         {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-
         }
     }
 }
