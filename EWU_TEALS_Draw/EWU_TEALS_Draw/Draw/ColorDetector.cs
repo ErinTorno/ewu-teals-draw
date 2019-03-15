@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace EwuTeals.Draw {
     class ColorDetector {
         private List<ColorRange> detectedColors = new List<ColorRange>();
-        private Mat hsvImage;
+        private Mat hsvImage, points;
         public Mat ThreshImage { get; private set; }
         public ImageBox VideoSource { get; set; }
         public ImageBox CanvasBox { get; set; }
@@ -22,6 +22,7 @@ namespace EwuTeals.Draw {
             CanvasBox = canvas;
             foreach (var c in defColors) detectedColors.Add(c);
             hsvImage = new Mat(size, DepthType.Cv8U, 3);
+            points = new Mat(size, DepthType.Cv8U, 1);
             ThreshImage = new Mat(size, DepthType.Cv8U, 1);
         }
 
@@ -46,14 +47,11 @@ namespace EwuTeals.Draw {
 
                 // These two matrices are the next things to be looked at for optimization
                 // Is there a way to reuse them? The size doesn't change, maybe we can just clear them
-                Mat points = new Mat(input.Size, DepthType.Cv8U, 1);
-                Mat combined = new Mat();
                 CvInvoke.FindNonZero(ThreshImage, points);
                 if (allPoints == null)
                     allPoints = ThreshImage;
                 else {
-                    CvInvoke.Add(allPoints, ThreshImage, combined);
-                    allPoints = combined;
+                    CvInvoke.Add(allPoints, ThreshImage, allPoints);
                 }
 
                 // An alternative approach to averaging would be to use the K-means 
