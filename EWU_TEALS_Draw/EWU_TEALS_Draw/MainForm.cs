@@ -26,14 +26,14 @@ namespace EWU_TEALS_Draw
         #region Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
         private const int FPS = 30;
-        private const int ActualCameraWidth = 1280;
-        private const int ActualCameraHeight = 720;
+        private const int ActualCameraWidth = 1920;
+        private const int ActualCameraHeight = 1080;
 
-        private const int DisplayedCameraWidth = ActualCameraWidth / 4;
-        private const int DisplayedCameraHeight = ActualCameraHeight / 4;
+        private const int DisplayedCameraWidth = ActualCameraWidth / 8;
+        private const int DisplayedCameraHeight = ActualCameraHeight / 8;
 
-        private const int CanvasWidth = DisplayedCameraWidth * 3;
-        private const int CanvasHeight = DisplayedCameraHeight * 3;
+        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 4.7);
+        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 4.7);
         #endregion
 
         #region Color Threshold Properties
@@ -81,6 +81,8 @@ namespace EWU_TEALS_Draw
         public MainForm()
         {
             InitializeComponent();
+
+            FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
 
             Startup();

@@ -49,7 +49,8 @@
             // 
             // ImageBox_VideoCapture
             // 
-            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(0, 0);
+            this.ImageBox_VideoCapture.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ImageBox_VideoCapture.Location = new System.Drawing.Point(107, 0);
             this.ImageBox_VideoCapture.Margin = new System.Windows.Forms.Padding(0);
             this.ImageBox_VideoCapture.Name = "ImageBox_VideoCapture";
             this.ImageBox_VideoCapture.Size = new System.Drawing.Size(320, 180);
@@ -59,7 +60,8 @@
             // 
             // ImageBox_VideoCapture_Gray
             // 
-            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(0, 289);
+            this.ImageBox_VideoCapture_Gray.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ImageBox_VideoCapture_Gray.Location = new System.Drawing.Point(107, 289);
             this.ImageBox_VideoCapture_Gray.Margin = new System.Windows.Forms.Padding(0);
             this.ImageBox_VideoCapture_Gray.Name = "ImageBox_VideoCapture_Gray";
             this.ImageBox_VideoCapture_Gray.Size = new System.Drawing.Size(320, 180);
@@ -126,15 +128,15 @@
             this.tableLayout_Main.AutoScroll = true;
             this.tableLayout_Main.AutoSize = true;
             this.tableLayout_Main.ColumnCount = 2;
-            this.tableLayout_Main.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.32275F));
-            this.tableLayout_Main.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.67725F));
+            this.tableLayout_Main.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 71.42857F));
+            this.tableLayout_Main.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28.57143F));
             this.tableLayout_Main.Controls.Add(this.ImageBox_Drawing, 0, 0);
             this.tableLayout_Main.Controls.Add(this.tableLayout_VideoFeeds, 1, 0);
             this.tableLayout_Main.Location = new System.Drawing.Point(0, 0);
             this.tableLayout_Main.Name = "tableLayout_Main";
             this.tableLayout_Main.RowCount = 1;
             this.tableLayout_Main.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayout_Main.Size = new System.Drawing.Size(1890, 1080);
+            this.tableLayout_Main.Size = new System.Drawing.Size(1894, 1080);
             this.tableLayout_Main.TabIndex = 8;
             // 
             // tableLayout_VideoFeeds
@@ -144,18 +146,19 @@
             this.tableLayout_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture, 0, 0);
             this.tableLayout_VideoFeeds.Controls.Add(this.tableLayout_Buttons, 0, 2);
             this.tableLayout_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture_Gray, 0, 1);
-            this.tableLayout_VideoFeeds.Location = new System.Drawing.Point(972, 3);
+            this.tableLayout_VideoFeeds.Location = new System.Drawing.Point(1355, 3);
             this.tableLayout_VideoFeeds.MinimumSize = new System.Drawing.Size(450, 0);
             this.tableLayout_VideoFeeds.Name = "tableLayout_VideoFeeds";
             this.tableLayout_VideoFeeds.RowCount = 3;
             this.tableLayout_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.7326F));
             this.tableLayout_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49.2674F));
             this.tableLayout_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 130F));
-            this.tableLayout_VideoFeeds.Size = new System.Drawing.Size(450, 701);
+            this.tableLayout_VideoFeeds.Size = new System.Drawing.Size(535, 701);
             this.tableLayout_VideoFeeds.TabIndex = 4;
             // 
             // tableLayout_Buttons
             // 
+            this.tableLayout_Buttons.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.tableLayout_Buttons.AutoSize = true;
             this.tableLayout_Buttons.ColumnCount = 4;
             this.tableLayout_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -166,7 +169,7 @@
             this.tableLayout_Buttons.Controls.Add(this.btnExit, 3, 0);
             this.tableLayout_Buttons.Controls.Add(this.btnPause, 1, 0);
             this.tableLayout_Buttons.Controls.Add(this.btnReset, 2, 0);
-            this.tableLayout_Buttons.Location = new System.Drawing.Point(3, 573);
+            this.tableLayout_Buttons.Location = new System.Drawing.Point(107, 573);
             this.tableLayout_Buttons.MinimumSize = new System.Drawing.Size(320, 40);
             this.tableLayout_Buttons.Name = "tableLayout_Buttons";
             this.tableLayout_Buttons.RowCount = 1;
