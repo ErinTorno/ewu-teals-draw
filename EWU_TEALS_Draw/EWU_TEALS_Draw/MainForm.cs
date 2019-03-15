@@ -75,7 +75,7 @@ namespace EWU_TEALS_Draw
             SetupVideoCapture();
             
             Mat color_image = VideoCapture.QueryFrame();
-            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange, DefaultColorRangeGreen);
+            colorDetector = new ColorDetector(ImageBox_VideoCapture, ImageBox_Drawing, color_image.Size, DefaultColorRange);
 
             Application.Idle += ProcessFrame;
 

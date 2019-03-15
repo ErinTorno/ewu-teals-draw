@@ -19,6 +19,18 @@ namespace EwuTeals.Draw {
             MaxHsvColor = maxHsvColor;
         }
 
+        // when given a camera color, we generate a color range to match that
+        public static ColorRange GenerateRange(MCvScalar bgrColor) {
+            var hsv = bgrColor.ToHsv();
+            // we increase the saturation, since it appears duller on camera
+            var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
+            var minHsv = new MCvScalar(hsv.V0 - 4.0, hsv.V1 - 10.0, 100.0);
+            var maxHsv = new MCvScalar(hsv.V0 + 4.0, hsv.V1 + 50.0, 230.0);
+            return new ColorRange(ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
+        }
+
+        // Equality
+
         public bool Equals(ColorRange other) {
             return ScalarEq(this.InkColor, other.InkColor)
                 && ScalarEq(this.MinHsvColor, other.MinHsvColor)

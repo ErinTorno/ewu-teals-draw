@@ -61,6 +61,7 @@
     <Compile Include="Draw\ColorRange.cs" />
     <Compile Include="Draw\Drawing.cs" />
     <Compile Include="Draw\Line.cs" />
+    <Compile Include="Draw\MCvScalarExtn.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

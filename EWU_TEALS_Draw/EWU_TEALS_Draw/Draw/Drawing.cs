@@ -18,7 +18,7 @@ namespace EwuTeals.Draw {
         // default color to draw; in future we will change this to whatever the user is holding
         private static readonly MCvScalar DefaultColor = new MCvScalar(0, 0, 0);
         // the minimum and maximum widths, relative to total page width, of the thickness of the line
-        private const double MinLineWidthPercent = 0.005, MaxLineWidthPercent = 0.015;
+        private const double MinLineWidthPercent = 0.010, MaxLineWidthPercent = 0.025;
 
         // after n seconds of not seeing the color, we decide that the next time we see it, it'll be the start of a new line
         private const double SecondsToStartNew = 0.75;
@@ -31,7 +31,7 @@ namespace EwuTeals.Draw {
         public int RefreshRate { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        
+
         public Drawing(int width, int height, int refreshRate) {
             Width = width;
             Height = height;
@@ -59,7 +59,7 @@ namespace EwuTeals.Draw {
             var nx = (int)(x / xscale);
             var ny = (int)(y / yscale);
             var width = last.Count == 0 ? MinLineWidthPercent : GetWidthBySpeed(last.Last(), nx, ny);
-            
+
             last.Add(new WPoint(nx, ny, width));
             lastTick[color] = curTime;
         }
