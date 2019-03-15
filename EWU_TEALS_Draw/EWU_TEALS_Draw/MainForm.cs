@@ -95,6 +95,7 @@ namespace EWU_TEALS_Draw
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             
             Application.Idle += ProcessFrame;
+            btnPlay.Enabled = false;
         }
 
         private void SetupVideoCapture()
@@ -292,14 +293,24 @@ namespace EWU_TEALS_Draw
         private void btnPlay_Click(object sender, EventArgs e)
         {
             Application.Idle += ProcessFrame;
+
+            btnPlay.Enabled = false;
+            btnPause.Enabled = true;
         }
 
         private void btnPause_Click(object sender, EventArgs e)
         {
             Application.Idle -= ProcessFrame;
-            ImageBox_VideoCapture_Gray.Image = new Image<Bgr, byte>(DisplayedCameraWidth, DisplayedCameraHeight, new Bgr(255, 255, 255));
-            BlueLastPosition.X = 0;
-            BlueLastPosition.Y = 0;
+            btnPlay.Enabled = true;
+            btnPause.Enabled = false;
+
+            Point point = new Point(0, 0);
+            UpdateColorLastPosition("Blue", point);
+            UpdateColorLastPosition("Green", point);
+            UpdateColorLastPosition("Yellow", point);
+            UpdateColorLastPosition("Orange", point);
+            UpdateColorLastPosition("Purple", point);
+            UpdateColorLastPosition("Red", point);
         }
 
         private void btnExit_Click(object sender, EventArgs e)
