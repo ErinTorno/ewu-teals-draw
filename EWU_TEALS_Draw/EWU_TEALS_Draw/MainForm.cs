@@ -78,6 +78,21 @@ namespace EWU_TEALS_Draw
         private Point RedLastPosition;
         #endregion
 
+        #region Re-used Objects for saving memory
+        private Mat HsvImage_Temp = new Mat();
+        public Mat BlueThreshImage_Temp = new Mat();
+        public Mat GreenThreshImage_Temp = new Mat();
+        public Mat YellowThreshImage_Temp = new Mat();
+        public Mat OrangeThreshImage_Temp = new Mat();
+        public Mat PurpleThreshImage_Temp = new Mat();
+        public Mat RedThreshImage_Temp = new Mat();
+        private Mat CombinedThreshImage = new Mat();
+        private Point AveragePoint = new Point();
+        private Mat Points = new Mat();
+        Queue<Mat> VideoFrames = new Queue<Mat>();
+        #endregion
+
+
         public MainForm()
         {
             InitializeComponent();
@@ -91,9 +106,9 @@ namespace EWU_TEALS_Draw
         private void Startup()
         {
             SetupVideoCapture();
-            ImageBox_VideoCapture_Gray.Image = new Image<Bgr, byte>(DisplayedCameraWidth, DisplayedCameraHeight, new Bgr(255, 255, 255));
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            
+            Points = new Mat(VideoCapture.QueryFrame().Size, DepthType.Cv8U, 1);
+
             Application.Idle += ProcessFrame;
             btnPlay.Enabled = false;
         }
@@ -111,107 +126,140 @@ namespace EWU_TEALS_Draw
         {
             if (VideoCapture != null)
             {
-                Mat flippedVideoFrame = FlipImage(VideoCapture.QueryFrame());
-                ImageBox_VideoCapture.Image = flippedVideoFrame;
+                Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
+                CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
+                ImageBox_VideoCapture.Image = videoFrame;
+                VideoFrames.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
 
-                Mat blueThreshImage = DetectColor(flippedVideoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
-                Mat greenThreshImage = DetectColor(flippedVideoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
-                Mat yellowThreshImage = DetectColor(flippedVideoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
-                Mat orangeThreshImage = DetectColor(flippedVideoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
-                Mat purpleThreshImage = DetectColor(flippedVideoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
-                Mat redThreshImage_Low = DetectColor(flippedVideoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
-                Mat redThreshImage_High = DetectColor(flippedVideoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
+                Mat blueThreshImage = DetectColor(videoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
+                Mat greenThreshImage = DetectColor(videoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
+                Mat yellowThreshImage = DetectColor(videoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
+                Mat orangeThreshImage = DetectColor(videoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
+                Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
+                Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
+                Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
 
-                Mat combinedImage = new Mat();
-                CvInvoke.Add(blueThreshImage, greenThreshImage, combinedImage);
-                CvInvoke.Add(yellowThreshImage, combinedImage, combinedImage);
-                CvInvoke.Add(orangeThreshImage, combinedImage, combinedImage);
-                CvInvoke.Add(purpleThreshImage, combinedImage, combinedImage);
-                CvInvoke.Add(redThreshImage_Low, combinedImage, combinedImage);
-                CvInvoke.Add(redThreshImage_High, combinedImage, combinedImage);
+                CvInvoke.Add(blueThreshImage, greenThreshImage, CombinedThreshImage);
+                CvInvoke.Add(yellowThreshImage, CombinedThreshImage, CombinedThreshImage);
+                CvInvoke.Add(orangeThreshImage, CombinedThreshImage, CombinedThreshImage);
+                CvInvoke.Add(purpleThreshImage, CombinedThreshImage, CombinedThreshImage);
+                CvInvoke.Add(redThreshImage_Low, CombinedThreshImage, CombinedThreshImage);
+                CvInvoke.Add(redThreshImage_High, CombinedThreshImage, CombinedThreshImage);
 
-                ImageBox_VideoCapture_Gray.Image = combinedImage;
+                ImageBox_VideoCapture_Gray.Image = CombinedThreshImage;
+                
+                if (VideoFrames.Count > 5)
+                {
+                    VideoFrames.Dequeue().Dispose();
+                }
             }
         }
 
         private Mat DetectColor(Mat inputImage, IInputArray hsvThreshMin, IInputArray hsvThreshMax, MCvScalar drawColor, Point thisColorLastPosition, string color)
         {
-            Mat hsvImage = new Mat();
-            Mat threshImage = new Mat();
+            Mat ThreshImage_Temp = GetColorThreshImage_Temp(color);
 
-            CvInvoke.CvtColor(inputImage, hsvImage, ColorConversion.Bgr2Hsv);
+            CvInvoke.CvtColor(inputImage, HsvImage_Temp, ColorConversion.Bgr2Hsv);
 
             // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
-            CvInvoke.InRange(hsvImage, hsvThreshMin, hsvThreshMax, threshImage);
+            CvInvoke.InRange(HsvImage_Temp, hsvThreshMin, hsvThreshMax, ThreshImage_Temp);
 
             // Find average of white pixels
-            Mat points = new Mat(inputImage.Size, DepthType.Cv8U, 1);
-            CvInvoke.FindNonZero(threshImage, points);
+            //Mat Points = new Mat(inputImage.Size, DepthType.Cv8U, 1);
+            CvInvoke.FindNonZero(ThreshImage_Temp, Points);
 
             // An alternative approach to averaging would be to use the K-means 
             // algorithm to find clusters, since average is significantly influenced by outliers.
-            MCvScalar avg = CvInvoke.Mean(points);
-            Point avgPoint = new Point((int)avg.V0, (int)avg.V1);
+            MCvScalar avg = CvInvoke.Mean(Points);
+            AveragePoint.X = (int)avg.V0;
+            AveragePoint.Y = (int)avg.V1;
 
-            int sumWhitePixels = CvInvoke.CountNonZero(threshImage);
+            int sumWhitePixels = CvInvoke.CountNonZero(ThreshImage_Temp);
 
             // Now we check if there are more than x pixels of detected color, since we don't want to draw
             // if all we detect is noise.
             if (sumWhitePixels > 100)
             {
                 // Draw circle on camera feed
-                CvInvoke.Circle(inputImage, avgPoint, 5, drawColor, 2);
+                CvInvoke.Circle(inputImage, AveragePoint, 5, drawColor, 2);
 
                 // Draw on canvas
-                avgPoint = ScaleToCanvas(avgPoint);
+                AveragePoint = ScaleToCanvas(AveragePoint);
 
-                int width = GetWidthBySpeed(thisColorLastPosition, avgPoint);
-                DrawLineTo(avgPoint, drawColor, thisColorLastPosition, width);
+                int width = GetWidthBySpeed(thisColorLastPosition, AveragePoint);
+                DrawLineTo(AveragePoint, drawColor, thisColorLastPosition, width);
 
-                UpdateColorLastPosition(color, avgPoint);
+                UpdateColorLastPosition(color, AveragePoint.X, AveragePoint.Y);
             }
             // If not enough pixels to count as an object, reset lastColorPosition to 0 so it will be 
             // updated when we do find it.
             else
             {
-                UpdateColorLastPosition(color, new Point(0, 0));
+                UpdateColorLastPosition(color, 0, 0);
             }
 
-            return threshImage;
+            return ThreshImage_Temp;
         }
 
-        private void UpdateColorLastPosition(string color, Point currentPosition)
+        private Mat GetColorThreshImage_Temp(string color)
         {
             switch (color)
             {
                 case "Blue":
-                    BlueLastPosition.X = currentPosition.X;
-                    BlueLastPosition.Y = currentPosition.Y;
+                    return BlueThreshImage_Temp;
+
+                case "Green":
+                    return GreenThreshImage_Temp;
+
+                case "Yellow":
+                    return YellowThreshImage_Temp;
+
+                case "Orange":
+                    return OrangeThreshImage_Temp;
+
+                case "Purple":
+                    return PurpleThreshImage_Temp;
+
+                case "Red":
+                    return RedThreshImage_Temp;
+
+                default:
+                    return null;
+            }
+        }
+
+        private void UpdateColorLastPosition(string color, int x, int y)
+        {
+            switch (color)
+            {
+                case "Blue":
+                    BlueLastPosition.X = x;
+                    BlueLastPosition.Y = y;
                     break;
 
                 case "Green":
-                    GreenLastPosition.X = currentPosition.X;
-                    GreenLastPosition.Y = currentPosition.Y;
+                    GreenLastPosition.X = x;
+                    GreenLastPosition.Y = y;
                     break;
 
                 case "Yellow":
-                    YellowLastPosition.X = currentPosition.X;
-                    YellowLastPosition.Y = currentPosition.Y;
+                    YellowLastPosition.X = x;
+                    YellowLastPosition.Y = y;
                     break;
 
                 case "Orange":
-                    OrangeLastPosition.X = currentPosition.X;
-                    OrangeLastPosition.Y = currentPosition.Y;
+                    OrangeLastPosition.X = x;
+                    OrangeLastPosition.Y = y;
                     break;
 
                 case "Purple":
-                    PurpleLastPosition.X = currentPosition.X;
-                    PurpleLastPosition.Y = currentPosition.Y;
+                    PurpleLastPosition.X = x;
+                    PurpleLastPosition.Y = y;
                     break;
 
                 case "Red":
-                    RedLastPosition.X = currentPosition.X;
-                    RedLastPosition.Y = currentPosition.Y;
+                    RedLastPosition.X = x;
+                    RedLastPosition.Y = y;
                     break;
             }
         }
@@ -242,7 +290,7 @@ namespace EWU_TEALS_Draw
 
 
             // To flip to wider when slower:
-            strokeWidth = maxWidth - strokeWidth;
+            //strokeWidth = maxWidth - strokeWidth;
 
             return strokeWidth;
         }
@@ -281,13 +329,14 @@ namespace EWU_TEALS_Draw
 
                 Disposables = null;
             }
-        }
 
-        private Mat FlipImage(Mat inputImage)
-        {
-            Mat flippedImage = new Mat(inputImage.Size, DepthType.Cv8U, inputImage.NumberOfChannels);
-            CvInvoke.Flip(inputImage, flippedImage, FlipType.Horizontal);
-            return flippedImage;
+            if (VideoFrames != null)
+            {
+                foreach (IDisposable disposable in VideoFrames)
+                {
+                    if (disposable != null) disposable.Dispose();
+                }
+            }
         }
 
         private void btnPlay_Click(object sender, EventArgs e)
@@ -304,13 +353,12 @@ namespace EWU_TEALS_Draw
             btnPlay.Enabled = true;
             btnPause.Enabled = false;
 
-            Point point = new Point(0, 0);
-            UpdateColorLastPosition("Blue", point);
-            UpdateColorLastPosition("Green", point);
-            UpdateColorLastPosition("Yellow", point);
-            UpdateColorLastPosition("Orange", point);
-            UpdateColorLastPosition("Purple", point);
-            UpdateColorLastPosition("Red", point);
+            UpdateColorLastPosition("Blue", 0, 0);
+            UpdateColorLastPosition("Green", 0, 0);
+            UpdateColorLastPosition("Yellow", 0, 0);
+            UpdateColorLastPosition("Orange", 0, 0);
+            UpdateColorLastPosition("Purple", 0, 0);
+            UpdateColorLastPosition("Red", 0, 0);
         }
 
         private void btnExit_Click(object sender, EventArgs e)
