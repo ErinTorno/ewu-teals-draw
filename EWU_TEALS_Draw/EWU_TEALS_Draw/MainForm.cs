@@ -32,8 +32,8 @@ namespace EWU_TEALS_Draw
         private const int DisplayedCameraWidth = ActualCameraWidth / 6;
         private const int DisplayedCameraHeight = ActualCameraHeight / 6;
 
-        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.5);
-        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.5);
+        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.77);
+        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.77);
         #endregion
 
         #region Color Threshold Properties
