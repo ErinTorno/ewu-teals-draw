@@ -129,6 +129,7 @@
             // 
             // tableLayoutPanel_Drawing
             // 
+            this.tableLayoutPanel_Drawing.AutoScroll = true;
             this.tableLayoutPanel_Drawing.AutoSize = true;
             this.tableLayoutPanel_Drawing.ColumnCount = 1;
             this.tableLayoutPanel_Drawing.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
