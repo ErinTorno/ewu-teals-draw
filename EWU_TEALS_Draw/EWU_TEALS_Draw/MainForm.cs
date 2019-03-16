@@ -286,12 +286,15 @@ namespace EWU_TEALS_Draw
 
             if (speedRatio > 1.0) speedRatio = 1.0;
             int maxWidth = 25;
+            int minWidth = 3;
             int strokeWidth = (int)Math.Round(speedRatio * maxWidth);
 
 
             // To flip to wider when slower:
             //strokeWidth = maxWidth - strokeWidth;
 
+            if (strokeWidth > maxWidth) strokeWidth = maxWidth;
+            if (strokeWidth < minWidth) strokeWidth = minWidth;
             return strokeWidth;
         }
 
