@@ -281,13 +281,13 @@ namespace EWU_TEALS_Draw
 
             double travelDistance = Math.Sqrt(dx * dx + dy * dy);
             double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/frame length in ms
-            double maxAssumedSpeed = 1; // found this number through testing...
+            double maxAssumedSpeed = .8; // found this number through testing...
             double speedRatio = speed / maxAssumedSpeed;
 
             if (speedRatio > 1.0) speedRatio = 1.0;
             int maxWidth = 25;
             int minWidth = 3;
-            int strokeWidth = (int)Math.Round(speedRatio * maxWidth);
+            int strokeWidth = (int)Math.Ceiling(speedRatio * maxWidth);
 
 
             // To flip to wider when slower:
