@@ -29,28 +29,28 @@ namespace EWU_TEALS_Draw
         private const int ActualCameraWidth = 1920;
         private const int ActualCameraHeight = 1080;
 
-        private const int DisplayedCameraWidth = ActualCameraWidth / 8;
-        private const int DisplayedCameraHeight = ActualCameraHeight / 8;
+        private const int DisplayedCameraWidth = ActualCameraWidth / 6;
+        private const int DisplayedCameraHeight = ActualCameraHeight / 6;
 
-        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 4.7);
-        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 4.7);
+        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.5);
+        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.5);
         #endregion
 
         #region Color Threshold Properties
         // Blue
-        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(100, 150, 65)); // Blue min
+        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(105, 125, 65)); // Blue min
         private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(117, 255, 255)); // Blue max
         private MCvScalar BlueDrawColor = new MCvScalar(255, 140, 85); // Blue draw color
         private Point BlueLastPosition;
 
         // Green
-        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(50, 100, 50));
-        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(80, 255, 255));
+        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(60, 100, 20));
+        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(90, 255, 255));
         private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135);
         private Point GreenLastPosition;
 
         // Yellow
-        private IInputArray YellowHsvMin = new ScalarArray(new MCvScalar(25, 150, 65));
+        private IInputArray YellowHsvMin = new ScalarArray(new MCvScalar(20, 50, 150));
         private IInputArray YellowHsvMax = new ScalarArray(new MCvScalar(35, 255, 255));
         private MCvScalar YellowDrawColor = new MCvScalar(100, 240, 240);
         private Point YellowLastPosition;
@@ -68,7 +68,7 @@ namespace EWU_TEALS_Draw
         private Point PurpleLastPosition;
 
         // Red Lower Threshold
-        private IInputArray RedHsvMin_Low = new ScalarArray(new MCvScalar(0, 175, 45));
+        private IInputArray RedHsvMin_Low = new ScalarArray(new MCvScalar(0, 50, 100));
         private IInputArray RedHsvMax_Low = new ScalarArray(new MCvScalar(5, 255, 255));
         // Red Upper Threshold
         private IInputArray RedHsvMin_High = new ScalarArray(new MCvScalar(170, 175, 45));
@@ -88,7 +88,7 @@ namespace EWU_TEALS_Draw
         public Mat RedThreshImage_Temp = new Mat();
         private Mat CombinedThreshImage = new Mat();
         private Point AveragePoint = new Point();
-        private Mat Points = new Mat();
+        private Mat Points;
         Queue<Mat> VideoFrames = new Queue<Mat>();
         #endregion
 
@@ -178,7 +178,7 @@ namespace EWU_TEALS_Draw
 
             // Now we check if there are more than x pixels of detected color, since we don't want to draw
             // if all we detect is noise.
-            if (sumWhitePixels > 100)
+            if (sumWhitePixels > 300)
             {
                 // Draw circle on camera feed
                 CvInvoke.Circle(inputImage, AveragePoint, 5, drawColor, 2);
