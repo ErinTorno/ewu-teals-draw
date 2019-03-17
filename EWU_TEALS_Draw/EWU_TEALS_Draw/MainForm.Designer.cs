@@ -81,11 +81,11 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.AutoSize = true;
+            this.btnPlay.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnPlay.Location = new System.Drawing.Point(0, 0);
             this.btnPlay.Margin = new System.Windows.Forms.Padding(0);
             this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(69, 28);
+            this.btnPlay.Size = new System.Drawing.Size(300, 35);
             this.btnPlay.TabIndex = 4;
             this.btnPlay.Text = "Play";
             this.btnPlay.UseVisualStyleBackColor = true;
@@ -93,11 +93,11 @@
             // 
             // btnExit
             // 
-            this.btnExit.AutoSize = true;
-            this.btnExit.Location = new System.Drawing.Point(240, 0);
+            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExit.Location = new System.Drawing.Point(0, 105);
             this.btnExit.Margin = new System.Windows.Forms.Padding(0);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(50, 28);
+            this.btnExit.Size = new System.Drawing.Size(300, 35);
             this.btnExit.TabIndex = 7;
             this.btnExit.Text = "Exit";
             this.btnExit.UseVisualStyleBackColor = true;
@@ -105,11 +105,11 @@
             // 
             // btnPause
             // 
-            this.btnPause.AutoSize = true;
-            this.btnPause.Location = new System.Drawing.Point(69, 0);
+            this.btnPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPause.Location = new System.Drawing.Point(0, 35);
             this.btnPause.Margin = new System.Windows.Forms.Padding(0);
             this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(69, 28);
+            this.btnPause.Size = new System.Drawing.Size(300, 35);
             this.btnPause.TabIndex = 5;
             this.btnPause.Text = "Pause";
             this.btnPause.UseVisualStyleBackColor = true;
@@ -117,11 +117,11 @@
             // 
             // btnReset
             // 
-            this.btnReset.AutoSize = true;
-            this.btnReset.Location = new System.Drawing.Point(138, 0);
+            this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnReset.Location = new System.Drawing.Point(0, 70);
             this.btnReset.Margin = new System.Windows.Forms.Padding(0);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(102, 28);
+            this.btnReset.Size = new System.Drawing.Size(300, 35);
             this.btnReset.TabIndex = 6;
             this.btnReset.Text = "Clear Canvas";
             this.btnReset.UseVisualStyleBackColor = true;
@@ -170,21 +170,21 @@
             this.tableLayoutPanel_Buttons.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel_Buttons.AutoSize = true;
-            this.tableLayoutPanel_Buttons.ColumnCount = 4;
-            this.tableLayoutPanel_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel_Buttons.ColumnCount = 1;
             this.tableLayoutPanel_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel_Buttons.Controls.Add(this.btnPlay, 0, 0);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnPause, 1, 0);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnReset, 2, 0);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnExit, 3, 0);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnPause, 0, 1);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnReset, 0, 2);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnExit, 0, 3);
             this.tableLayoutPanel_Buttons.Location = new System.Drawing.Point(5, 470);
             this.tableLayoutPanel_Buttons.Margin = new System.Windows.Forms.Padding(5, 5, 0, 0);
             this.tableLayoutPanel_Buttons.Name = "tableLayoutPanel_Buttons";
-            this.tableLayoutPanel_Buttons.RowCount = 1;
+            this.tableLayoutPanel_Buttons.RowCount = 4;
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel_Buttons.Size = new System.Drawing.Size(325, 28);
+            this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_Buttons.Size = new System.Drawing.Size(325, 140);
             this.tableLayoutPanel_Buttons.TabIndex = 10;
             // 
             // MainForm
@@ -207,7 +207,6 @@
             this.tableLayoutPanel_VideoFeeds.ResumeLayout(false);
             this.tableLayoutPanel_VideoFeeds.PerformLayout();
             this.tableLayoutPanel_Buttons.ResumeLayout(false);
-            this.tableLayoutPanel_Buttons.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

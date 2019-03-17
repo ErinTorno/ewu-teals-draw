@@ -35,7 +35,7 @@ namespace EWU_TEALS_Draw
         private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.77);
         private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.77);
         #endregion
-
+        
         #region Color Threshold Properties
         // Blue
         private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(105, 125, 65)); // Blue min
@@ -115,11 +115,12 @@ namespace EWU_TEALS_Draw
 
         private void SetupVideoCapture()
         {
-            VideoCapture = new VideoCapture(CameraToUse); // Webcam is 1280x720
+            if (CameraToUse == 0) VideoCapture = new VideoCapture(CameraToUse);
+            else if (CameraToUse == 1) VideoCapture = new VideoCapture(CameraToUse + CaptureType.DShow); // Need DShow backend for Logitech Webcam
 
-            VideoCapture.SetCaptureProperty(CapProp.Fps, FPS); // The FPS property doesn't actually work...
-            VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);  // 1280, 640, 320
-            VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight); // 720, 360, 180
+            VideoCapture.SetCaptureProperty(CapProp.Fps, FPS);
+            VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);
+            VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight);
         }
 
         private void ProcessFrame(object sender, EventArgs e)
