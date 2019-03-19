@@ -22,6 +22,7 @@ namespace EWU_TEALS_Draw
     {
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
+        private bool IsRunning;
 
         #region Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
@@ -105,7 +106,7 @@ namespace EWU_TEALS_Draw
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
 
             Application.Idle += ProcessFrame;
-            btnPlay.Enabled = false;
+            IsRunning = true;
         }
 
         private void SetupVideoCapture()
@@ -362,24 +363,22 @@ namespace EWU_TEALS_Draw
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-            Application.Idle += ProcessFrame;
+            if (IsRunning == false)
+            {
+                Application.Idle += ProcessFrame;
+                IsRunning = true;
+            }
+            else {
+                Application.Idle -= ProcessFrame;
+                IsRunning = false;
 
-            btnPlay.Enabled = false;
-            btnPause.Enabled = true;
-        }
-
-        private void btnPause_Click(object sender, EventArgs e)
-        {
-            Application.Idle -= ProcessFrame;
-            btnPlay.Enabled = true;
-            btnPause.Enabled = false;
-
-            UpdateColorLastPosition("Blue", 0, 0);
-            UpdateColorLastPosition("Green", 0, 0);
-            UpdateColorLastPosition("Yellow", 0, 0);
-            UpdateColorLastPosition("Orange", 0, 0);
-            UpdateColorLastPosition("Purple", 0, 0);
-            UpdateColorLastPosition("Red", 0, 0);
+                UpdateColorLastPosition("Blue", 0, 0);
+                UpdateColorLastPosition("Green", 0, 0);
+                UpdateColorLastPosition("Yellow", 0, 0);
+                UpdateColorLastPosition("Orange", 0, 0);
+                UpdateColorLastPosition("Purple", 0, 0);
+                UpdateColorLastPosition("Red", 0, 0);
+            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)

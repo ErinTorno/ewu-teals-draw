@@ -34,11 +34,11 @@
             this.ImageBox_Drawing = new Emgu.CV.UI.ImageBox();
             this.btnPlay = new System.Windows.Forms.Button();
             this.btnExit = new System.Windows.Forms.Button();
-            this.btnPause = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
             this.tableLayoutPanel_Drawing = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel_VideoFeeds = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel_Buttons = new System.Windows.Forms.TableLayoutPanel();
+            this.btnEdit = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_VideoCapture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_VideoCapture_Gray)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_Drawing)).BeginInit();
@@ -87,14 +87,14 @@
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(300, 35);
             this.btnPlay.TabIndex = 4;
-            this.btnPlay.Text = "Play";
+            this.btnPlay.Text = "Play/Pause";
             this.btnPlay.UseVisualStyleBackColor = true;
             this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
             // btnExit
             // 
             this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExit.Location = new System.Drawing.Point(0, 105);
+            this.btnExit.Location = new System.Drawing.Point(0, 70);
             this.btnExit.Margin = new System.Windows.Forms.Padding(0);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(300, 35);
@@ -103,22 +103,10 @@
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
-            // btnPause
-            // 
-            this.btnPause.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPause.Location = new System.Drawing.Point(0, 35);
-            this.btnPause.Margin = new System.Windows.Forms.Padding(0);
-            this.btnPause.Name = "btnPause";
-            this.btnPause.Size = new System.Drawing.Size(300, 35);
-            this.btnPause.TabIndex = 5;
-            this.btnPause.Text = "Pause";
-            this.btnPause.UseVisualStyleBackColor = true;
-            this.btnPause.Click += new System.EventHandler(this.btnPause_Click);
-            // 
             // btnReset
             // 
             this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnReset.Location = new System.Drawing.Point(0, 70);
+            this.btnReset.Location = new System.Drawing.Point(0, 35);
             this.btnReset.Margin = new System.Windows.Forms.Padding(0);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(300, 35);
@@ -162,6 +150,7 @@
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(330, 673);
             this.tableLayoutPanel_VideoFeeds.TabIndex = 9;
             // 
@@ -173,9 +162,9 @@
             this.tableLayoutPanel_Buttons.ColumnCount = 1;
             this.tableLayoutPanel_Buttons.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel_Buttons.Controls.Add(this.btnPlay, 0, 0);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnPause, 0, 1);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnReset, 0, 2);
-            this.tableLayoutPanel_Buttons.Controls.Add(this.btnExit, 0, 3);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnEdit, 0, 3);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnExit, 0, 2);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.btnReset, 0, 1);
             this.tableLayoutPanel_Buttons.Location = new System.Drawing.Point(5, 470);
             this.tableLayoutPanel_Buttons.Margin = new System.Windows.Forms.Padding(5, 5, 0, 0);
             this.tableLayoutPanel_Buttons.Name = "tableLayoutPanel_Buttons";
@@ -186,6 +175,18 @@
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_Buttons.Size = new System.Drawing.Size(325, 140);
             this.tableLayoutPanel_Buttons.TabIndex = 10;
+            // 
+            // btnEdit
+            // 
+            this.btnEdit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnEdit.Location = new System.Drawing.Point(0, 105);
+            this.btnEdit.Margin = new System.Windows.Forms.Padding(0);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new System.Drawing.Size(300, 35);
+            this.btnEdit.TabIndex = 5;
+            this.btnEdit.Text = "Edit Detection";
+            this.btnEdit.UseVisualStyleBackColor = true;
+            this.btnEdit.Click += new System.EventHandler(this.btnPause_Click);
             // 
             // MainForm
             // 
@@ -219,11 +220,11 @@
         private Emgu.CV.UI.ImageBox ImageBox_Drawing;
         private System.Windows.Forms.Button btnPlay;
         private System.Windows.Forms.Button btnExit;
-        private System.Windows.Forms.Button btnPause;
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Drawing;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_VideoFeeds;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Buttons;
+        private System.Windows.Forms.Button btnEdit;
     }
 }
 
