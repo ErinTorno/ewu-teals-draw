@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,7 +24,7 @@ namespace EWU_TEALS_Draw
         private VideoCapture VideoCapture;
 
         #region Resolution Properties
-        private const int CameraToUse = 1; // Default Camera: 0
+        private const int CameraToUse = 0; // Default Camera: 0
         private const int FPS = 30;
         private const int ActualCameraWidth = 1920;
         private const int ActualCameraHeight = 1080;
@@ -59,13 +59,13 @@ namespace EWU_TEALS_Draw
         private Point YellowLastPosition;
 
         // Green
-        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(85, 200, 70));
-        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(95, 255, 255));
+        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(45, 35, 66)); //(85, 200, 70));
+        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(95, 255, 255));//(95, 255, 255));
         private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135);
         private Point GreenLastPosition;
 
         // Blue
-        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(95, 170, 110));
+        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(95, 109, 65));
         private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(117, 255, 255));
         private MCvScalar BlueDrawColor = new MCvScalar(255, 140, 85);
         private Point BlueLastPosition;
@@ -88,7 +88,6 @@ namespace EWU_TEALS_Draw
 
         Queue<Mat> DisposableQueue = new Queue<Mat>();
         #endregion
-
 
         public MainForm()
         {
@@ -114,12 +113,11 @@ namespace EWU_TEALS_Draw
             if (CameraToUse == 0) VideoCapture = new VideoCapture(CameraToUse);
             else if (CameraToUse == 1) VideoCapture = new VideoCapture(CameraToUse + CaptureType.DShow); // Need DShow backend for Logitech Webcam
 
-            VideoCapture.SetCaptureProperty(CapProp.Fps, FPS);
+            //VideoCapture.SetCaptureProperty(CapProp.Fps, FPS);
             VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);
             VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight);
             VideoCapture.SetCaptureProperty(CapProp.Autofocus, 0);
             //VideoCapture.SetCaptureProperty(CapProp.AutoExposure, 0);
-            //VideoCapture.SetCaptureProperty(CapProp.Contrast, 20);
         }
 
         private void ProcessFrame(object sender, EventArgs e)
@@ -191,7 +189,7 @@ namespace EWU_TEALS_Draw
                 }
 
                 // If at least one contour was found and its area is at least 300 pixels
-                if (maxContourIndex >= 0 && maxArea >= 1000)
+                if (maxContourIndex >= 0 && maxArea >= 600)
                 {
                     // Draw the contour in white
                     CvInvoke.DrawContours(inputImage, contours, maxContourIndex, new MCvScalar(255, 255, 255), 2);
@@ -331,9 +329,9 @@ namespace EWU_TEALS_Draw
 
         private IImage GetGrayImage(Mat color_image)
         {
-            var image = new Image<Gray, byte>(color_image.Bitmap);
+            Image<Gray, byte> grayImage = new Image<Gray, byte>(color_image.Bitmap);
 
-            return image;
+            return grayImage;
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
