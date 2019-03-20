@@ -136,10 +136,6 @@ namespace EWU_TEALS_Draw
         {
             if (VideoCapture != null)
             {
-                if (ColorPicker.Text == "Red" || ColorPicker.Text == "Blue" || ColorPicker.Text == "Green" || ColorPicker.Text == "Yellow")
-                {
-                    ChangeColor();
-                }
                 Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
@@ -148,6 +144,10 @@ namespace EWU_TEALS_Draw
                 Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
                 DisposableQueue.Enqueue(combinedThreshImage);
 
+                if (ColorPicker.Text == "Red" || ColorPicker.Text == "Blue" || ColorPicker.Text == "Green" || ColorPicker.Text == "Yellow")
+                {
+                    ChangeColor();
+                }
                 if (RedOn)
                 {
                     Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
@@ -254,34 +254,6 @@ namespace EWU_TEALS_Draw
             }
             
             return ThreshImage_Temp;
-        }
-
-        private void ChangeColor ()
-        {
-            if (ColorPicker.Text == "Red")
-            {
-                ColorOn.Checked = RedOn;
-                RedColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                RedHsvMin_Low = new ScalarArray(RedColor);
-            }
-            else if (ColorPicker.Text == "Blue")
-            {
-                ColorOn.Checked = BlueOn;
-                BlueColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                BlueHsvMin = new ScalarArray(BlueColor);
-            }
-            else if (ColorPicker.Text == "Green")
-            {
-                ColorOn.Checked = GreenOn;
-                GreenColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                GreenHsvMin = new ScalarArray(GreenColor);
-            }
-            else if (ColorPicker.Text == "Yellow")
-            {
-                ColorOn.Checked = YellowOn;
-                YellowColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                YellowHsvMin = new ScalarArray(YellowColor);
-            }
         }
 
         private Mat GetColorThreshImage_Temp(string color)
@@ -457,6 +429,34 @@ namespace EWU_TEALS_Draw
         private void btnReset_Click(object sender, EventArgs e)
         {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
+        }
+
+        private void ChangeColor()
+        {
+            if (ColorPicker.Text == "Red")
+            {
+                ColorOn.Checked = RedOn;
+                RedColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                RedHsvMin_Low = new ScalarArray(RedColor);
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                ColorOn.Checked = BlueOn;
+                BlueColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                BlueHsvMin = new ScalarArray(BlueColor);
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                ColorOn.Checked = GreenOn;
+                GreenColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                GreenHsvMin = new ScalarArray(GreenColor);
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                ColorOn.Checked = YellowOn;
+                YellowColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                YellowHsvMin = new ScalarArray(YellowColor);
+            }
         }
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e)
