@@ -435,25 +435,21 @@ namespace EWU_TEALS_Draw
         {
             if (ColorPicker.Text == "Red")
             {
-                ColorOn.Checked = RedOn;
                 RedColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
                 RedHsvMin_Low = new ScalarArray(RedColor);
             }
             else if (ColorPicker.Text == "Blue")
             {
-                ColorOn.Checked = BlueOn;
                 BlueColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
                 BlueHsvMin = new ScalarArray(BlueColor);
             }
             else if (ColorPicker.Text == "Green")
             {
-                ColorOn.Checked = GreenOn;
                 GreenColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
                 GreenHsvMin = new ScalarArray(GreenColor);
             }
             else if (ColorPicker.Text == "Yellow")
             {
-                ColorOn.Checked = YellowOn;
                 YellowColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
                 YellowHsvMin = new ScalarArray(YellowColor);
             }
@@ -463,24 +459,28 @@ namespace EWU_TEALS_Draw
         {
             if (ColorPicker.Text == "Red")
             {
+                ColorOn.Checked = RedOn;
                 HSlider.Value = (int)RedColor.V2;
                 SSlider.Value = (int)RedColor.V1;
                 VSlider.Value = (int)RedColor.V0;
             }
             else if (ColorPicker.Text == "Blue")
             {
+                ColorOn.Checked = BlueOn;
                 HSlider.Value = (int)BlueColor.V2;
                 SSlider.Value = (int)BlueColor.V1;
                 VSlider.Value = (int)BlueColor.V0;
             }
             else if (ColorPicker.Text == "Green")
             {
+                ColorOn.Checked = GreenOn;
                 HSlider.Value = (int)GreenColor.V2;
                 SSlider.Value = (int)GreenColor.V1;
                 VSlider.Value = (int)GreenColor.V0;
             }
             else if (ColorPicker.Text == "Yellow")
             {
+                ColorOn.Checked = YellowOn;
                 HSlider.Value = (int)YellowColor.V2;
                 SSlider.Value = (int)YellowColor.V1;
                 VSlider.Value = (int)YellowColor.V0;
