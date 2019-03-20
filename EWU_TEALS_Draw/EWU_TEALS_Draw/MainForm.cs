@@ -39,39 +39,50 @@ namespace EWU_TEALS_Draw
 
         #region Color Threshold Properties
         // Red Low Threshold
+        private bool RedLowOn;
         private IInputArray RedHsvMin_Low = new ScalarArray(new MCvScalar(0, 50, 100));
         private IInputArray RedHsvMax_Low = new ScalarArray(new MCvScalar(5, 255, 255));
         // Red High Threshold
-        private IInputArray RedHsvMin_High = new ScalarArray(new MCvScalar(157, 105, 115));
+        private bool RedOn = true;
+        private static MCvScalar RedColor = new MCvScalar(157, 105, 115);
+        private IInputArray RedHsvMin_High = new ScalarArray(RedColor);
         private IInputArray RedHsvMax_High = new ScalarArray(new MCvScalar(180, 255, 255));
         private MCvScalar RedDrawColor = new MCvScalar(60, 60, 230);
         private Point RedLastPosition;
 
         // Orange
+        private bool OrangeOn;
         private IInputArray OrangeHsvMin = new ScalarArray(new MCvScalar(10, 175, 65));
         private IInputArray OrangeHsvMax = new ScalarArray(new MCvScalar(18, 255, 255));
         private MCvScalar OrangeDrawColor = new MCvScalar(60, 140, 255);
         private Point OrangeLastPosition;
 
         // Yellow
-        private IInputArray YellowHsvMin = new ScalarArray(new MCvScalar(25, 50, 120));
+        private bool YellowOn = true;
+        private static MCvScalar YellowColor = new MCvScalar(25, 50, 120);
+        private IInputArray YellowHsvMin = new ScalarArray(YellowColor);
         private IInputArray YellowHsvMax = new ScalarArray(new MCvScalar(35, 255, 255));
         private MCvScalar YellowDrawColor = new MCvScalar(100, 240, 240);
         private Point YellowLastPosition;
 
         // Green
-        private IInputArray GreenHsvMin = new ScalarArray(new MCvScalar(45, 35, 66)); //(85, 200, 70));
+        private bool GreenOn = true;
+        private static MCvScalar GreenColor = new MCvScalar(45, 35, 66);
+        private IInputArray GreenHsvMin = new ScalarArray(GreenColor); //(85, 200, 70));
         private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(95, 255, 255));//(95, 255, 255));
         private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135);
         private Point GreenLastPosition;
 
         // Blue
-        private IInputArray BlueHsvMin = new ScalarArray(new MCvScalar(95, 109, 65));
+        private bool BlueOn = true;
+        private static MCvScalar BlueColor = new MCvScalar(95, 109, 65);
+        private IInputArray BlueHsvMin = new ScalarArray(BlueColor);
         private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(117, 255, 255));
         private MCvScalar BlueDrawColor = new MCvScalar(255, 140, 85);
         private Point BlueLastPosition;
 
         // Purple
+        private bool PurpleOn;
         private IInputArray PurpleHsvMin = new ScalarArray(new MCvScalar(125, 100, 100));
         private IInputArray PurpleHsvMax = new ScalarArray(new MCvScalar(140, 255, 255));
         private MCvScalar PurpleDrawColor = new MCvScalar(255, 135, 135);
@@ -125,28 +136,53 @@ namespace EWU_TEALS_Draw
         {
             if (VideoCapture != null)
             {
+                if (ColorPicker.Text == "Red" || ColorPicker.Text == "Blue" || ColorPicker.Text == "Green" || ColorPicker.Text == "Yellow")
+                {
+                    ChangeColor();
+                }
                 Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
                 DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
 
-                //Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
-                Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
-                //Mat orangeThreshImage = DetectColor(videoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
-                Mat yellowThreshImage = DetectColor(videoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
-                Mat greenThreshImage = DetectColor(videoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
-                Mat blueThreshImage = DetectColor(videoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
-                //Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
-
                 Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
                 DisposableQueue.Enqueue(combinedThreshImage);
-                //CvInvoke.Add(redThreshImage_Low, combinedThreshImage, combinedThreshImage);
-                CvInvoke.Add(redThreshImage_High, combinedThreshImage, combinedThreshImage);
-                //CvInvoke.Add(orangeThreshImage, combinedThreshImage, combinedThreshImage);
-                CvInvoke.Add(yellowThreshImage, combinedThreshImage, combinedThreshImage);
-                CvInvoke.Add(greenThreshImage, combinedThreshImage, combinedThreshImage);
-                CvInvoke.Add(blueThreshImage, combinedThreshImage, combinedThreshImage);
-                //CvInvoke.Add(purpleThreshImage, combinedThreshImage, combinedThreshImage);
+
+                if (RedOn)
+                {
+                    Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
+                    CvInvoke.Add(redThreshImage_High, combinedThreshImage, combinedThreshImage);
+                }
+                if (RedLowOn)
+                {
+                    Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
+                    CvInvoke.Add(redThreshImage_Low, combinedThreshImage, combinedThreshImage);
+                }
+                if (YellowOn)
+                {
+                    Mat yellowThreshImage = DetectColor(videoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
+                    CvInvoke.Add(yellowThreshImage, combinedThreshImage, combinedThreshImage);
+                }
+                if (GreenOn)
+                {
+                    Mat greenThreshImage = DetectColor(videoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
+                    CvInvoke.Add(greenThreshImage, combinedThreshImage, combinedThreshImage);
+                }
+                if (BlueOn)
+                {
+                    Mat blueThreshImage = DetectColor(videoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
+                    CvInvoke.Add(blueThreshImage, combinedThreshImage, combinedThreshImage);
+                }
+                if (OrangeOn)
+                {
+                    Mat orangeThreshImage = DetectColor(videoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
+                    CvInvoke.Add(orangeThreshImage, combinedThreshImage, combinedThreshImage);
+                }
+                if (PurpleOn)
+                {
+                    Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
+                    CvInvoke.Add(purpleThreshImage, combinedThreshImage, combinedThreshImage);
+                }
 
                 ImageBox_VideoCapture_Gray.Image = combinedThreshImage;
 
@@ -218,6 +254,34 @@ namespace EWU_TEALS_Draw
             }
             
             return ThreshImage_Temp;
+        }
+
+        private void ChangeColor ()
+        {
+            if (ColorPicker.Text == "Red")
+            {
+                ColorOn.Checked = RedOn;
+                RedColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                RedHsvMin_Low = new ScalarArray(RedColor);
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                ColorOn.Checked = BlueOn;
+                BlueColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                BlueHsvMin = new ScalarArray(BlueColor);
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                ColorOn.Checked = GreenOn;
+                GreenColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                GreenHsvMin = new ScalarArray(GreenColor);
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                ColorOn.Checked = YellowOn;
+                YellowColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
+                YellowHsvMin = new ScalarArray(YellowColor);
+            }
         }
 
         private Mat GetColorThreshImage_Temp(string color)
@@ -393,6 +457,77 @@ namespace EWU_TEALS_Draw
         private void btnReset_Click(object sender, EventArgs e)
         {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
+        }
+
+        private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ColorPicker.Text == "Red")
+            {
+                HSlider.Value = (int)RedColor.V2;
+                SSlider.Value = (int)RedColor.V1;
+                VSlider.Value = (int)RedColor.V0;
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                HSlider.Value = (int)BlueColor.V2;
+                SSlider.Value = (int)BlueColor.V1;
+                VSlider.Value = (int)BlueColor.V0;
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                HSlider.Value = (int)GreenColor.V2;
+                SSlider.Value = (int)GreenColor.V1;
+                VSlider.Value = (int)GreenColor.V0;
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                HSlider.Value = (int)YellowColor.V2;
+                SSlider.Value = (int)YellowColor.V1;
+                VSlider.Value = (int)YellowColor.V0;
+            }
+        }
+
+        private void HSlider_ValueChanged(object sender, EventArgs e)
+        {
+            TrackBar bar = (TrackBar)sender;
+            lblH.Text = "H(" + bar.Value + ")";
+        }
+
+        private void SSlider_ValueChanged(object sender, EventArgs e)
+        {
+            TrackBar bar = (TrackBar)sender;
+            lblS.Text = "S(" + bar.Value + ")";
+        }
+
+        private void VSlider_ValueChanged(object sender, EventArgs e)
+        {
+            TrackBar bar = (TrackBar)sender;
+            lblV.Text = "V(" + bar.Value + ")";
+        }
+
+        private void ColorOn_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ColorPicker.Text == "Red")
+            {
+                RedOn = ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                BlueOn = ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                GreenOn = ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                YellowOn = ColorOn.Checked;
+            }
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
         }
     }
 }
