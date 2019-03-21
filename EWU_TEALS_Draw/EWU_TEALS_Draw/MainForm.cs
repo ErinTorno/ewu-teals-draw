@@ -33,60 +33,77 @@ namespace EWU_TEALS_Draw
         private const int DisplayedCameraWidth = ActualCameraWidth / 6;
         private const int DisplayedCameraHeight = ActualCameraHeight / 6;
 
-        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.77);
-        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.77);
+        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.76);
+        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.76);
         #endregion
 
         #region Color Threshold Properties
         // Red Low Threshold
         private bool RedLowOn;
-        private IInputArray RedHsvMin_Low = new ScalarArray(new MCvScalar(0, 50, 100));
-        private IInputArray RedHsvMax_Low = new ScalarArray(new MCvScalar(5, 255, 255));
+        private IInputArray RedHsvMin_LowRange = new ScalarArray(new MCvScalar(0, 50, 100));
+        private IInputArray RedHsvMax_LowRange = new ScalarArray(new MCvScalar(5, 255, 255));
         // Red High Threshold
         private bool RedOn = true;
-        private static MCvScalar RedColor = new MCvScalar(157, 105, 115);
-        private IInputArray RedHsvMin_High = new ScalarArray(RedColor);
-        private IInputArray RedHsvMax_High = new ScalarArray(new MCvScalar(180, 255, 255));
+        private static MCvScalar RedHsvMin_HighRange_Editable = new MCvScalar(157, 105, 115);
+        private static MCvScalar RedHsvMax_HighRange_Editable = new MCvScalar(180, 255, 255);
+        private IInputArray RedHsvMin_HighRange = new ScalarArray(RedHsvMin_HighRange_Editable);
+        private IInputArray RedHsvMax_HighRange = new ScalarArray(RedHsvMax_HighRange_Editable);
         private MCvScalar RedDrawColor = new MCvScalar(60, 60, 230);
         private Point RedLastPosition;
 
         // Orange
-        private bool OrangeOn;
-        private IInputArray OrangeHsvMin = new ScalarArray(new MCvScalar(10, 175, 65));
-        private IInputArray OrangeHsvMax = new ScalarArray(new MCvScalar(18, 255, 255));
+        private bool OrangeOn = true;
+        private static MCvScalar OrangeHsvMin_Editable = new MCvScalar(10, 175, 65);
+        private static MCvScalar OrangeHsvMax_Editable = new MCvScalar(18, 255, 255);
+        private IInputArray OrangeHsvMin = new ScalarArray(OrangeHsvMin_Editable);
+        private IInputArray OrangeHsvMax = new ScalarArray(OrangeHsvMax_Editable);
         private MCvScalar OrangeDrawColor = new MCvScalar(60, 140, 255);
         private Point OrangeLastPosition;
 
         // Yellow
         private bool YellowOn = true;
-        private static MCvScalar YellowColor = new MCvScalar(25, 50, 120);
-        private IInputArray YellowHsvMin = new ScalarArray(YellowColor);
-        private IInputArray YellowHsvMax = new ScalarArray(new MCvScalar(35, 255, 255));
+        private static MCvScalar YellowHsvMin_Editable = new MCvScalar(25, 50, 120);
+        private static MCvScalar YellowHsvMax_Editable = new MCvScalar(35, 255, 255);
+        private IInputArray YellowHsvMin = new ScalarArray(YellowHsvMin_Editable);
+        private IInputArray YellowHsvMax = new ScalarArray(YellowHsvMax_Editable);
         private MCvScalar YellowDrawColor = new MCvScalar(100, 240, 240);
         private Point YellowLastPosition;
 
         // Green
         private bool GreenOn = true;
-        private static MCvScalar GreenColor = new MCvScalar(45, 35, 66);
-        private IInputArray GreenHsvMin = new ScalarArray(GreenColor); //(85, 200, 70));
-        private IInputArray GreenHsvMax = new ScalarArray(new MCvScalar(95, 255, 255));//(95, 255, 255));
+        private static MCvScalar GreenHsvMin_Editable = new MCvScalar(45, 35, 66);
+        private static MCvScalar GreenHsvMax_Editable = new MCvScalar(95, 255, 255);
+        private IInputArray GreenHsvMin = new ScalarArray(GreenHsvMin_Editable);
+        private IInputArray GreenHsvMax = new ScalarArray(GreenHsvMax_Editable);
         private MCvScalar GreenDrawColor = new MCvScalar(135, 230, 135);
         private Point GreenLastPosition;
 
         // Blue
         private bool BlueOn = true;
-        private static MCvScalar BlueColor = new MCvScalar(95, 109, 65);
-        private IInputArray BlueHsvMin = new ScalarArray(BlueColor);
-        private IInputArray BlueHsvMax = new ScalarArray(new MCvScalar(117, 255, 255));
+        private static MCvScalar BlueHsvMin_Editable = new MCvScalar(95, 109, 65);
+        private static MCvScalar BlueHsvMax_Editable = new MCvScalar(117, 255, 255);
+        private IInputArray BlueHsvMin = new ScalarArray(BlueHsvMin_Editable);
+        private IInputArray BlueHsvMax = new ScalarArray(BlueHsvMax_Editable);
         private MCvScalar BlueDrawColor = new MCvScalar(255, 140, 85);
         private Point BlueLastPosition;
 
         // Purple
-        private bool PurpleOn;
-        private IInputArray PurpleHsvMin = new ScalarArray(new MCvScalar(125, 100, 100));
-        private IInputArray PurpleHsvMax = new ScalarArray(new MCvScalar(140, 255, 255));
+        private bool PurpleOn = true;
+        private static MCvScalar PurpleHsvMin_Editable = new MCvScalar(125, 100, 100);
+        private static MCvScalar PurpleHsvMax_Editable = new MCvScalar(140, 255, 255);
+        private IInputArray PurpleHsvMin = new ScalarArray(PurpleHsvMin_Editable);
+        private IInputArray PurpleHsvMax = new ScalarArray(PurpleHsvMax_Editable);
         private MCvScalar PurpleDrawColor = new MCvScalar(255, 135, 135);
         private Point PurpleLastPosition;
+
+        // Special Color
+        private bool SpecialOn = false;
+        private static MCvScalar SpecialHsvMin_Editable = new MCvScalar(0, 0, 0);
+        private static MCvScalar SpecialHsvMax_Editable = new MCvScalar(180, 255, 255);
+        private IInputArray SpecialHsvMin = new ScalarArray(SpecialHsvMin_Editable);
+        private IInputArray SpecialHsvMax = new ScalarArray(SpecialHsvMax_Editable);
+        private MCvScalar SpecialDrawColor = new MCvScalar(0,0,0);
+        private Point SpecialLastPosition;
         #endregion
 
         #region Re-used Objects for saving memory
@@ -97,6 +114,7 @@ namespace EWU_TEALS_Draw
         private Mat GreenThreshImage_Temp = new Mat();
         private Mat BlueThreshImage_Temp = new Mat();
         private Mat PurpleThreshImage_Temp = new Mat();
+        private Mat SpecialThreshImage_Temp = new Mat();
 
         Queue<Mat> DisposableQueue = new Queue<Mat>();
         #endregion
@@ -144,18 +162,14 @@ namespace EWU_TEALS_Draw
                 Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
                 DisposableQueue.Enqueue(combinedThreshImage);
 
-                if (ColorPicker.Text == "Red" || ColorPicker.Text == "Blue" || ColorPicker.Text == "Green" || ColorPicker.Text == "Yellow")
-                {
-                    ChangeColor();
-                }
                 if (RedOn)
                 {
-                    Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_High, RedHsvMax_High, RedDrawColor, RedLastPosition, "Red");
+                    Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_HighRange, RedHsvMax_HighRange, RedDrawColor, RedLastPosition, "Red");
                     CvInvoke.Add(redThreshImage_High, combinedThreshImage, combinedThreshImage);
                 }
                 if (RedLowOn)
                 {
-                    Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_Low, RedHsvMax_Low, RedDrawColor, RedLastPosition, "Red");
+                    Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_LowRange, RedHsvMax_LowRange, RedDrawColor, RedLastPosition, "Red");
                     CvInvoke.Add(redThreshImage_Low, combinedThreshImage, combinedThreshImage);
                 }
                 if (YellowOn)
@@ -182,6 +196,11 @@ namespace EWU_TEALS_Draw
                 {
                     Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
                     CvInvoke.Add(purpleThreshImage, combinedThreshImage, combinedThreshImage);
+                }
+                if (SpecialOn)
+                {
+                    Mat specialThreshImage = DetectColor(videoFrame, SpecialHsvMin, SpecialHsvMax, SpecialDrawColor, SpecialLastPosition, "Special");
+                    CvInvoke.Add(specialThreshImage, combinedThreshImage, combinedThreshImage);
                 }
 
                 ImageBox_VideoCapture_Gray.Image = combinedThreshImage;
@@ -278,6 +297,9 @@ namespace EWU_TEALS_Draw
                 case "Red":
                     return RedThreshImage_Temp;
 
+                case "Special":
+                    return SpecialThreshImage_Temp;
+
                 default:
                     return null;
             }
@@ -315,6 +337,11 @@ namespace EWU_TEALS_Draw
                 case "Red":
                     RedLastPosition.X = x;
                     RedLastPosition.Y = y;
+                    break;
+
+                case "Special":
+                    SpecialLastPosition.X = x;
+                    SpecialLastPosition.Y = y;
                     break;
             }
         }
@@ -403,10 +430,12 @@ namespace EWU_TEALS_Draw
             {
                 Application.Idle += ProcessFrame;
                 IsRunning = true;
+                btnPlay.Text = "Pause";
             }
             else {
                 Application.Idle -= ProcessFrame;
                 IsRunning = false;
+                btnPlay.Text = "Play";
 
                 UpdateColorLastPosition("Blue", 0, 0);
                 UpdateColorLastPosition("Green", 0, 0);
@@ -414,6 +443,7 @@ namespace EWU_TEALS_Draw
                 UpdateColorLastPosition("Orange", 0, 0);
                 UpdateColorLastPosition("Purple", 0, 0);
                 UpdateColorLastPosition("Red", 0, 0);
+                UpdateColorLastPosition("Special", 0, 0);
             }
         }
 
@@ -431,59 +461,43 @@ namespace EWU_TEALS_Draw
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
         }
 
-        private void ChangeColor()
+        private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (ColorPicker.Text == "Red")
-            {
-                RedColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                RedHsvMin_Low = new ScalarArray(RedColor);
-            }
-            else if (ColorPicker.Text == "Blue")
-            {
-                BlueColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                BlueHsvMin = new ScalarArray(BlueColor);
-            }
-            else if (ColorPicker.Text == "Green")
-            {
-                GreenColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                GreenHsvMin = new ScalarArray(GreenColor);
-            }
-            else if (ColorPicker.Text == "Yellow")
-            {
-                YellowColor = new MCvScalar(VSlider.Value, SSlider.Value, HSlider.Value);
-                YellowHsvMin = new ScalarArray(YellowColor);
-            }
+            tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
         }
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
+            CheckBox_IsMin.Checked = true;
+            UpdateSliderValues(sender, e);
+
             if (ColorPicker.Text == "Red")
             {
-                ColorOn.Checked = RedOn;
-                HSlider.Value = (int)RedColor.V2;
-                SSlider.Value = (int)RedColor.V1;
-                VSlider.Value = (int)RedColor.V0;
+                CheckBox_ColorOn.Checked = RedOn;
             }
             else if (ColorPicker.Text == "Blue")
             {
-                ColorOn.Checked = BlueOn;
-                HSlider.Value = (int)BlueColor.V2;
-                SSlider.Value = (int)BlueColor.V1;
-                VSlider.Value = (int)BlueColor.V0;
+                CheckBox_ColorOn.Checked = BlueOn;
             }
             else if (ColorPicker.Text == "Green")
             {
-                ColorOn.Checked = GreenOn;
-                HSlider.Value = (int)GreenColor.V2;
-                SSlider.Value = (int)GreenColor.V1;
-                VSlider.Value = (int)GreenColor.V0;
+                CheckBox_ColorOn.Checked = GreenOn;
             }
             else if (ColorPicker.Text == "Yellow")
             {
-                ColorOn.Checked = YellowOn;
-                HSlider.Value = (int)YellowColor.V2;
-                SSlider.Value = (int)YellowColor.V1;
-                VSlider.Value = (int)YellowColor.V0;
+                CheckBox_ColorOn.Checked = YellowOn;
+            }
+            else if (ColorPicker.Text == "Orange")
+            {
+                CheckBox_ColorOn.Checked = OrangeOn;
+            }
+            else if (ColorPicker.Text == "Purple")
+            {
+                CheckBox_ColorOn.Checked = PurpleOn;
+            }
+            else if (ColorPicker.Text == "Special")
+            {
+                CheckBox_ColorOn.Checked = SpecialOn;
             }
         }
 
@@ -491,43 +505,199 @@ namespace EWU_TEALS_Draw
         {
             TrackBar bar = (TrackBar)sender;
             lblH.Text = "H(" + bar.Value + ")";
+
+            UpdateHSVCodes();
         }
 
         private void SSlider_ValueChanged(object sender, EventArgs e)
         {
             TrackBar bar = (TrackBar)sender;
             lblS.Text = "S(" + bar.Value + ")";
+
+            UpdateHSVCodes();
         }
 
         private void VSlider_ValueChanged(object sender, EventArgs e)
         {
             TrackBar bar = (TrackBar)sender;
             lblV.Text = "V(" + bar.Value + ")";
+
+            UpdateHSVCodes();
         }
 
-        private void ColorOn_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e)
         {
             if (ColorPicker.Text == "Red")
             {
-                RedOn = ColorOn.Checked;
+                RedOn = CheckBox_ColorOn.Checked;
             }
             else if (ColorPicker.Text == "Blue")
             {
-                BlueOn = ColorOn.Checked;
+                BlueOn = CheckBox_ColorOn.Checked;
             }
             else if (ColorPicker.Text == "Green")
             {
-                GreenOn = ColorOn.Checked;
+                GreenOn = CheckBox_ColorOn.Checked;
             }
             else if (ColorPicker.Text == "Yellow")
             {
-                YellowOn = ColorOn.Checked;
+                YellowOn = CheckBox_ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Orange")
+            {
+                OrangeOn = CheckBox_ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Purple")
+            {
+                PurpleOn = CheckBox_ColorOn.Checked;
+            }
+            else if (ColorPicker.Text == "Special")
+            {
+                SpecialOn = CheckBox_ColorOn.Checked;
             }
         }
 
-        private void btnEdit_Click(object sender, EventArgs e)
+        private void UpdateSliderValues(object sender, EventArgs e)
         {
-            tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
+            double[] hsvValues = null;
+            
+            if (ColorPicker.Text == "Red")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = RedHsvMin_HighRange_Editable.ToArray();
+                else hsvValues = RedHsvMax_HighRange_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = BlueHsvMin_Editable.ToArray();
+                else hsvValues = BlueHsvMax_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = GreenHsvMin_Editable.ToArray();
+                else hsvValues = GreenHsvMax_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = YellowHsvMin_Editable.ToArray();
+                else hsvValues = YellowHsvMax_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Orange")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = OrangeHsvMin_Editable.ToArray();
+                else hsvValues = OrangeHsvMax_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Purple")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = PurpleHsvMin_Editable.ToArray();
+                else hsvValues = PurpleHsvMax_Editable.ToArray();
+            }
+            else if (ColorPicker.Text == "Special")
+            {
+                if (CheckBox_IsMin.Checked) hsvValues = SpecialHsvMin_Editable.ToArray();
+                else hsvValues = SpecialHsvMax_Editable.ToArray();
+            }
+
+            if (hsvValues != null)
+            {
+                HSlider.Value = (int)hsvValues[0];
+                SSlider.Value = (int)hsvValues[1];
+                VSlider.Value = (int)hsvValues[2];
+            }
+        }
+
+        private void UpdateHSVCodes()
+        {
+            if (ColorPicker.Text == "Red")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    RedHsvMin_HighRange_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    RedHsvMin_HighRange = new ScalarArray(RedHsvMin_HighRange_Editable);
+                }
+                else
+                {
+                    RedHsvMax_HighRange_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    RedHsvMax_HighRange = new ScalarArray(RedHsvMax_HighRange_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Blue")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    BlueHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    BlueHsvMin = new ScalarArray(BlueHsvMin_Editable);
+                }
+                else
+                {
+                    BlueHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    BlueHsvMax = new ScalarArray(BlueHsvMax_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Green")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    GreenHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    GreenHsvMin = new ScalarArray(GreenHsvMin_Editable);
+                }
+                else
+                {
+                    GreenHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    GreenHsvMax = new ScalarArray(GreenHsvMax_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Yellow")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    YellowHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    YellowHsvMin = new ScalarArray(YellowHsvMin_Editable);
+                }
+                else
+                {
+                    YellowHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    YellowHsvMax = new ScalarArray(YellowHsvMax_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Orange")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    OrangeHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    OrangeHsvMin = new ScalarArray(OrangeHsvMin_Editable);
+                }
+                else
+                {
+                    OrangeHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    OrangeHsvMax = new ScalarArray(OrangeHsvMax_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Purple")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    PurpleHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    PurpleHsvMin = new ScalarArray(PurpleHsvMin_Editable);
+                }
+                else
+                {
+                    PurpleHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    PurpleHsvMax = new ScalarArray(PurpleHsvMax_Editable);
+                }
+            }
+            else if (ColorPicker.Text == "Special")
+            {
+                if (CheckBox_IsMin.Checked)
+                {
+                    SpecialHsvMin_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    SpecialHsvMin = new ScalarArray(SpecialHsvMin_Editable);
+                }
+                else
+                {
+                    SpecialHsvMax_Editable = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    SpecialHsvMax = new ScalarArray(SpecialHsvMax_Editable);
+                }
+            }
         }
     }
 }

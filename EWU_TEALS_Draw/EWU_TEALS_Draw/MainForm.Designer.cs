@@ -36,11 +36,12 @@
             this.ImageBox_Drawing = new Emgu.CV.UI.ImageBox();
             this.tableLayoutPanel_VideoFeeds = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel_Sliders = new System.Windows.Forms.TableLayoutPanel();
+            this.CheckBox_IsMin = new System.Windows.Forms.CheckBox();
             this.ColorPicker = new System.Windows.Forms.ComboBox();
             this.VSlider = new System.Windows.Forms.TrackBar();
             this.SSlider = new System.Windows.Forms.TrackBar();
             this.HSlider = new System.Windows.Forms.TrackBar();
-            this.ColorOn = new System.Windows.Forms.CheckBox();
+            this.CheckBox_ColorOn = new System.Windows.Forms.CheckBox();
             this.lblH = new System.Windows.Forms.Label();
             this.lblS = new System.Windows.Forms.Label();
             this.lblV = new System.Windows.Forms.Label();
@@ -122,13 +123,13 @@
             this.tableLayoutPanel_Drawing.Name = "tableLayoutPanel_Drawing";
             this.tableLayoutPanel_Drawing.RowCount = 1;
             this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(480, 1033);
+            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(485, 763);
             this.tableLayoutPanel_Drawing.TabIndex = 8;
             // 
             // ImageBox_Drawing
             // 
-            this.ImageBox_Drawing.Location = new System.Drawing.Point(0, 100);
-            this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(0, 100, 0, 0);
+            this.ImageBox_Drawing.Location = new System.Drawing.Point(5, 100);
+            this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(5, 100, 0, 0);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
             this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 573);
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -146,7 +147,7 @@
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture, 0, 0);
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture_Gray, 0, 1);
             this.tableLayoutPanel_VideoFeeds.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1572, 0);
+            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1102, 0);
             this.tableLayoutPanel_VideoFeeds.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel_VideoFeeds.MinimumSize = new System.Drawing.Size(320, 0);
             this.tableLayoutPanel_VideoFeeds.Name = "tableLayoutPanel_VideoFeeds";
@@ -156,21 +157,23 @@
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(330, 1033);
+            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(330, 763);
             this.tableLayoutPanel_VideoFeeds.TabIndex = 9;
             // 
             // tableLayoutPanel_Sliders
             // 
             this.tableLayoutPanel_Sliders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel_Sliders.ColumnCount = 2;
+            this.tableLayoutPanel_Sliders.ColumnCount = 3;
             this.tableLayoutPanel_Sliders.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-            this.tableLayoutPanel_Sliders.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 363F));
-            this.tableLayoutPanel_Sliders.Controls.Add(this.ColorPicker, 1, 0);
+            this.tableLayoutPanel_Sliders.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            this.tableLayoutPanel_Sliders.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 250F));
+            this.tableLayoutPanel_Sliders.Controls.Add(this.CheckBox_IsMin, 1, 0);
+            this.tableLayoutPanel_Sliders.Controls.Add(this.ColorPicker, 2, 0);
             this.tableLayoutPanel_Sliders.Controls.Add(this.VSlider, 1, 3);
             this.tableLayoutPanel_Sliders.Controls.Add(this.SSlider, 1, 2);
             this.tableLayoutPanel_Sliders.Controls.Add(this.HSlider, 1, 1);
-            this.tableLayoutPanel_Sliders.Controls.Add(this.ColorOn, 0, 0);
+            this.tableLayoutPanel_Sliders.Controls.Add(this.CheckBox_ColorOn, 0, 0);
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblH, 0, 1);
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblS, 0, 2);
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblV, 0, 3);
@@ -181,9 +184,25 @@
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 58.88889F));
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
-            this.tableLayoutPanel_Sliders.Size = new System.Drawing.Size(324, 166);
+            this.tableLayoutPanel_Sliders.Size = new System.Drawing.Size(324, 151);
             this.tableLayoutPanel_Sliders.TabIndex = 15;
             this.tableLayoutPanel_Sliders.Visible = false;
+            // 
+            // CheckBox_IsMin
+            // 
+            this.CheckBox_IsMin.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckBox_IsMin.Checked = true;
+            this.CheckBox_IsMin.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckBox_IsMin.Location = new System.Drawing.Point(60, 0);
+            this.CheckBox_IsMin.Margin = new System.Windows.Forms.Padding(0);
+            this.CheckBox_IsMin.Name = "CheckBox_IsMin";
+            this.CheckBox_IsMin.Size = new System.Drawing.Size(60, 25);
+            this.CheckBox_IsMin.TabIndex = 13;
+            this.CheckBox_IsMin.Text = "Min";
+            this.CheckBox_IsMin.UseVisualStyleBackColor = true;
+            this.CheckBox_IsMin.CheckedChanged += new System.EventHandler(this.UpdateSliderValues);
             // 
             // ColorPicker
             // 
@@ -193,62 +212,71 @@
             "Blue",
             "Red",
             "Yellow",
-            "Green"});
-            this.ColorPicker.Location = new System.Drawing.Point(63, 3);
+            "Green",
+            "Orange",
+            "Purple",
+            "Special"});
+            this.ColorPicker.Location = new System.Drawing.Point(123, 3);
             this.ColorPicker.Name = "ColorPicker";
-            this.ColorPicker.Size = new System.Drawing.Size(357, 24);
+            this.ColorPicker.Size = new System.Drawing.Size(244, 24);
             this.ColorPicker.TabIndex = 11;
             this.ColorPicker.SelectedIndexChanged += new System.EventHandler(this.ColorPicker_SelectedIndexChanged);
             // 
             // VSlider
             // 
             this.VSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.VSlider.Location = new System.Drawing.Point(63, 122);
-            this.VSlider.Maximum = 179;
+            this.tableLayoutPanel_Sliders.SetColumnSpan(this.VSlider, 2);
+            this.VSlider.Location = new System.Drawing.Point(63, 107);
+            this.VSlider.Maximum = 255;
             this.VSlider.Name = "VSlider";
-            this.VSlider.Size = new System.Drawing.Size(357, 41);
+            this.VSlider.Size = new System.Drawing.Size(304, 41);
             this.VSlider.TabIndex = 14;
+            this.VSlider.TickFrequency = 5;
             this.VSlider.ValueChanged += new System.EventHandler(this.VSlider_ValueChanged);
             // 
             // SSlider
             // 
             this.SSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.SSlider.Location = new System.Drawing.Point(63, 78);
+            this.tableLayoutPanel_Sliders.SetColumnSpan(this.SSlider, 2);
+            this.SSlider.Location = new System.Drawing.Point(63, 63);
             this.SSlider.Maximum = 255;
             this.SSlider.Name = "SSlider";
-            this.SSlider.Size = new System.Drawing.Size(357, 38);
+            this.SSlider.Size = new System.Drawing.Size(304, 38);
             this.SSlider.TabIndex = 13;
+            this.SSlider.TickFrequency = 5;
             this.SSlider.ValueChanged += new System.EventHandler(this.SSlider_ValueChanged);
             // 
             // HSlider
             // 
             this.HSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.HSlider.Location = new System.Drawing.Point(63, 34);
-            this.HSlider.Maximum = 255;
+            this.tableLayoutPanel_Sliders.SetColumnSpan(this.HSlider, 2);
+            this.HSlider.Location = new System.Drawing.Point(63, 28);
+            this.HSlider.Maximum = 180;
             this.HSlider.Name = "HSlider";
-            this.HSlider.Size = new System.Drawing.Size(357, 38);
+            this.HSlider.Size = new System.Drawing.Size(304, 29);
             this.HSlider.TabIndex = 12;
+            this.HSlider.TickFrequency = 5;
             this.HSlider.ValueChanged += new System.EventHandler(this.HSlider_ValueChanged);
             // 
-            // ColorOn
+            // CheckBox_ColorOn
             // 
-            this.ColorOn.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.ColorOn.AutoSize = true;
-            this.ColorOn.Checked = true;
-            this.ColorOn.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ColorOn.Location = new System.Drawing.Point(3, 5);
-            this.ColorOn.Name = "ColorOn";
-            this.ColorOn.Size = new System.Drawing.Size(49, 21);
-            this.ColorOn.TabIndex = 12;
-            this.ColorOn.Text = "On";
-            this.ColorOn.UseVisualStyleBackColor = true;
-            this.ColorOn.CheckedChanged += new System.EventHandler(this.ColorOn_CheckedChanged);
+            this.CheckBox_ColorOn.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.CheckBox_ColorOn.AutoSize = true;
+            this.CheckBox_ColorOn.Checked = true;
+            this.CheckBox_ColorOn.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckBox_ColorOn.Location = new System.Drawing.Point(3, 3);
+            this.CheckBox_ColorOn.Name = "CheckBox_ColorOn";
+            this.CheckBox_ColorOn.Size = new System.Drawing.Size(49, 19);
+            this.CheckBox_ColorOn.TabIndex = 12;
+            this.CheckBox_ColorOn.Text = "On";
+            this.CheckBox_ColorOn.UseVisualStyleBackColor = true;
+            this.CheckBox_ColorOn.CheckedChanged += new System.EventHandler(this.CheckBox_ColorOn_CheckedChanged);
             // 
             // lblH
             // 
             this.lblH.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblH.AutoSize = true;
-            this.lblH.Location = new System.Drawing.Point(3, 44);
+            this.lblH.Location = new System.Drawing.Point(3, 34);
             this.lblH.Name = "lblH";
             this.lblH.Size = new System.Drawing.Size(36, 17);
             this.lblH.TabIndex = 15;
@@ -258,7 +286,7 @@
             // 
             this.lblS.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblS.AutoSize = true;
-            this.lblS.Location = new System.Drawing.Point(3, 88);
+            this.lblS.Location = new System.Drawing.Point(3, 73);
             this.lblS.Name = "lblS";
             this.lblS.Size = new System.Drawing.Size(35, 17);
             this.lblS.TabIndex = 16;
@@ -268,7 +296,7 @@
             // 
             this.lblV.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblV.AutoSize = true;
-            this.lblV.Location = new System.Drawing.Point(3, 134);
+            this.lblV.Location = new System.Drawing.Point(3, 119);
             this.lblV.Name = "lblV";
             this.lblV.Size = new System.Drawing.Size(35, 17);
             this.lblV.TabIndex = 17;
@@ -345,7 +373,7 @@
             this.pictureBox1.Location = new System.Drawing.Point(4, 4);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1893, 87);
+            this.pictureBox1.Size = new System.Drawing.Size(1423, 87);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 10;
             this.pictureBox1.TabStop = false;
@@ -354,8 +382,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.DimGray;
-            this.ClientSize = new System.Drawing.Size(1902, 1033);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
+            this.ClientSize = new System.Drawing.Size(1432, 763);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
             this.Controls.Add(this.tableLayoutPanel_VideoFeeds);
@@ -396,15 +424,16 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Buttons;
         private System.Windows.Forms.Button btnEdit;
         public System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.ComboBox ColorPicker;
         private System.Windows.Forms.TrackBar HSlider;
         private System.Windows.Forms.TrackBar SSlider;
         private System.Windows.Forms.TrackBar VSlider;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_Sliders;
-        private System.Windows.Forms.CheckBox ColorOn;
+        private System.Windows.Forms.CheckBox CheckBox_ColorOn;
         private System.Windows.Forms.Label lblH;
         private System.Windows.Forms.Label lblS;
         private System.Windows.Forms.Label lblV;
+        private System.Windows.Forms.CheckBox CheckBox_IsMin;
+        private System.Windows.Forms.ComboBox ColorPicker;
     }
 }
 
