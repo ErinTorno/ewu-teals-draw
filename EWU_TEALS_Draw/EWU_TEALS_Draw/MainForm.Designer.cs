@@ -74,7 +74,7 @@
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(325, 34);
             this.btnPlay.TabIndex = 4;
-            this.btnPlay.Text = "Play/Pause";
+            this.btnPlay.Text = "Pause";
             this.btnPlay.UseVisualStyleBackColor = true;
             this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 

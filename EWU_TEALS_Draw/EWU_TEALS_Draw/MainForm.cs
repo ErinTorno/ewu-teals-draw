@@ -23,6 +23,7 @@ namespace EWU_TEALS_Draw
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
         private bool IsRunning;
+        private int MinAreaToDetect = 600;
 
         #region Resolution Properties
         private const int CameraToUse = 0; // Default Camera: 0
@@ -44,15 +45,15 @@ namespace EWU_TEALS_Draw
         private IInputArray RedHsvMax_LowRange = new ScalarArray(new MCvScalar(5, 255, 255));
         // Red High Threshold
         private bool RedOn = true;
-        private static MCvScalar RedHsvMin_HighRange_Editable = new MCvScalar(157, 105, 115);
-        private static MCvScalar RedHsvMax_HighRange_Editable = new MCvScalar(180, 255, 255);
+        private static MCvScalar RedHsvMin_HighRange_Editable = new MCvScalar(0, 125, 180);
+        private static MCvScalar RedHsvMax_HighRange_Editable = new MCvScalar(6, 255, 255);
         private IInputArray RedHsvMin_HighRange = new ScalarArray(RedHsvMin_HighRange_Editable);
         private IInputArray RedHsvMax_HighRange = new ScalarArray(RedHsvMax_HighRange_Editable);
         private MCvScalar RedDrawColor = new MCvScalar(60, 60, 230);
         private Point RedLastPosition;
 
         // Orange
-        private bool OrangeOn = true;
+        private bool OrangeOn = false;
         private static MCvScalar OrangeHsvMin_Editable = new MCvScalar(10, 175, 65);
         private static MCvScalar OrangeHsvMax_Editable = new MCvScalar(18, 255, 255);
         private IInputArray OrangeHsvMin = new ScalarArray(OrangeHsvMin_Editable);
@@ -62,7 +63,7 @@ namespace EWU_TEALS_Draw
 
         // Yellow
         private bool YellowOn = true;
-        private static MCvScalar YellowHsvMin_Editable = new MCvScalar(25, 50, 120);
+        private static MCvScalar YellowHsvMin_Editable = new MCvScalar(19, 50, 195);
         private static MCvScalar YellowHsvMax_Editable = new MCvScalar(35, 255, 255);
         private IInputArray YellowHsvMin = new ScalarArray(YellowHsvMin_Editable);
         private IInputArray YellowHsvMax = new ScalarArray(YellowHsvMax_Editable);
@@ -71,7 +72,7 @@ namespace EWU_TEALS_Draw
 
         // Green
         private bool GreenOn = true;
-        private static MCvScalar GreenHsvMin_Editable = new MCvScalar(45, 35, 66);
+        private static MCvScalar GreenHsvMin_Editable = new MCvScalar(70, 70, 75);
         private static MCvScalar GreenHsvMax_Editable = new MCvScalar(95, 255, 255);
         private IInputArray GreenHsvMin = new ScalarArray(GreenHsvMin_Editable);
         private IInputArray GreenHsvMax = new ScalarArray(GreenHsvMax_Editable);
@@ -80,7 +81,7 @@ namespace EWU_TEALS_Draw
 
         // Blue
         private bool BlueOn = true;
-        private static MCvScalar BlueHsvMin_Editable = new MCvScalar(95, 109, 65);
+        private static MCvScalar BlueHsvMin_Editable = new MCvScalar(99,111,66);
         private static MCvScalar BlueHsvMax_Editable = new MCvScalar(117, 255, 255);
         private IInputArray BlueHsvMin = new ScalarArray(BlueHsvMin_Editable);
         private IInputArray BlueHsvMax = new ScalarArray(BlueHsvMax_Editable);
@@ -88,7 +89,7 @@ namespace EWU_TEALS_Draw
         private Point BlueLastPosition;
 
         // Purple
-        private bool PurpleOn = true;
+        private bool PurpleOn = false;
         private static MCvScalar PurpleHsvMin_Editable = new MCvScalar(125, 100, 100);
         private static MCvScalar PurpleHsvMax_Editable = new MCvScalar(140, 255, 255);
         private IInputArray PurpleHsvMin = new ScalarArray(PurpleHsvMin_Editable);
@@ -245,7 +246,7 @@ namespace EWU_TEALS_Draw
                 }
 
                 // If at least one contour was found and its area is at least 300 pixels
-                if (maxContourIndex >= 0 && maxArea >= 600)
+                if (maxContourIndex >= 0 && maxArea >= MinAreaToDetect)
                 {
                     // Draw the contour in white
                     CvInvoke.DrawContours(inputImage, contours, maxContourIndex, new MCvScalar(255, 255, 255), 2);
