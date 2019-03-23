@@ -15,9 +15,12 @@ using Emgu.CV.Util;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace EWU_TEALS_Draw
 {
+    public enum Color { Red, Yellow, Green, Blue, Orange, Purple, Special }
+
     public partial class MainForm : Form
     {
         private List<IDisposable> Disposables;
@@ -120,6 +123,13 @@ namespace EWU_TEALS_Draw
         Queue<Mat> DisposableQueue = new Queue<Mat>();
         #endregion
 
+        #region Controls
+        private const Keys KeyReset = Keys.R;
+        private const Keys KeyExit = Keys.Q;
+        private const Keys KeySave = Keys.S;
+        private const Keys KeyOpen = Keys.O;
+        #endregion
+
         public MainForm()
         {
             InitializeComponent();
@@ -137,6 +147,8 @@ namespace EWU_TEALS_Draw
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
+            this.KeyPreview = true;
+            this.KeyDown += MainForm_KeyDown;
         }
 
         private void SetupVideoCapture()
@@ -165,42 +177,42 @@ namespace EWU_TEALS_Draw
 
                 if (RedOn)
                 {
-                    Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_HighRange, RedHsvMax_HighRange, RedDrawColor, RedLastPosition, "Red");
+                    Mat redThreshImage_High = DetectColor(videoFrame, RedHsvMin_HighRange, RedHsvMax_HighRange, RedDrawColor, RedLastPosition, Color.Red);
                     CvInvoke.Add(redThreshImage_High, combinedThreshImage, combinedThreshImage);
                 }
                 if (RedLowOn)
                 {
-                    Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_LowRange, RedHsvMax_LowRange, RedDrawColor, RedLastPosition, "Red");
+                    Mat redThreshImage_Low = DetectColor(videoFrame, RedHsvMin_LowRange, RedHsvMax_LowRange, RedDrawColor, RedLastPosition, Color.Red);
                     CvInvoke.Add(redThreshImage_Low, combinedThreshImage, combinedThreshImage);
                 }
                 if (YellowOn)
                 {
-                    Mat yellowThreshImage = DetectColor(videoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, "Yellow");
+                    Mat yellowThreshImage = DetectColor(videoFrame, YellowHsvMin, YellowHsvMax, YellowDrawColor, YellowLastPosition, Color.Yellow);
                     CvInvoke.Add(yellowThreshImage, combinedThreshImage, combinedThreshImage);
                 }
                 if (GreenOn)
                 {
-                    Mat greenThreshImage = DetectColor(videoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, "Green");
+                    Mat greenThreshImage = DetectColor(videoFrame, GreenHsvMin, GreenHsvMax, GreenDrawColor, GreenLastPosition, Color.Green);
                     CvInvoke.Add(greenThreshImage, combinedThreshImage, combinedThreshImage);
                 }
                 if (BlueOn)
                 {
-                    Mat blueThreshImage = DetectColor(videoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, "Blue");
+                    Mat blueThreshImage = DetectColor(videoFrame, BlueHsvMin, BlueHsvMax, BlueDrawColor, BlueLastPosition, Color.Blue);
                     CvInvoke.Add(blueThreshImage, combinedThreshImage, combinedThreshImage);
                 }
                 if (OrangeOn)
                 {
-                    Mat orangeThreshImage = DetectColor(videoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, "Orange");
+                    Mat orangeThreshImage = DetectColor(videoFrame, OrangeHsvMin, OrangeHsvMax, OrangeDrawColor, OrangeLastPosition, Color.Orange);
                     CvInvoke.Add(orangeThreshImage, combinedThreshImage, combinedThreshImage);
                 }
                 if (PurpleOn)
                 {
-                    Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, "Purple");
+                    Mat purpleThreshImage = DetectColor(videoFrame, PurpleHsvMin, PurpleHsvMax, PurpleDrawColor, PurpleLastPosition, Color.Purple);
                     CvInvoke.Add(purpleThreshImage, combinedThreshImage, combinedThreshImage);
                 }
                 if (SpecialOn)
                 {
-                    Mat specialThreshImage = DetectColor(videoFrame, SpecialHsvMin, SpecialHsvMax, SpecialDrawColor, SpecialLastPosition, "Special");
+                    Mat specialThreshImage = DetectColor(videoFrame, SpecialHsvMin, SpecialHsvMax, SpecialDrawColor, SpecialLastPosition, Color.Special);
                     CvInvoke.Add(specialThreshImage, combinedThreshImage, combinedThreshImage);
                 }
 
@@ -214,7 +226,7 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private Mat DetectColor(Mat inputImage, IInputArray hsvThreshMin, IInputArray hsvThreshMax, MCvScalar drawColor, Point thisColorLastPosition, string color)
+        private Mat DetectColor(Mat inputImage, IInputArray hsvThreshMin, IInputArray hsvThreshMax, MCvScalar drawColor, Point thisColorLastPosition, Color color)
         {
             Mat ThreshImage_Temp = GetColorThreshImage_Temp(color);
 
@@ -276,29 +288,29 @@ namespace EWU_TEALS_Draw
             return ThreshImage_Temp;
         }
 
-        private Mat GetColorThreshImage_Temp(string color)
+        private Mat GetColorThreshImage_Temp(Color color)
         {
             switch (color)
             {
-                case "Blue":
+                case Color.Blue:
                     return BlueThreshImage_Temp;
 
-                case "Green":
+                case Color.Green:
                     return GreenThreshImage_Temp;
 
-                case "Yellow":
+                case Color.Yellow:
                     return YellowThreshImage_Temp;
 
-                case "Orange":
+                case Color.Orange:
                     return OrangeThreshImage_Temp;
 
-                case "Purple":
+                case Color.Purple:
                     return PurpleThreshImage_Temp;
 
-                case "Red":
+                case Color.Red:
                     return RedThreshImage_Temp;
 
-                case "Special":
+                case Color.Special:
                     return SpecialThreshImage_Temp;
 
                 default:
@@ -306,41 +318,41 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private void UpdateColorLastPosition(string color, int x, int y)
+        private void UpdateColorLastPosition(Color color, int x, int y)
         {
             switch (color)
             {
-                case "Blue":
+                case Color.Blue:
                     BlueLastPosition.X = x;
                     BlueLastPosition.Y = y;
                     break;
 
-                case "Green":
+                case Color.Green:
                     GreenLastPosition.X = x;
                     GreenLastPosition.Y = y;
                     break;
 
-                case "Yellow":
+                case Color.Yellow:
                     YellowLastPosition.X = x;
                     YellowLastPosition.Y = y;
                     break;
 
-                case "Orange":
+                case Color.Orange:
                     OrangeLastPosition.X = x;
                     OrangeLastPosition.Y = y;
                     break;
 
-                case "Purple":
+                case Color.Purple:
                     PurpleLastPosition.X = x;
                     PurpleLastPosition.Y = y;
                     break;
 
-                case "Red":
+                case Color.Red:
                     RedLastPosition.X = x;
                     RedLastPosition.Y = y;
                     break;
 
-                case "Special":
+                case Color.Special:
                     SpecialLastPosition.X = x;
                     SpecialLastPosition.Y = y;
                     break;
@@ -424,6 +436,23 @@ namespace EWU_TEALS_Draw
                 }
             }
         }
+        
+        void MainForm_KeyDown(object sender, KeyEventArgs e) {
+            switch (e.KeyCode) {
+                case KeyReset:
+                    btnReset.PerformClick();
+                    break;
+                case KeyExit:
+                    btnExit.PerformClick();
+                    break;
+                case KeySave:
+                    SaveFileDialog();
+                    break;
+                case KeyOpen:
+                    OpenFileDialog();
+                    break;
+            }
+        }
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
@@ -438,13 +467,13 @@ namespace EWU_TEALS_Draw
                 IsRunning = false;
                 btnPlay.Text = "Play";
 
-                UpdateColorLastPosition("Blue", 0, 0);
-                UpdateColorLastPosition("Green", 0, 0);
-                UpdateColorLastPosition("Yellow", 0, 0);
-                UpdateColorLastPosition("Orange", 0, 0);
-                UpdateColorLastPosition("Purple", 0, 0);
-                UpdateColorLastPosition("Red", 0, 0);
-                UpdateColorLastPosition("Special", 0, 0);
+                UpdateColorLastPosition(Color.Blue, 0, 0);
+                UpdateColorLastPosition(Color.Green, 0, 0);
+                UpdateColorLastPosition(Color.Yellow, 0, 0);
+                UpdateColorLastPosition(Color.Orange, 0, 0);
+                UpdateColorLastPosition(Color.Purple, 0, 0);
+                UpdateColorLastPosition(Color.Red, 0, 0);
+                UpdateColorLastPosition(Color.Special, 0, 0);
             }
         }
 
@@ -472,31 +501,31 @@ namespace EWU_TEALS_Draw
             CheckBox_IsMin.Checked = true;
             UpdateSliderValues(sender, e);
 
-            if (ColorPicker.Text == "Red")
+            if (ColorPicker.Text == Color.Red.ToString())
             {
                 CheckBox_ColorOn.Checked = RedOn;
             }
-            else if (ColorPicker.Text == "Blue")
+            else if (ColorPicker.Text == Color.Blue.ToString())
             {
                 CheckBox_ColorOn.Checked = BlueOn;
             }
-            else if (ColorPicker.Text == "Green")
+            else if (ColorPicker.Text == Color.Green.ToString())
             {
                 CheckBox_ColorOn.Checked = GreenOn;
             }
-            else if (ColorPicker.Text == "Yellow")
+            else if (ColorPicker.Text == Color.Yellow.ToString())
             {
                 CheckBox_ColorOn.Checked = YellowOn;
             }
-            else if (ColorPicker.Text == "Orange")
+            else if (ColorPicker.Text == Color.Orange.ToString())
             {
                 CheckBox_ColorOn.Checked = OrangeOn;
             }
-            else if (ColorPicker.Text == "Purple")
+            else if (ColorPicker.Text == Color.Purple.ToString())
             {
                 CheckBox_ColorOn.Checked = PurpleOn;
             }
-            else if (ColorPicker.Text == "Special")
+            else if (ColorPicker.Text == Color.Special.ToString())
             {
                 CheckBox_ColorOn.Checked = SpecialOn;
             }
@@ -528,31 +557,31 @@ namespace EWU_TEALS_Draw
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e)
         {
-            if (ColorPicker.Text == "Red")
+            if (ColorPicker.Text == Color.Red.ToString())
             {
                 RedOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Blue")
+            else if (ColorPicker.Text == Color.Blue.ToString())
             {
                 BlueOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Green")
+            else if (ColorPicker.Text == Color.Green.ToString())
             {
                 GreenOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Yellow")
+            else if (ColorPicker.Text == Color.Yellow.ToString())
             {
                 YellowOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Orange")
+            else if (ColorPicker.Text == Color.Orange.ToString())
             {
                 OrangeOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Purple")
+            else if (ColorPicker.Text == Color.Purple.ToString())
             {
                 PurpleOn = CheckBox_ColorOn.Checked;
             }
-            else if (ColorPicker.Text == "Special")
+            else if (ColorPicker.Text == Color.Special.ToString())
             {
                 SpecialOn = CheckBox_ColorOn.Checked;
             }
@@ -562,37 +591,37 @@ namespace EWU_TEALS_Draw
         {
             double[] hsvValues = null;
             
-            if (ColorPicker.Text == "Red")
+            if (ColorPicker.Text == Color.Red.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = RedHsvMin_HighRange_Editable.ToArray();
                 else hsvValues = RedHsvMax_HighRange_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Blue")
+            else if (ColorPicker.Text == Color.Blue.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = BlueHsvMin_Editable.ToArray();
                 else hsvValues = BlueHsvMax_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Green")
+            else if (ColorPicker.Text == Color.Green.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = GreenHsvMin_Editable.ToArray();
                 else hsvValues = GreenHsvMax_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Yellow")
+            else if (ColorPicker.Text == Color.Yellow.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = YellowHsvMin_Editable.ToArray();
                 else hsvValues = YellowHsvMax_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Orange")
+            else if (ColorPicker.Text == Color.Orange.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = OrangeHsvMin_Editable.ToArray();
                 else hsvValues = OrangeHsvMax_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Purple")
+            else if (ColorPicker.Text == Color.Purple.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = PurpleHsvMin_Editable.ToArray();
                 else hsvValues = PurpleHsvMax_Editable.ToArray();
             }
-            else if (ColorPicker.Text == "Special")
+            else if (ColorPicker.Text == Color.Special.ToString())
             {
                 if (CheckBox_IsMin.Checked) hsvValues = SpecialHsvMin_Editable.ToArray();
                 else hsvValues = SpecialHsvMax_Editable.ToArray();
@@ -608,7 +637,7 @@ namespace EWU_TEALS_Draw
 
         private void UpdateHSVCodes()
         {
-            if (ColorPicker.Text == "Red")
+            if (ColorPicker.Text == Color.Red.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -621,7 +650,7 @@ namespace EWU_TEALS_Draw
                     RedHsvMax_HighRange = new ScalarArray(RedHsvMax_HighRange_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Blue")
+            else if (ColorPicker.Text == Color.Blue.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -634,7 +663,7 @@ namespace EWU_TEALS_Draw
                     BlueHsvMax = new ScalarArray(BlueHsvMax_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Green")
+            else if (ColorPicker.Text == Color.Green.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -647,7 +676,7 @@ namespace EWU_TEALS_Draw
                     GreenHsvMax = new ScalarArray(GreenHsvMax_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Yellow")
+            else if (ColorPicker.Text == Color.Yellow.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -660,7 +689,7 @@ namespace EWU_TEALS_Draw
                     YellowHsvMax = new ScalarArray(YellowHsvMax_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Orange")
+            else if (ColorPicker.Text == Color.Orange.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -673,7 +702,7 @@ namespace EWU_TEALS_Draw
                     OrangeHsvMax = new ScalarArray(OrangeHsvMax_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Purple")
+            else if (ColorPicker.Text == Color.Purple.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -686,7 +715,7 @@ namespace EWU_TEALS_Draw
                     PurpleHsvMax = new ScalarArray(PurpleHsvMax_Editable);
                 }
             }
-            else if (ColorPicker.Text == "Special")
+            else if (ColorPicker.Text == Color.Special.ToString())
             {
                 if (CheckBox_IsMin.Checked)
                 {
@@ -699,6 +728,64 @@ namespace EWU_TEALS_Draw
                     SpecialHsvMax = new ScalarArray(SpecialHsvMax_Editable);
                 }
             }
+        }
+
+        public void SaveFileDialog() {
+            using (var diag = new SaveFileDialog()) {
+                diag.Filter = "JSON File|*.json";
+                diag.Title = "Save HSV Preset to File";
+                var res = diag.ShowDialog();
+                if (res == DialogResult.OK) {
+                    SaveHsvToFile(diag.FileName);
+                }
+            }
+        }
+
+        public void OpenFileDialog() {
+            using (var diag = new OpenFileDialog()) {
+                diag.Filter = "JSON File|*.json";
+                diag.Title = "Open HSV Preset from File";
+                var res = diag.ShowDialog();
+                if (res == DialogResult.OK) {
+                    LoadHsvFromFile(diag.FileName);
+                }
+            }
+        }
+
+        public void SaveHsvToFile(string path) {
+            var ser = new HsvSerializer();
+            ser.AddColor(Color.Red, RedOn, RedHsvMin_HighRange_Editable, RedHsvMax_HighRange_Editable);
+            ser.AddColor(Color.Yellow, YellowOn, YellowHsvMin_Editable, YellowHsvMax_Editable);
+            ser.AddColor(Color.Green, GreenOn, GreenHsvMin_Editable, GreenHsvMax_Editable);
+            ser.AddColor(Color.Blue, BlueOn, BlueHsvMin_Editable, BlueHsvMax_Editable);
+            ser.AddColor(Color.Orange, OrangeOn, OrangeHsvMin_Editable, OrangeHsvMax_Editable);
+            ser.AddColor(Color.Purple, PurpleOn, PurpleHsvMin_Editable, PurpleHsvMax_Editable);
+            ser.AddColor(Color.Special, SpecialOn, SpecialHsvMin_Editable, SpecialHsvMax_Editable);
+            File.WriteAllText(path, ser.AsJson());
+        }
+        public void LoadHsvFromFile(string path) {
+            var ser = HsvSerializer.FromJson(File.ReadAllText(path));
+
+            Action<Color> updateColor = color => {
+                Action<MCvScalar> setSliders = scalar => {
+                    HSlider.Value = (int)scalar.V0;
+                    SSlider.Value = (int)scalar.V1;
+                    VSlider.Value = (int)scalar.V2;
+                };
+                ColorPicker.Text = color.ToString();
+                CheckBox_ColorOn.Checked = ser.IsEnabled(color);
+                var min = ser.MinHsv(color);
+                var max = ser.MaxHsv(color);
+
+                CheckBox_IsMin.Checked = true;
+                setSliders(min);
+                CheckBox_IsMin.Checked = false;
+                setSliders(max);
+            };
+            // for all availale colors, we update them
+            foreach (var color in Enum.GetValues(typeof(Color)).Cast<Color>())
+                updateColor(color);
+            ColorPicker.Text = Color.Red.ToString();
         }
     }
 }
