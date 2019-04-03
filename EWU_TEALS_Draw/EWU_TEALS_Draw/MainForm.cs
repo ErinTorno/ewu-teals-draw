@@ -333,13 +333,17 @@ namespace EWU_TEALS_Draw
             return grayImage;
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
             ReleaseResources();
         }
 
-        private void ReleaseResources() {
-            if (Disposables != null) {
-                foreach (IDisposable disposable in Disposables) {
+        private void ReleaseResources()
+        {
+            if (Disposables != null)
+            {
+                foreach (IDisposable disposable in Disposables)
+                {
                     if (disposable != null) disposable.Dispose();
                 }
 
@@ -395,15 +399,17 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private void btnExit_Click(object sender, EventArgs e) {
+        private void btnExit_Click(object sender, EventArgs e)
+        {
             DialogResult result = MessageBox.Show("Do you want to exit the beautiful application?",
                     "Important Question",
                     MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            if(result == DialogResult.Yes)
                 Application.Exit();
         }
 
-        private void btnReset_Click(object sender, EventArgs e) {
+        private void btnReset_Click(object sender, EventArgs e)
+        {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
         }
 
