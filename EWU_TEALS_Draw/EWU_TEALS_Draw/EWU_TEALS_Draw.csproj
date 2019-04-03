@@ -35,11 +35,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DirectShowLib, Version=2.1.0.1599, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DirectShowLib.1.0.0\lib\DirectShowLib.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI, Version=3.4.3.3016, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.4.3.3016\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.World, Version=3.4.3.3016, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.4.3.3016\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -57,10 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Draw\ColorDetector.cs" />
-    <Compile Include="Draw\ColorRange.cs" />
-    <Compile Include="Draw\Drawing.cs" />
-    <Compile Include="Draw\Line.cs" />
+    <Compile Include="Draw\ContourExtens.cs" />
+    <Compile Include="Draw\HsvConfig.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,25 +101,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HaarCascades\haarcascade_eye.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="HaarCascades\haarcascade_frontalface_alt.xml" />
-    <Content Include="HaarCascades\haarcascade_frontalface_default.xml" />
-    <Content Include="HaarCascades\haarcascade_lefteye_2splits.xml" />
-    <Content Include="HaarCascades\haarcascade_profileface.xml" />
-    <Content Include="HaarCascades\haarcascade_righteye_2splits.xml" />
-    <Content Include="HaarCascades\haarcascade_smile.xml" />
-    <Content Include="HaarCascades\haarcascade_upperbody.xml" />
-    <Content Include="HaarCascades\Hand.xml" />
-    <Content Include="HaarCascades\HandHaarCascade.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="HaarCascades\Handy.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="HaarCascades\Hand_haar_cascade.xml" />
     <Content Include="License-LGPL.txt" />
+    <None Include="Resources\logo_uh_color.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.3.4.3.3016\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.3.4.3.3016\build\EMGU.CV.targets')" />
