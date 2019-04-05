@@ -30,7 +30,6 @@ namespace EWU_TEALS_Draw
         private int MinAreaToDetect = 600;
 
         #region Resolution Properties
-        private const int CameraToUse = 0; // Default Camera: 0
         private const int FPS = 30;
         private const int ActualCameraWidth = 1920;
         private const int ActualCameraHeight = 1080;
@@ -43,6 +42,8 @@ namespace EWU_TEALS_Draw
         #endregion
 
         #region Color Threshold Properties
+        private AutoConfigure AutoColor;
+
         private Dictionary<Color, HsvConfig> Colors = new Dictionary<Color, HsvConfig> {
             { Color.Red,     new HsvConfig(true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)) },
             { Color.Orange,  new HsvConfig(true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)) },
@@ -83,6 +84,8 @@ namespace EWU_TEALS_Draw
         private const Keys KeyExit = Keys.Q;
         private const Keys KeySave = Keys.S;
         private const Keys KeyOpen = Keys.O;
+        private const Keys ToggleAuto = Keys.A;
+        private const Keys CaptureColor = Keys.Space;
         #endregion
 
         public MainForm()
@@ -99,6 +102,7 @@ namespace EWU_TEALS_Draw
         {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
+            AutoColor = new AutoConfigure(ImageBox_VideoCapture);
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
@@ -109,14 +113,14 @@ namespace EWU_TEALS_Draw
 
         private void SetupVideoCapture()
         {
-            if (CameraToUse == 0) VideoCapture = new VideoCapture(CameraToUse);
-            else if (CameraToUse == 1) VideoCapture = new VideoCapture(CameraToUse + CaptureType.DShow); // Need DShow backend for Logitech Webcam
-
-            //VideoCapture.SetCaptureProperty(CapProp.Fps, FPS);
+            // attempt to use this type; if it fails, we go to default
+            VideoCapture = new VideoCapture(1 + CaptureType.DShow); // Need DShow backend for Logitech Webcam
+            if (VideoCapture.Width == 0 || VideoCapture.Height == 0)
+                VideoCapture = new VideoCapture(0);
+            
             VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);
             VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight);
             VideoCapture.SetCaptureProperty(CapProp.Autofocus, 0);
-            //VideoCapture.SetCaptureProperty(CapProp.AutoExposure, 0);
         }
 
         private void ProcessFrame(object sender, EventArgs e)
@@ -130,6 +134,8 @@ namespace EWU_TEALS_Draw
 
                 Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
                 DisposableQueue.Enqueue(combinedThreshImage);
+
+                AutoColor.Update(videoFrame);
 
                 foreach (var pair in Colors) {
                     var color = pair.Key;
@@ -361,6 +367,12 @@ namespace EWU_TEALS_Draw
         
         void MainForm_KeyDown(object sender, KeyEventArgs e) {
             switch (e.KeyCode) {
+                case ToggleAuto:
+                    AutoColor.IsActive = !AutoColor.IsActive;
+                    break;
+                case CaptureColor:
+                    AutoColor.CaptureNextUpdate = true;
+                    break;
                 case KeyReset:
                     btnReset.PerformClick();
                     break;

@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
-    public struct HsvConfig {
-        public bool IsEnabled;
-        public MCvScalar InkColor;
+    public struct HsvConfig : IDetectable {
+        public bool IsEnabled { get; set; }
+        public MCvScalar InkColor { get; set; }
         public MCvScalar MinHsv;
         public MCvScalar MaxHsv;
         public IInputArray MinHsvRange { get => new ScalarArray(MinHsv); }
