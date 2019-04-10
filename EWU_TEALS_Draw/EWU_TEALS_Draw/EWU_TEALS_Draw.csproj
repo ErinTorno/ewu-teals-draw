@@ -69,6 +69,7 @@
     <Compile Include="Draw\HsvConfig.cs" />
     <Compile Include="Draw\IDetectable.cs" />
     <Compile Include="Draw\MCvScalarExtensions.cs" />
+    <Compile Include="Draw\ViewWatcher.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
