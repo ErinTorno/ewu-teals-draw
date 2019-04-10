@@ -97,7 +97,7 @@ namespace EwuTeals.Draw {
             var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
             var minHsv = new MCvScalar(hsv.V0 - 4.0, hsv.V1 - 10.0, 100.0);
             var maxHsv = new MCvScalar(hsv.V0 + 4.0, hsv.V1 + 50.0, 230.0);
-            return new HsvConfig(true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
+            return new HsvConfig("Auto Color", true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
     }
 }

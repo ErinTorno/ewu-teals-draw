@@ -45,13 +45,13 @@ namespace EWU_TEALS_Draw
         private AutoConfigure AutoColor;
 
         private Dictionary<Color, HsvConfig> Colors = new Dictionary<Color, HsvConfig> {
-            { Color.Red,     new HsvConfig(true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)) },
-            { Color.Orange,  new HsvConfig(true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)) },
-            { Color.Yellow,  new HsvConfig(true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)) },
-            { Color.Green,   new HsvConfig(true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)) },
-            { Color.Blue,    new HsvConfig(true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)) },
-            { Color.Purple,  new HsvConfig(true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)) },
-            { Color.Special, new HsvConfig(false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)) }
+            { Color.Red,     new HsvConfig("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)) },
+            { Color.Orange,  new HsvConfig("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)) },
+            { Color.Yellow,  new HsvConfig("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)) },
+            { Color.Green,   new HsvConfig("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)) },
+            { Color.Blue,    new HsvConfig("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)) },
+            { Color.Purple,  new HsvConfig("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)) },
+            { Color.Special, new HsvConfig("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)) }
         };
 
         private Dictionary<Color, Point> LastPosition = new Dictionary<Color, Point> {
