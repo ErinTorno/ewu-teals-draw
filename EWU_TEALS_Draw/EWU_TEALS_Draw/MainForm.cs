@@ -17,6 +17,7 @@ using Emgu.CV.CvEnum;
 using System.IO;
 using Newtonsoft.Json;
 using EwuTeals.Draw;
+using System.Collections.ObjectModel;
 
 namespace EWU_TEALS_Draw
 {
@@ -27,7 +28,6 @@ namespace EWU_TEALS_Draw
         private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
         private bool IsRunning;
-        private int MinAreaToDetect = 600;
 
         #region Resolution Properties
         private const int FPS = 30;
@@ -41,41 +41,11 @@ namespace EWU_TEALS_Draw
         private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.76);
         #endregion
 
-        #region Color Threshold Properties
-        private AutoConfigure AutoColor;
-
-        private Dictionary<Color, HsvConfig> Colors = new Dictionary<Color, HsvConfig> {
-            { Color.Red,     new HsvConfig("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)) },
-            { Color.Orange,  new HsvConfig("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)) },
-            { Color.Yellow,  new HsvConfig("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)) },
-            { Color.Green,   new HsvConfig("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)) },
-            { Color.Blue,    new HsvConfig("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)) },
-            { Color.Purple,  new HsvConfig("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)) },
-            { Color.Special, new HsvConfig("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)) }
-        };
-
-        private Dictionary<Color, Point> LastPosition = new Dictionary<Color, Point> {
-            { Color.Red, new Point(0, 0) },
-            { Color.Orange, new Point(0, 0) },
-            { Color.Yellow, new Point(0, 0) },
-            { Color.Green, new Point(0, 0) },
-            { Color.Blue, new Point(0, 0) },
-            { Color.Purple, new Point(0, 0) },
-            { Color.Special, new Point(0, 0) }
-        };
-       
-        #endregion
+        private ObservableCollection<Drawable> Drawables = new ObservableCollection<Drawable>();
+        
+        private AutoColor AutoColor;
 
         #region Re-used Objects for saving memory
-        private Mat HsvImage_Temp = new Mat();
-        private Mat RedThreshImage_Temp = new Mat();
-        private Mat OrangeThreshImage_Temp = new Mat();
-        private Mat YellowThreshImage_Temp = new Mat();
-        private Mat GreenThreshImage_Temp = new Mat();
-        private Mat BlueThreshImage_Temp = new Mat();
-        private Mat PurpleThreshImage_Temp = new Mat();
-        private Mat SpecialThreshImage_Temp = new Mat();
-
         Queue<Mat> DisposableQueue = new Queue<Mat>();
         #endregion
 
@@ -102,13 +72,30 @@ namespace EWU_TEALS_Draw
         {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            AutoColor = new AutoConfigure(ImageBox_VideoCapture);
+            AutoColor = new AutoColor(ImageBox_VideoCapture);
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
             this.KeyPreview = true;
             this.KeyDown += MainForm_KeyDown;
             ColorPicker.SelectedIndex = 0;
+
+            Drawables.Add(new HsvConfig("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)));
+            Drawables.Add(new HsvConfig("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)));
+            Drawables.Add(new HsvConfig("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)));
+            Drawables.Add(new HsvConfig("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)));
+            Drawables.Add(new HsvConfig("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)));
+            Drawables.Add(new HsvConfig("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
+            Drawables.Add(new HsvConfig("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)));
+            Drawables.CollectionChanged += (sender, e) => {
+                ColorPicker.Items.Clear();
+                foreach (var d in Drawables)
+                    ColorPicker.Items.Add(d.Name);
+            };
+
+            AutoColor.OnColorCapture += (sender, e) => {
+                Drawables.Add(e.Color);
+            };
         }
 
         private void SetupVideoCapture()
@@ -137,11 +124,9 @@ namespace EWU_TEALS_Draw
 
                 AutoColor.Update(videoFrame);
 
-                foreach (var pair in Colors) {
-                    var color = pair.Key;
-                    var config = pair.Value;
-                    if (config.IsEnabled) {
-                        Mat curThresh = DetectColor(videoFrame, color);
+                foreach (var d in Drawables) {
+                    if (d.IsEnabled) {
+                        Mat curThresh = d.Draw(ImageBox_Drawing, videoFrame);
                         CvInvoke.Add(curThresh, combinedThreshImage, combinedThreshImage);
                     }
                 }
@@ -154,182 +139,6 @@ namespace EWU_TEALS_Draw
                     DisposableQueue.Dequeue().Dispose();
                 }
             }
-        }
-
-        private Mat DetectColor(Mat inputImage, Color color)
-        {
-            var curColor = Colors[color];
-            Mat ThreshImage_Temp = GetColorThreshImage_Temp(color);
-
-            CvInvoke.CvtColor(inputImage, HsvImage_Temp, ColorConversion.Bgr2Hsv);
-
-            // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
-            CvInvoke.InRange(HsvImage_Temp, curColor.MinHsvRange, curColor.MaxHsvRange, ThreshImage_Temp);
-
-            // Get contours of thresh image
-            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
-            {
-                //Mat hierarchy = new Mat(); Use this if need hierarchy parameter in FindContours
-                CvInvoke.FindContours(ThreshImage_Temp, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-                
-                // Find largest contour
-                double maxArea = 0;
-                int maxContourIndex = -1;
-                for (int i = 0; i < contours.Size; i++) {
-                    using (VectorOfPoint contour = contours[i]) {
-                        double area = CvInvoke.ContourArea(contour);
-                        if (area > maxArea) {
-                            maxArea = area;
-                            maxContourIndex = i;
-                        }
-                    }
-                }
-
-                // If at least one contour was found and its area is at least 300 pixels
-                if (maxContourIndex >= 0 && maxArea >= MinAreaToDetect) {
-                    // Draw the contour in white
-                    CvInvoke.DrawContours(inputImage, contours, maxContourIndex, new MCvScalar(255, 255, 255), 2);
-
-                    // Get the contour center of mass
-                    MCvMoments moments = CvInvoke.Moments(contours[maxContourIndex]);
-                    Point contourCenter = new Point(
-                        (int)(moments.M10 / moments.M00),
-                        (int)(moments.M01 / moments.M00));
-
-                    // Draw the contour center on video feed
-                    CvInvoke.Circle(inputImage, contourCenter, 5, new MCvScalar(255, 255, 255), 2);
-
-                    // Draw on canvas using contour center
-                    contourCenter = ScaleToCanvas(contourCenter);
-                    int width = GetWidthBySpeed(LastPosition[color], contourCenter);
-                    DrawLineTo(contourCenter, curColor.InkColor, LastPosition[color], width);
-
-                    UpdateColorLastPosition(color, contourCenter.X, contourCenter.Y);
-                }
-                else {
-                    UpdateColorLastPosition(color, 0, 0);
-                }
-
-                /*
-                // Find largest contour
-                double maxRating = 0;
-                var contourCenter = new Point(0, 0);
-                int maxContourIndex = -1;
-                for (int i = 0; i < contours.Size; i++)
-                {
-                    using (VectorOfPoint contour = contours[i])
-                    {
-                        double area = CvInvoke.ContourArea(contour);
-                        // as long as area is large enough, we check if it is a better choice
-                        if (area > MinAreaToDetect) {
-                            // Get the contour center of mass
-                            MCvMoments moments = CvInvoke.Moments(contour);
-                            var center = new Point(
-                                (int)(moments.M10 / moments.M00),
-                                (int)(moments.M01 / moments.M00));
-                            // we negate, so that more irregular shapes are negative, and so lower rating
-                            var rating = -contour.IrregularityRating(contourCenter);
-                            if (rating > maxRating) {
-                                maxContourIndex = i;
-                                contourCenter = center;
-                            }
-                        }
-                    }
-                }
-                
-                if (maxContourIndex >= 0) ...
-                */
-            }
-            
-            return ThreshImage_Temp;
-        }
-
-        private Mat GetColorThreshImage_Temp(Color color)
-        {
-            switch (color)
-            {
-                case Color.Blue:
-                    return BlueThreshImage_Temp;
-
-                case Color.Green:
-                    return GreenThreshImage_Temp;
-
-                case Color.Yellow:
-                    return YellowThreshImage_Temp;
-
-                case Color.Orange:
-                    return OrangeThreshImage_Temp;
-
-                case Color.Purple:
-                    return PurpleThreshImage_Temp;
-
-                case Color.Red:
-                    return RedThreshImage_Temp;
-
-                case Color.Special:
-                    return SpecialThreshImage_Temp;
-
-                default:
-                    return null;
-            }
-        }
-
-        private void UpdateColorLastPosition(Color color, int x, int y)
-        {
-            var lastPos = LastPosition[color];
-            lastPos.X = x;
-            lastPos.Y = y;
-            LastPosition[color] = lastPos;
-        }
-
-        private void DrawLineTo(Point point, MCvScalar color, Point thisColorLastPosition, int strokeWidth)
-        {
-            if (strokeWidth <= 0) strokeWidth = 1;
-            if (thisColorLastPosition.X != 0 && thisColorLastPosition.Y != 0)
-            {
-                CvInvoke.Line(ImageBox_Drawing.Image, thisColorLastPosition, point, color, strokeWidth, LineType.AntiAlias);
-                ImageBox_Drawing.Refresh();
-            }
-        }
-
-        private Color GetSelectedColor() {
-            var name = ColorPicker.Text;
-            return (Color)Enum.Parse(typeof(Color), ColorPicker.Text);
-        }
-
-        private int GetWidthBySpeed(Point colorLastPosition, Point colorDestination)
-        {
-            int dx = colorDestination.X - colorLastPosition.X;
-            int dy = colorDestination.Y - colorLastPosition.Y;
-
-            double travelDistance = Math.Sqrt(dx * dx + dy * dy);
-            double speed = travelDistance / (1000 / FPS); // Speed as a ratio of pixels/frame length in ms
-            double maxAssumedSpeed = 2; // found this number through testing...
-            double speedRatio = speed / maxAssumedSpeed;
-
-            if (speedRatio > 1.0) speedRatio = 1.0;
-            int maxWidth = 25;
-            int minWidth = 3;
-            int strokeWidth = (int)Math.Ceiling(speedRatio * maxWidth);
-
-
-            // To flip to wider when slower:
-            //strokeWidth = maxWidth - strokeWidth;
-
-            if (strokeWidth > maxWidth) strokeWidth = maxWidth;
-            if (strokeWidth < minWidth) strokeWidth = minWidth;
-            return strokeWidth;
-        }
-
-        private Point ScaleToCanvas(Point point)
-        {
-            double widthMultiplier = (CanvasWidth * 1.0) / DisplayedCameraWidth;
-            double heightMultiplier = (CanvasHeight * 1.0) / DisplayedCameraHeight;
-
-            point.X = (int)(point.X * widthMultiplier);
-            point.Y = (int)(point.Y * heightMultiplier);
-
-            return point;
         }
 
         private IImage GetGrayImage(Mat color_image)
@@ -401,13 +210,8 @@ namespace EWU_TEALS_Draw
                 IsRunning = false;
                 btnPlay.Text = "Play";
 
-                UpdateColorLastPosition(Color.Blue, 0, 0);
-                UpdateColorLastPosition(Color.Green, 0, 0);
-                UpdateColorLastPosition(Color.Yellow, 0, 0);
-                UpdateColorLastPosition(Color.Orange, 0, 0);
-                UpdateColorLastPosition(Color.Purple, 0, 0);
-                UpdateColorLastPosition(Color.Red, 0, 0);
-                UpdateColorLastPosition(Color.Special, 0, 0);
+                // we reset each of these to prevent weird line issues when unpausing at far away locations
+                foreach (var d in Drawables) d.ResetLastPosition();
             }
         }
 
@@ -430,13 +234,13 @@ namespace EWU_TEALS_Draw
             tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
         }
 
-        private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            CheckBox_IsMin.Checked = true;
-            UpdateSliderValues(sender, e);
+        private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
+            if (ColorPicker.SelectedIndex < Drawables.Count) {
+                CheckBox_IsMin.Checked = true;
+                UpdateSliderValues(sender, e);
 
-            var color = GetSelectedColor();
-            CheckBox_ColorOn.Checked = Colors[color].IsEnabled;
+                CheckBox_ColorOn.Checked = Drawables[ColorPicker.SelectedIndex].IsEnabled;
+            }
         }
 
         private void HSlider_ValueChanged(object sender, EventArgs e)
@@ -465,40 +269,42 @@ namespace EWU_TEALS_Draw
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e)
         {
-            var color = GetSelectedColor();
-            var config = Colors[color];
-            config.IsEnabled = CheckBox_ColorOn.Checked;
-            Colors[color] = config;
+            if (ColorPicker.SelectedIndex < Drawables.Count)
+                Drawables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }
 
-        private void UpdateSliderValues(object sender, EventArgs e)
-        {
-            double[] hsvValues = null;
+        private void UpdateSliderValues(object sender, EventArgs e) {
+            if (ColorPicker.SelectedIndex < Drawables.Count) {
+                var drawable = Drawables[ColorPicker.SelectedIndex];
+                if (drawable is HsvConfig) {
+                    var hsv = (HsvConfig)drawable;
+                    double[] hsvValues = null;
 
-            var color = GetSelectedColor();
-            var config = Colors[color];
-            if (CheckBox_IsMin.Checked)
-                hsvValues = config.MinHsv.ToArray();
-            else
-                hsvValues = config.MaxHsv.ToArray();
-            
-            if (hsvValues != null)
-            {
-                HSlider.Value = (int)hsvValues[0];
-                SSlider.Value = (int)hsvValues[1];
-                VSlider.Value = (int)hsvValues[2];
+                    if (CheckBox_IsMin.Checked)
+                        hsvValues = hsv.MinHsv.ToArray();
+                    else
+                        hsvValues = hsv.MaxHsv.ToArray();
+
+                    if (hsvValues != null) {
+                        HSlider.Value = (int)hsvValues[0];
+                        SSlider.Value = (int)hsvValues[1];
+                        VSlider.Value = (int)hsvValues[2];
+                    }
+                }
             }
         }
 
-        private void UpdateHSVCodes()
-        {
-            var color = GetSelectedColor();
-            var config = Colors[color];
-            if (CheckBox_IsMin.Checked)
-                config.MinHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
-            else
-                config.MaxHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
-            Colors[color] = config;
+        private void UpdateHSVCodes() {
+            if (ColorPicker.SelectedIndex < Drawables.Count) {
+                var drawable = Drawables[ColorPicker.SelectedIndex];
+                if (drawable is HsvConfig) {
+                    var hsv = (HsvConfig)drawable;
+                    if (CheckBox_IsMin.Checked)
+                        hsv.MinHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                    else
+                        hsv.MaxHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
+                }
+            }
         }
 
         public void SaveFileDialog() {
@@ -523,12 +329,17 @@ namespace EWU_TEALS_Draw
             }
         }
 
+        // saving and loading disabled write now until we decide how to handle this
+
         public void SaveHsvToFile(string path) {
-            File.WriteAllText(path, JsonConvert.SerializeObject(Colors));
+            /*
+            File.WriteAllText(path, JsonConvert.SerializeObject(Drawables));
+            */
         }
 
         public void LoadHsvFromFile(string path) {
-            var ser = JsonConvert.DeserializeObject<Dictionary<Color, HsvConfig>>(File.ReadAllText(path));
+            /*
+            var ser = JsonConvert.DeserializeObject<ObservableCollection<Dictionary<string, string>>>(File.ReadAllText(path));
 
             Action<Color, HsvConfig> updateColor = (color, config) => {
                 Action<MCvScalar> setSliders = scalar => {
@@ -549,6 +360,7 @@ namespace EWU_TEALS_Draw
                 updateColor(pair.Key, pair.Value);
             Colors = ser;
             ColorPicker.Text = Color.Red.ToString();
+            */
         }
     }
 }

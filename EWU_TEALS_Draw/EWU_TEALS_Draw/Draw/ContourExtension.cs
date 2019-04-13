@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
-    static class ContourExtens {
+    static class ContourExtension {
         private const int MaxPointsToAnalyze = 50;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
