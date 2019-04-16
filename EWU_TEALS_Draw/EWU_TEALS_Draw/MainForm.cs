@@ -41,7 +41,7 @@ namespace EWU_TEALS_Draw
         private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.76);
         #endregion
 
-        private ObservableCollection<Drawable> Drawables = new ObservableCollection<Drawable>();
+        private ObservableCollection<Detectable> Detectables = new ObservableCollection<Detectable>();
         
         private AutoColor AutoColor;
 
@@ -80,21 +80,22 @@ namespace EWU_TEALS_Draw
             this.KeyDown += MainForm_KeyDown;
             ColorPicker.SelectedIndex = 0;
 
-            Drawables.Add(new HsvConfig("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)));
-            Drawables.Add(new HsvConfig("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)));
-            Drawables.Add(new HsvConfig("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)));
-            Drawables.Add(new HsvConfig("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)));
-            Drawables.Add(new HsvConfig("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)));
-            Drawables.Add(new HsvConfig("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
-            Drawables.Add(new HsvConfig("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)));
-            Drawables.CollectionChanged += (sender, e) => {
+            Detectables.Add(new DetectableColor("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)));
+            Detectables.Add(new DetectableColor("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)));
+            Detectables.Add(new DetectableColor("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)));
+            Detectables.Add(new DetectableColor("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)));
+            Detectables.Add(new DetectableColor("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)));
+            Detectables.Add(new DetectableColor("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
+            Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)));
+
+            Detectables.CollectionChanged += (sender, e) => {
                 ColorPicker.Items.Clear();
-                foreach (var d in Drawables)
+                foreach (var d in Detectables)
                     ColorPicker.Items.Add(d.Name);
             };
 
             AutoColor.OnColorCapture += (sender, e) => {
-                Drawables.Add(e.Color);
+                Detectables.Add(e.Color);
             };
         }
 
@@ -124,7 +125,7 @@ namespace EWU_TEALS_Draw
 
                 AutoColor.Update(videoFrame);
 
-                foreach (var d in Drawables) {
+                foreach (var d in Detectables) {
                     if (d.IsEnabled) {
                         Mat curThresh = d.Draw(ImageBox_Drawing, videoFrame);
                         CvInvoke.Add(curThresh, combinedThreshImage, combinedThreshImage);
@@ -211,7 +212,7 @@ namespace EWU_TEALS_Draw
                 btnPlay.Text = "Play";
 
                 // we reset each of these to prevent weird line issues when unpausing at far away locations
-                foreach (var d in Drawables) d.ResetLastPosition();
+                foreach (var d in Detectables) d.ResetLastPosition();
             }
         }
 
@@ -235,11 +236,11 @@ namespace EWU_TEALS_Draw
         }
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Drawables.Count) {
+            if (ColorPicker.SelectedIndex < Detectables.Count) {
                 CheckBox_IsMin.Checked = true;
                 UpdateSliderValues(sender, e);
 
-                CheckBox_ColorOn.Checked = Drawables[ColorPicker.SelectedIndex].IsEnabled;
+                CheckBox_ColorOn.Checked = Detectables[ColorPicker.SelectedIndex].IsEnabled;
             }
         }
 
@@ -269,15 +270,15 @@ namespace EWU_TEALS_Draw
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e)
         {
-            if (ColorPicker.SelectedIndex < Drawables.Count)
-                Drawables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
+            if (ColorPicker.SelectedIndex < Detectables.Count)
+                Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }
 
         private void UpdateSliderValues(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Drawables.Count) {
-                var drawable = Drawables[ColorPicker.SelectedIndex];
-                if (drawable is HsvConfig) {
-                    var hsv = (HsvConfig)drawable;
+            if (ColorPicker.SelectedIndex < Detectables.Count) {
+                var drawable = Detectables[ColorPicker.SelectedIndex];
+                if (drawable is DetectableColor) {
+                    var hsv = (DetectableColor)drawable;
                     double[] hsvValues = null;
 
                     if (CheckBox_IsMin.Checked)
@@ -295,10 +296,10 @@ namespace EWU_TEALS_Draw
         }
 
         private void UpdateHSVCodes() {
-            if (ColorPicker.SelectedIndex < Drawables.Count) {
-                var drawable = Drawables[ColorPicker.SelectedIndex];
-                if (drawable is HsvConfig) {
-                    var hsv = (HsvConfig)drawable;
+            if (ColorPicker.SelectedIndex < Detectables.Count) {
+                var drawable = Detectables[ColorPicker.SelectedIndex];
+                if (drawable is DetectableColor) {
+                    var hsv = (DetectableColor)drawable;
                     if (CheckBox_IsMin.Checked)
                         hsv.MinHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
                     else
@@ -332,35 +333,22 @@ namespace EWU_TEALS_Draw
         // saving and loading disabled write now until we decide how to handle this
 
         public void SaveHsvToFile(string path) {
-            /*
-            File.WriteAllText(path, JsonConvert.SerializeObject(Drawables));
-            */
+            var settings = new JsonSerializerSettings() {
+                TypeNameHandling = TypeNameHandling.All
+            };
+            var json = JsonConvert.SerializeObject(Detectables, settings);
+            File.WriteAllText(path, json);
         }
 
         public void LoadHsvFromFile(string path) {
-            /*
-            var ser = JsonConvert.DeserializeObject<ObservableCollection<Dictionary<string, string>>>(File.ReadAllText(path));
-
-            Action<Color, HsvConfig> updateColor = (color, config) => {
-                Action<MCvScalar> setSliders = scalar => {
-                    HSlider.Value = (int)scalar.V0;
-                    SSlider.Value = (int)scalar.V1;
-                    VSlider.Value = (int)scalar.V2;
-                };
-                ColorPicker.Text = color.ToString();
-
-                CheckBox_ColorOn.Checked = config.IsEnabled;
-                CheckBox_IsMin.Checked = true;
-                setSliders(config.MinHsv);
-                CheckBox_IsMin.Checked = false;
-                setSliders(config.MaxHsv);
+            var settings = new JsonSerializerSettings() {
+                TypeNameHandling = TypeNameHandling.All
             };
+            var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), settings);
             // for all availale colors, we update them
-            foreach (var pair in ser)
-                updateColor(pair.Key, pair.Value);
-            Colors = ser;
-            ColorPicker.Text = Color.Red.ToString();
-            */
+            Detectables.Clear();
+            foreach (var d in ser)
+                Detectables.Add(d);
         }
     }
 }

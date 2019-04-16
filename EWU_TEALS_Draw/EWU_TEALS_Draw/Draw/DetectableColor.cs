@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
-    public class HsvConfig : Drawable {
+    public class DetectableColor : Detectable {
         // set to correspond to the "600 pixels" constant in the mainform, so that scaling will work consistently
         private const double PercentOfScreenToDetect = 0.0078125;
         private const int FramesPerSecond = 30;
@@ -25,13 +25,17 @@ namespace EwuTeals.Draw {
         public MCvScalar InkColor { get; set; }
         public MCvScalar MinHsv;
         public MCvScalar MaxHsv;
+        [JsonIgnore]
         public IInputArray MinHsvRange { get => new ScalarArray(MinHsv); }
+        [JsonIgnore]
         public IInputArray MaxHsvRange { get => new ScalarArray(MaxHsv); }
 
+        [JsonIgnore]
         private Mat threshMat = new Mat();
+        [JsonIgnore]
         private Point lastPosition = InvalidPoint;
 
-        public HsvConfig(string name, bool isEnabled, MCvScalar inkColor, MCvScalar minHsv, MCvScalar maxHsv) : base(name) {
+        public DetectableColor(string name, bool isEnabled, MCvScalar inkColor, MCvScalar minHsv, MCvScalar maxHsv) : base(name) {
             IsEnabled = isEnabled;
             InkColor = inkColor;
             MinHsv = minHsv;

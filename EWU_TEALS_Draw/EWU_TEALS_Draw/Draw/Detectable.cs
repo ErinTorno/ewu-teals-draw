@@ -10,12 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
-    public abstract class Drawable {
+    public abstract class Detectable {
         public bool IsEnabled { get; set; }
 
         public string Name { get; }
 
-        public Drawable(string name) {
+        public Detectable(string name) {
             Name = name;
         }
 

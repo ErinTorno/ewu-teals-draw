@@ -68,10 +68,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Draw\AutoColor.cs" />
-    <Compile Include="Draw\ContourExtension.cs" />
-    <Compile Include="Draw\HsvConfig.cs" />
-    <Compile Include="Draw\Drawable.cs" />
-    <Compile Include="Draw\MCvScalarExtensions.cs" />
+    <Compile Include="Draw\ContourUtils.cs" />
+    <Compile Include="Draw\DetectableColor.cs" />
+    <Compile Include="Draw\Detectable.cs" />
+    <Compile Include="Draw\MCvScalarUtils.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

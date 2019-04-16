@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
-    static class MCvScalarExtensions {
+    static class MCvScalarUtils {
         private static double Max3(double a, double b, double c) {
             return Math.Max(a, Math.Max(b, c));
         }

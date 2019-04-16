@@ -15,12 +15,12 @@ namespace EwuTeals.Draw {
         private static readonly MCvScalar RectangleColor = new MCvScalar(255, 230, 230);
         private const double PointDistPercent = 0.19, MinPointDistPercent = 0.14, DrawSquareDimPercent = 0.20;
 
-        private List<HsvConfig> colors = new List<HsvConfig>();
+        private List<DetectableColor> colors = new List<DetectableColor>();
         private DateTime lastCapure = DateTime.Now;
 
         public event EventHandler<ColorCaptureArgs> OnColorCapture;
 
-        public IReadOnlyList<HsvConfig> Colors { get => colors.AsReadOnly(); }
+        public IReadOnlyList<DetectableColor> Colors { get => colors.AsReadOnly(); }
 
         public ImageBox VideoCapture { get; set; }
         
@@ -35,7 +35,7 @@ namespace EwuTeals.Draw {
         }
 
         public void Reset() {
-            colors = new List<HsvConfig>();
+            colors = new List<DetectableColor>();
         }
 
         public void Update(Mat source) {
@@ -95,19 +95,19 @@ namespace EwuTeals.Draw {
             return new MCvScalar(b / points, g / points, r / points);
         }
 
-        public static HsvConfig GenerateHsvConfig(MCvScalar bgrColor) {
+        public static DetectableColor GenerateHsvConfig(MCvScalar bgrColor) {
             var hsv = bgrColor.ToHsv();
             // we increase the saturation, since it appears duller on camera
             var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
             var minHsv = new MCvScalar(hsv.V0 - 4.0, hsv.V1 - 10.0, 100.0);
             var maxHsv = new MCvScalar(hsv.V0 + 4.0, hsv.V1 + 50.0, 230.0);
-            return new HsvConfig("Auto Color", true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
+            return new DetectableColor("Auto Color", true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
 
         public class ColorCaptureArgs : EventArgs {
-            public HsvConfig Color { get; }
+            public DetectableColor Color { get; }
 
-            public ColorCaptureArgs(HsvConfig config) {
+            public ColorCaptureArgs(DetectableColor config) {
                 Color = config;
             }
         }
