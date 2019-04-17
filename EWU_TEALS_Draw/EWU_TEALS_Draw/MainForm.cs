@@ -21,8 +21,6 @@ using System.Collections.ObjectModel;
 
 namespace EWU_TEALS_Draw
 {
-    public enum Color { Red, Yellow, Green, Blue, Orange, Purple, Special }
-
     public partial class MainForm : Form
     {
         private List<IDisposable> Disposables;
@@ -54,8 +52,9 @@ namespace EWU_TEALS_Draw
         private const Keys KeyExit = Keys.Q;
         private const Keys KeySave = Keys.S;
         private const Keys KeyOpen = Keys.O;
-        private const Keys ToggleAuto = Keys.A;
-        private const Keys CaptureColor = Keys.Space;
+        private const Keys KeyToggleAuto = Keys.A;
+        private const Keys KeyCaptureColor = Keys.Space;
+        private const Keys KeyClearDetectables = Keys.C;
         #endregion
 
         public MainForm()
@@ -177,10 +176,10 @@ namespace EWU_TEALS_Draw
         
         void MainForm_KeyDown(object sender, KeyEventArgs e) {
             switch (e.KeyCode) {
-                case ToggleAuto:
+                case KeyToggleAuto:
                     AutoColor.IsActive = !AutoColor.IsActive;
                     break;
-                case CaptureColor:
+                case KeyCaptureColor:
                     AutoColor.CaptureNextUpdate = true;
                     break;
                 case KeyReset:
@@ -194,6 +193,9 @@ namespace EWU_TEALS_Draw
                     break;
                 case KeyOpen:
                     OpenFileDialog();
+                    break;
+                case KeyClearDetectables:
+                    Detectables.Clear();
                     break;
             }
         }

@@ -99,8 +99,8 @@ namespace EwuTeals.Draw {
             var hsv = bgrColor.ToHsv();
             // we increase the saturation, since it appears duller on camera
             var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
-            var minHsv = new MCvScalar(hsv.V0 - 4.0, hsv.V1 - 10.0, 100.0);
-            var maxHsv = new MCvScalar(hsv.V0 + 4.0, hsv.V1 + 50.0, 230.0);
+            var minHsv = new MCvScalar(hsv.V0 - 6.0, hsv.V1 * 0.5, 80.0);
+            var maxHsv = new MCvScalar(hsv.V0 + 6.0, 255.0, 255.0);
             return new DetectableColor("Auto Color", true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
 
