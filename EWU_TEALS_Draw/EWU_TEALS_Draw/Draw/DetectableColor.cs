@@ -17,7 +17,6 @@ namespace EwuTeals.Draw {
         // set to correspond to the "600 pixels" constant in the mainform, so that scaling will work consistently
         private const double PercentOfScreenToDetect = 0.0078125;
         private const int FramesPerSecond = 30;
-        private static readonly Point InvalidPoint = new Point(-255, -255);
         // reused to save memory
         private static Mat HsvImageTemp = new Mat();
         private static Mat HsvThreshTemp = new Mat();

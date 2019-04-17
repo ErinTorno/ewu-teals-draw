@@ -229,6 +229,7 @@ namespace EWU_TEALS_Draw
 
         private void btnReset_Click(object sender, EventArgs e)
         {
+            ImageBox_Drawing.Image.Dispose();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
         }
 
@@ -351,6 +352,8 @@ namespace EWU_TEALS_Draw
             Detectables.Clear();
             foreach (var d in ser)
                 Detectables.Add(d);
+            if (Detectables.Count > 0)
+                ColorPicker.Text = Detectables.First().Name;
         }
     }
 }

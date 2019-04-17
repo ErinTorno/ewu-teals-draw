@@ -13,7 +13,9 @@ namespace EwuTeals.Draw {
         private static readonly TimeSpan DelayBetweenCaptures = new TimeSpan(0, 0, 0, 0, 1000);
         private static readonly Point IncorrectPoint = new Point(-255, -255);
         private static readonly MCvScalar RectangleColor = new MCvScalar(255, 230, 230);
-        private const double PointDistPercent = 0.19, MinPointDistPercent = 0.14, DrawSquareDimPercent = 0.20;
+        private const double PointDistPercent = 0.19, DrawSquareDimPercent = 0.20;
+        // we take a number of strips of points in the captured area, so that the total number of points are n^2
+        private const double PointLinesTaken = 15.0;
 
         private List<DetectableColor> colors = new List<DetectableColor>();
         private DateTime lastCapure = DateTime.Now;
@@ -43,9 +45,10 @@ namespace EwuTeals.Draw {
                 if (CaptureNextUpdate) {
                     CaptureNextUpdate = false;
                     if (lastCapure.Add(DelayBetweenCaptures) < DateTime.Now) {
+                        var name = "Auto Color #" + colors.Count;
                         lastCapure = DateTime.Now;
                         var avgC = GetColorFromSurrounding(source, new Point(source.Width / 2, source.Height / 2));
-                        colors.Add(GenerateHsvConfig(avgC));
+                        colors.Add(GenerateHsvConfig(name, avgC));
                         var ev = OnColorCapture;
                         if (ev != null) ev(this, new ColorCaptureArgs(colors.Last()));
                     }
@@ -71,7 +74,7 @@ namespace EwuTeals.Draw {
         /// <returns></returns>
         private MCvScalar GetColorFromSurrounding(Mat source, Point center) {
             int dist = (int)(PointDistPercent * VideoCapture.Width);
-            int minDist = (int)(MinPointDistPercent * VideoCapture.Width);
+            var pixelIncrement = (int)(dist / PointLinesTaken);
             var bitmap = source.Bitmap;
             var minX = center.X - dist < 0 ? 0 : center.X - dist;
             var maxX = center.X + dist >= source.Width ? source.Width - 1 : center.X + dist;
@@ -79,12 +82,8 @@ namespace EwuTeals.Draw {
             var maxY = center.Y + dist >= source.Height ? source.Height - 1 : center.Y + dist;
             int points = 0;
             var b = 0.0; var g = 0.0; var r = 0.0;
-            for (int x = minX; x < maxX; x += 2) {
-                if (x > minX + minDist && x < maxX - minDist)
-                    continue;
-                for (int y = minY; y < maxY; y += 2) {
-                    if (y > minY + minDist && y < maxY - minDist)
-                        continue;
+            for (int x = minX; x < maxX; x += pixelIncrement) {
+                for (int y = minY; y < maxY; y += pixelIncrement) {
                     var col = bitmap.GetPixel(x, y);
                     b += col.B;
                     g += col.G;
@@ -95,13 +94,13 @@ namespace EwuTeals.Draw {
             return new MCvScalar(b / points, g / points, r / points);
         }
 
-        public static DetectableColor GenerateHsvConfig(MCvScalar bgrColor) {
+        public static DetectableColor GenerateHsvConfig(string name, MCvScalar bgrColor) {
             var hsv = bgrColor.ToHsv();
             // we increase the saturation, since it appears duller on camera
             var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
             var minHsv = new MCvScalar(hsv.V0 - 6.0, hsv.V1 * 0.5, 80.0);
             var maxHsv = new MCvScalar(hsv.V0 + 6.0, 255.0, 255.0);
-            return new DetectableColor("Auto Color", true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
+            return new DetectableColor(name, true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
 
         public class ColorCaptureArgs : EventArgs {

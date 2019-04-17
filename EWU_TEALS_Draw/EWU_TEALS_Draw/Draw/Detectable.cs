@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace EwuTeals.Draw {
     public abstract class Detectable {
+        protected static readonly Point InvalidPoint = new Point(-255, -255);
+
         public bool IsEnabled { get; set; }
 
         public string Name { get; }
@@ -24,6 +26,8 @@ namespace EwuTeals.Draw {
         public abstract Mat Draw(ImageBox canvas, Mat videoCapture);
 
         protected void DrawLineTo(ImageBox canvas, Point orig, Point desti, MCvScalar color, int strokeWidth) {
+            if (orig == InvalidPoint || desti == InvalidPoint)
+                return;
             if (strokeWidth <= 0) strokeWidth = 1;
             CvInvoke.Line(canvas.Image, orig, desti, color, strokeWidth, LineType.AntiAlias);
             canvas.Refresh();
