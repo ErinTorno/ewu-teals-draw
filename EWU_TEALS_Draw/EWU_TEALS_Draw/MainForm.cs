@@ -23,7 +23,6 @@ namespace EWU_TEALS_Draw
 {
     public partial class MainForm : Form
     {
-        private List<IDisposable> Disposables;
         private VideoCapture VideoCapture;
         private bool IsRunning;
 
@@ -56,6 +55,10 @@ namespace EWU_TEALS_Draw
         private const Keys KeyCaptureColor = Keys.Space;
         private const Keys KeyClearDetectables = Keys.C;
         #endregion
+
+        JsonSerializerSettings JsonSettings = new JsonSerializerSettings() {
+            TypeNameHandling = TypeNameHandling.All
+        };
 
         public MainForm()
         {
@@ -150,25 +153,8 @@ namespace EWU_TEALS_Draw
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            ReleaseResources();
-        }
-
-        private void ReleaseResources()
-        {
-            if (Disposables != null)
-            {
-                foreach (IDisposable disposable in Disposables)
-                {
-                    if (disposable != null) disposable.Dispose();
-                }
-
-                Disposables = null;
-            }
-
-            if (DisposableQueue != null)
-            {
-                foreach (IDisposable disposable in DisposableQueue)
-                {
+            if (DisposableQueue != null) {
+                foreach (IDisposable disposable in DisposableQueue) {
                     if (disposable != null) disposable.Dispose();
                 }
             }
@@ -336,18 +322,12 @@ namespace EWU_TEALS_Draw
         // saving and loading disabled write now until we decide how to handle this
 
         public void SaveHsvToFile(string path) {
-            var settings = new JsonSerializerSettings() {
-                TypeNameHandling = TypeNameHandling.All
-            };
-            var json = JsonConvert.SerializeObject(Detectables, settings);
+            var json = JsonConvert.SerializeObject(Detectables, JsonSettings);
             File.WriteAllText(path, json);
         }
 
         public void LoadHsvFromFile(string path) {
-            var settings = new JsonSerializerSettings() {
-                TypeNameHandling = TypeNameHandling.All
-            };
-            var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), settings);
+            var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), JsonSettings);
             // for all availale colors, we update them
             Detectables.Clear();
             foreach (var d in ser)

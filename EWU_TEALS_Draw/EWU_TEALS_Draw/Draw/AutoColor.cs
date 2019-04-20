@@ -30,6 +30,8 @@ namespace EwuTeals.Draw {
 
         public bool CaptureNextUpdate { get; set; }
 
+        private string NextColorName { get => "Auto Color #" + colors.Count; }
+
         public AutoColor(ImageBox video) {
             VideoCapture = video;
             IsActive = false;
@@ -40,15 +42,15 @@ namespace EwuTeals.Draw {
             colors = new List<DetectableColor>();
         }
 
+
         public void Update(Mat source) {
             if (IsActive) {
                 if (CaptureNextUpdate) {
                     CaptureNextUpdate = false;
                     if (lastCapure.Add(DelayBetweenCaptures) < DateTime.Now) {
-                        var name = "Auto Color #" + colors.Count;
                         lastCapure = DateTime.Now;
                         var avgC = GetColorFromSurrounding(source, new Point(source.Width / 2, source.Height / 2));
-                        colors.Add(GenerateHsvConfig(name, avgC));
+                        colors.Add(GenerateHsvConfig(NextColorName, avgC));
                         var ev = OnColorCapture;
                         if (ev != null) ev(this, new ColorCaptureArgs(colors.Last()));
                     }
@@ -56,12 +58,10 @@ namespace EwuTeals.Draw {
 
                 var image = VideoCapture.Image;
                 var bitmap = image.Bitmap;
-
-                {
-                    var squareSize = (int)(DrawSquareDimPercent * bitmap.Width);
-                    var rectangle = new Rectangle((bitmap.Width - squareSize) / 2, bitmap.Height / 2 - squareSize, squareSize, squareSize);
-                    CvInvoke.Rectangle(image, rectangle, RectangleColor, 3);
-                }
+                
+                var squareSize = (int)(DrawSquareDimPercent * bitmap.Width);
+                var rectangle = new Rectangle((bitmap.Width - squareSize) / 2, bitmap.Height / 2 - squareSize, squareSize, squareSize);
+                CvInvoke.Rectangle(image, rectangle, RectangleColor, 3);
 
                 VideoCapture.Refresh();
             }
@@ -80,6 +80,8 @@ namespace EwuTeals.Draw {
             var maxX = center.X + dist >= source.Width ? source.Width - 1 : center.X + dist;
             var minY = center.Y - dist < 0 ? 0 : center.Y - dist;
             var maxY = center.Y + dist >= source.Height ? source.Height - 1 : center.Y + dist;
+
+            // we just sum together every color component, then divide to find average; it's consistent enough that we don't have to use HSV
             int points = 0;
             var b = 0.0; var g = 0.0; var r = 0.0;
             for (int x = minX; x < maxX; x += pixelIncrement) {
