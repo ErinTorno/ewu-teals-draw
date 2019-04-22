@@ -62,7 +62,6 @@ namespace EwuTeals.Draw {
             var max = new List<Point>();
             // if we don't have at least this many points, there can't be any extremum
             if (contour.Size >= 3) {
-
                 for (int i = 1; i < contour.Size; ++i) {
                     var cur = contour[i];
                     var curMag = cur.GetMagnitudeSquare(center);
