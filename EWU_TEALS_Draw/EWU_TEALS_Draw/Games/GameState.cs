@@ -17,7 +17,7 @@ namespace EwuTeals.Draw.Game {
         public Boolean ShouldYieldKeys { get; private set; }
         public Keys ToggleYieldKey = Keys.Space;
 
-        protected int logicTime = 0;
+        protected double logicTime = 0;
         protected int logicTicks = 0;
         protected ImageBox canvas;
         protected Form form;
@@ -42,7 +42,7 @@ namespace EwuTeals.Draw.Game {
             }
         }
 
-        public virtual void Update(int dT, Mat input) {
+        public virtual void Update(double dT, Mat input) {
             ++logicTicks;
             logicTime += dT;
         }

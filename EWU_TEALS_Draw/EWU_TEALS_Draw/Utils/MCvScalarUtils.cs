@@ -22,6 +22,10 @@ namespace EwuTeals.Draw {
             return new MCvScalar(hue, sat, val);
         }
 
+        public static Color ToColor(this MCvScalar bgr) {
+            return Color.FromArgb((byte)bgr.V3, (byte)bgr.V2, (byte)bgr.V1, (byte)bgr.V0);
+        }
+
         public static MCvScalar ToHsv(this MCvScalar bgr) {
             var blue = bgr.V0;
             var green = bgr.V1;
