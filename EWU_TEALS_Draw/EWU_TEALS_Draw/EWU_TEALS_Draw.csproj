@@ -67,13 +67,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Draw\AutoColor.cs" />
-    <Compile Include="Draw\ContourUtils.cs" />
-    <Compile Include="Draw\DetectableColor.cs" />
-    <Compile Include="Draw\Detectable.cs" />
-    <Compile Include="Draw\Game\GameState.cs" />
-    <Compile Include="Draw\Game\MostColorGame.cs" />
-    <Compile Include="Draw\MCvScalarUtils.cs" />
+    <Compile Include="Utils\AutoColor.cs" />
+    <Compile Include="Utils\ContourUtils.cs" />
+    <Compile Include="Detectables\DetectableColor.cs" />
+    <Compile Include="Detectables\Detectable.cs" />
+    <Compile Include="Games\GameState.cs" />
+    <Compile Include="Utils\MCvScalarUtils.cs" />
+    <Compile Include="Games\MostColorGame.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-
-namespace EWU_TEALS_Draw
+﻿namespace EWU_TEALS_Draw
 {
     partial class MainForm
     {
@@ -37,7 +34,6 @@ namespace EWU_TEALS_Draw
             this.btnReset = new System.Windows.Forms.Button();
             this.tableLayoutPanel_Drawing = new System.Windows.Forms.TableLayoutPanel();
             this.ImageBox_Drawing = new Emgu.CV.UI.ImageBox();
-            this.GamePanel = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel_VideoFeeds = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel_Sliders = new System.Windows.Forms.TableLayoutPanel();
             this.CheckBox_IsMin = new System.Windows.Forms.CheckBox();
@@ -120,18 +116,16 @@ namespace EWU_TEALS_Draw
             this.tableLayoutPanel_Drawing.ColumnCount = 1;
             this.tableLayoutPanel_Drawing.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel_Drawing.Controls.Add(this.ImageBox_Drawing, 0, 0);
-            this.tableLayoutPanel_Drawing.Controls.Add(this.GamePanel, 0, 1);
             this.tableLayoutPanel_Drawing.Dock = System.Windows.Forms.DockStyle.Left;
             this.tableLayoutPanel_Drawing.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel_Drawing.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel_Drawing.MaximumSize = new System.Drawing.Size(1208, 0);
             this.tableLayoutPanel_Drawing.Name = "tableLayoutPanel_Drawing";
-            this.tableLayoutPanel_Drawing.RowCount = 2;
-            this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75F));
-            this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 1041);
+            this.tableLayoutPanel_Drawing.RowCount = 1;
+            this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 749);
             this.tableLayoutPanel_Drawing.TabIndex = 8;
-            this.tableLayoutPanel_Drawing.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel_Drawing_Paint);
             // 
             // ImageBox_Drawing
             // 
@@ -142,22 +136,6 @@ namespace EWU_TEALS_Draw
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_Drawing.TabIndex = 3;
             this.ImageBox_Drawing.TabStop = false;
-            // 
-            // GamePanel
-            // 
-            this.GamePanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GamePanel.ColumnCount = 1;
-            this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Location = new System.Drawing.Point(3, 783);
-            this.GamePanel.Name = "GamePanel";
-            this.GamePanel.RowCount = 1;
-            this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Size = new System.Drawing.Size(478, 255);
-            this.GamePanel.TabIndex = 4;
             // 
             // tableLayoutPanel_VideoFeeds
             // 
@@ -170,7 +148,7 @@ namespace EWU_TEALS_Draw
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture, 0, 0);
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture_Gray, 0, 1);
             this.tableLayoutPanel_VideoFeeds.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1576, 0);
+            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1036, 0);
             this.tableLayoutPanel_VideoFeeds.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel_VideoFeeds.MinimumSize = new System.Drawing.Size(240, 0);
             this.tableLayoutPanel_VideoFeeds.Name = "tableLayoutPanel_VideoFeeds";
@@ -180,7 +158,7 @@ namespace EWU_TEALS_Draw
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 1041);
+            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 749);
             this.tableLayoutPanel_VideoFeeds.TabIndex = 9;
             // 
             // tableLayoutPanel_Sliders
@@ -407,7 +385,7 @@ namespace EWU_TEALS_Draw
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1897, 71);
+            this.pictureBox1.Size = new System.Drawing.Size(1357, 71);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 10;
             this.pictureBox1.TabStop = false;
@@ -417,7 +395,7 @@ namespace EWU_TEALS_Draw
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
-            this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.ClientSize = new System.Drawing.Size(1364, 749);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
             this.Controls.Add(this.tableLayoutPanel_VideoFeeds);
@@ -445,10 +423,6 @@ namespace EWU_TEALS_Draw
 
         }
 
-        private void tableLayoutPanel_Drawing_Paint(object sender, PaintEventArgs e) {
-
-        }
-
         #endregion
 
         private Emgu.CV.UI.ImageBox ImageBox_VideoCapture;
@@ -472,7 +446,6 @@ namespace EWU_TEALS_Draw
         private System.Windows.Forms.Label lblV;
         private System.Windows.Forms.CheckBox CheckBox_IsMin;
         private System.Windows.Forms.ComboBox ColorPicker;
-        private System.Windows.Forms.TableLayoutPanel GamePanel;
     }
 }
 
