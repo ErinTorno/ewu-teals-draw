@@ -1,330 +1,148 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using Emgu;
 using Emgu.CV;
-using Emgu.CV.UI;
-using Emgu.CV.Util;
 using Emgu.CV.Structure;
-using Emgu.CV.CvEnum;
-using System.IO;
-using Newtonsoft.Json;
-using EwuTeals.Draw;
-using System.Collections.ObjectModel;
-using EwuTeals.Draw.Game;
+using Emgu.CV.UI;
 
-namespace EWU_TEALS_Draw {
-    public partial class MainForm : Form {
-        private VideoCapture VideoCapture;
-        private bool IsRunning;
+namespace EwuTeals.Draw.Game {
+    class MostColorGame : GameState {
+        private const string TextIntro = "Starting Color Game!";
+        private const string TextAddPlayer = "Press S to start!";
+        // clunky way of doing this, but it works for now
+        private const string TextOrder2 = "1st {0} ({1}%), 2nd {2} ({3}%)";
+        private const string TextOrder3 = "1st {0} ({1}%), 2nd {2} ({3}%), 3rd {4} ({5}%)";
+        private const string TextOrderTie = "It's a tied";
+        private enum CGState { AddPlayer, Running, EndGame };
 
-        #region Resolution Properties
-        private const int FPS = 30;
-        private const int ActualCameraWidth = 1920;
-        private const int ActualCameraHeight = 1080;
+        private List<Player> players = new List<Player>();
+        private CGState _curState = CGState.AddPlayer;
+        private CGState CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
 
-        private const int DisplayedCameraWidth = ActualCameraWidth / 6;
-        private const int DisplayedCameraHeight = ActualCameraHeight / 6;
+        private const Keys KeyStart = Keys.S;
 
-        private int CanvasWidth = (int)Math.Floor(DisplayedCameraWidth * 3.76);
-        private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.76);
-        #endregion
+        private TextBox prompt;
 
-        private ObservableCollection<Detectable> Detectables = new ObservableCollection<Detectable>();
-
-        private AutoColor AutoColor;
-
-        private GameState Game;
-
-        #region Re-used Objects for saving memory
-        Queue<Mat> DisposableQueue = new Queue<Mat>();
-        #endregion
-
-        #region Controls
-        private const Keys KeyReset = Keys.R;
-        private const Keys KeyExit = Keys.Q;
-        private const Keys KeySave = Keys.S;
-        private const Keys KeyOpen = Keys.O;
-        private const Keys KeyToggleAuto = Keys.A;
-        private const Keys KeyCaptureColor = Keys.P;
-        private const Keys KeyClearDetectables = Keys.C;
-        #endregion
-
-        JsonSerializerSettings JsonSettings = new JsonSerializerSettings() {
-            TypeNameHandling = TypeNameHandling.All
-        };
-
-        public MainForm() {
-            InitializeComponent();
-
-            FormBorderStyle = FormBorderStyle.None;
-            WindowState = FormWindowState.Maximized;
-
-            Startup();
-        }
-
-        private void Startup() {
-            SetupVideoCapture();
-            ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            AutoColor = new AutoColor(ImageBox_VideoCapture);
-
-            Application.Idle += ProcessFrame;
-            IsRunning = true;
-            this.KeyPreview = true;
-            this.KeyDown += MainForm_KeyDown;
-            ColorPicker.SelectedIndex = 0;
-
-            Detectables.Add(new DetectableColor("Red", true, inkColor: new MCvScalar(60, 60, 230), minHsv: new MCvScalar(0, 125, 180), maxHsv: new MCvScalar(6, 255, 255)));
-            Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));
-            Detectables.Add(new DetectableColor("Yellow", true, inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195), maxHsv: new MCvScalar(35, 255, 255)));
-            Detectables.Add(new DetectableColor("Green", true, inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75), maxHsv: new MCvScalar(95, 255, 255)));
-            Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
-            Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
-            Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
-
-            Detectables.CollectionChanged += (sender, e) => {
-                ColorPicker.Items.Clear();
-                foreach (var d in Detectables)
-                    ColorPicker.Items.Add(d.Name);
+        public MostColorGame(Form form, ImageBox canvas, TableLayoutPanel panel) : base(form, canvas) {
+            prompt = new TextBox {
+                ReadOnly = true,
+                Text = TextIntro,
+                Visible = true,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                TextAlign = HorizontalAlignment.Center
             };
+            prompt.Font = new Font(prompt.Font.FontFamily, 24);
+            panel.Controls.Add(prompt);
 
-            AutoColor.OnColorCapture += (sender, e) => {
-                Detectables.Add(e.Color);
-            };
-
-            Game = new MostColorGame(this, ImageBox_Drawing, GamePanel);
+            players.Add(new Player("Jane", Color.FromArgb(135, 250, 250)));
+            players.Add(new Player("Tom", Color.FromArgb(250, 250, 120)));
         }
 
-        private void SetupVideoCapture() {
-            // attempt to use this type; if it fails, we go to default
-            VideoCapture = new VideoCapture(1 + CaptureType.DShow); // Need DShow backend for Logitech Webcam
-            if (VideoCapture.Width == 0 || VideoCapture.Height == 0)
-                VideoCapture = new VideoCapture(0);
-
-            VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);
-            VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight);
-            VideoCapture.SetCaptureProperty(CapProp.Autofocus, 0);
+        public override void Dispose() {
+            base.Dispose();
+            form.Controls.Remove(prompt);
         }
 
-        private void ProcessFrame(object sender, EventArgs e) {
-            if (VideoCapture != null) {
-                Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
-                CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
-                ImageBox_VideoCapture.Image = videoFrame;
-                DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
-
-                Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
-                DisposableQueue.Enqueue(combinedThreshImage);
-
-                AutoColor.Update(videoFrame);
-                if (Game != null)
-                    Game.Update(1000 / FPS, videoFrame);
-
-                foreach (var d in Detectables) {
-                    if (d.IsEnabled) {
-                        Mat curThresh = d.Draw(ImageBox_Drawing, videoFrame);
-                        CvInvoke.Add(curThresh, combinedThreshImage, combinedThreshImage);
-                    }
-                }
-
-                ImageBox_VideoCapture_Gray.Image = combinedThreshImage;
-
-                if (DisposableQueue.Count > 8) {
-                    DisposableQueue.Dequeue().Dispose();
-                    DisposableQueue.Dequeue().Dispose();
-                }
-            }
-        }
-
-        private IImage GetGrayImage(Mat color_image) {
-            Image<Gray, byte> grayImage = new Image<Gray, byte>(color_image.Bitmap);
-
-            return grayImage;
-        }
-
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
-            if (DisposableQueue != null) {
-                foreach (IDisposable disposable in DisposableQueue) {
-                    if (disposable != null) disposable.Dispose();
-                }
-            }
-        }
-
-        void MainForm_KeyDown(object sender, KeyEventArgs e) {
-            // if the Game is requesting all key input, then we won't run this
-            if (Game.ShouldYieldKeys) {
-                switch (e.KeyCode) {
-                    case KeyToggleAuto:
-                        AutoColor.IsActive = !AutoColor.IsActive;
+        public override void Update(double dT, Mat input) {
+            base.Update(dT, input);
+            // we don't update every frame to make it easier on the computer
+            if (logicTicks % 2 == 0) {
+                switch (CurState) {
+                    case CGState.AddPlayer:
+                        prompt.Text = TextAddPlayer;
                         break;
-                    case KeyCaptureColor:
-                        AutoColor.CaptureNextUpdate = true;
-                        break;
-                    case KeyReset:
-                        btnReset.PerformClick();
-                        break;
-                    case KeyExit:
-                        btnExit.PerformClick();
-                        break;
-                    case KeySave:
-                        SaveFileDialog();
-                        break;
-                    case KeyOpen:
-                        OpenFileDialog();
-                        break;
-                    case KeyClearDetectables:
-                        Detectables.Clear();
+                    case CGState.Running:
+                        var bmp = input.Bitmap;
+
+                        // we increment by this
+                        var incr = 2;
+                        foreach (var p in players)
+                            p.Pixels = 0;
+                        // since we are skipping pixels, we need to divide the total size by the square
+                        int totalPixels = (bmp.Width * bmp.Height) / (incr * incr);
+
+                        // we sum each pixel for each player
+                        for (int x = 0; x < bmp.Width; x += incr) {
+                            for (int y = 0; y < bmp.Height; y += incr) {
+                                var pixel = bmp.GetPixel(x, y);
+                                foreach (var p in players) {
+                                    if (p.InkColor == pixel) {
+                                        ++p.Pixels;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        UpdatePlayerOrder(totalPixels);
                         break;
                 }
             }
         }
 
-        private void btnPlay_Click(object sender, EventArgs e) {
-            if (IsRunning == false) {
-                Application.Idle += ProcessFrame;
-                IsRunning = true;
-                btnPlay.Text = "Pause";
+        protected override void OnKeyPress(object sender, KeyEventArgs e) {
+            base.OnKeyPress(sender, e);
+            if (!ShouldYieldKeys) {
+                switch (CurState) {
+                    case CGState.AddPlayer:
+                        switch (e.KeyCode) {
+                            case KeyStart:
+                                CurState = CGState.Running;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void InitState() {
+            switch (CurState) {
+                case CGState.AddPlayer:
+
+                    break;
+            }
+        }
+
+        private void FinalizeState() {
+            switch (CurState) {
+                case CGState.AddPlayer:
+
+                    break;
+            }
+        }
+
+        private void UpdatePlayerOrder(int totalPixels) {
+            Func<Player, double> toPercent = p => p.Pixels / totalPixels * 100.0;
+            var order = players.OrderBy(p => p.Pixels).Reverse().ToList();
+            var str = "";
+            // if both in lead have same pixels, report it as a tie
+            if (players.Count >= 2 && order[0].Pixels == order[1].Pixels) {
+                str = TextOrderTie;
             }
             else {
-                Application.Idle -= ProcessFrame;
-                IsRunning = false;
-                btnPlay.Text = "Play";
-
-                // we reset each of these to prevent weird line issues when unpausing at far away locations
-                foreach (var d in Detectables) d.ResetLastPosition();
+                if (players.Count == 2)
+                    str = String.Format(TextOrder2, order[0].Name, toPercent(order[0]), order[1].Name, toPercent(order[1]));
+                else if (players.Count > 2)
+                    str = String.Format(TextOrder3, order[0].Name, toPercent(order[0]), order[1].Name, toPercent(order[1]), order[2].Name, toPercent(order[2]));
             }
+            prompt.Text = str;
         }
 
-        private void btnExit_Click(object sender, EventArgs e) {
-            DialogResult result = MessageBox.Show("Do you want to exit the beautiful application?",
-                    "Important Question",
-                    MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
-                Application.Exit();
-        }
+        class Player {
+            public string Name { get; }
+            public int Pixels { get; set; }
+            public Color InkColor;
 
-        private void btnReset_Click(object sender, EventArgs e) {
-            ImageBox_Drawing.Image.Dispose();
-            ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-        }
-
-        private void btnEdit_Click(object sender, EventArgs e) {
-            tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
-        }
-
-        private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
-                CheckBox_IsMin.Checked = true;
-                UpdateSliderValues(sender, e);
-
-                CheckBox_ColorOn.Checked = Detectables[ColorPicker.SelectedIndex].IsEnabled;
+            public Player(string name, Color inkColor) {
+                Name = name;
+                Pixels = 0;
+                InkColor = inkColor;
             }
-        }
-
-        private void HSlider_ValueChanged(object sender, EventArgs e) {
-            TrackBar bar = (TrackBar)sender;
-            lblH.Text = "H(" + bar.Value + ")";
-
-            UpdateHSVCodes();
-        }
-
-        private void SSlider_ValueChanged(object sender, EventArgs e) {
-            TrackBar bar = (TrackBar)sender;
-            lblS.Text = "S(" + bar.Value + ")";
-
-            UpdateHSVCodes();
-        }
-
-        private void VSlider_ValueChanged(object sender, EventArgs e) {
-            TrackBar bar = (TrackBar)sender;
-            lblV.Text = "V(" + bar.Value + ")";
-
-            UpdateHSVCodes();
-        }
-
-        private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count)
-                Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
-        }
-
-        private void UpdateSliderValues(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
-                var drawable = Detectables[ColorPicker.SelectedIndex];
-                if (drawable is DetectableColor) {
-                    var hsv = (DetectableColor)drawable;
-                    double[] hsvValues = null;
-
-                    if (CheckBox_IsMin.Checked)
-                        hsvValues = hsv.MinHsv.ToArray();
-                    else
-                        hsvValues = hsv.MaxHsv.ToArray();
-
-                    if (hsvValues != null) {
-                        HSlider.Value = (int)hsvValues[0];
-                        SSlider.Value = (int)hsvValues[1];
-                        VSlider.Value = (int)hsvValues[2];
-                    }
-                }
-            }
-        }
-
-        private void UpdateHSVCodes() {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
-                var drawable = Detectables[ColorPicker.SelectedIndex];
-                if (drawable is DetectableColor) {
-                    var hsv = (DetectableColor)drawable;
-                    if (CheckBox_IsMin.Checked)
-                        hsv.MinHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
-                    else
-                        hsv.MaxHsv = new MCvScalar(HSlider.Value, SSlider.Value, VSlider.Value);
-                }
-            }
-        }
-
-        public void SaveFileDialog() {
-            using (var diag = new SaveFileDialog()) {
-                diag.Filter = "JSON File|*.json";
-                diag.Title = "Save HSV Preset to File";
-                var res = diag.ShowDialog();
-                if (res == DialogResult.OK) {
-                    SaveHsvToFile(diag.FileName);
-                }
-            }
-        }
-
-        public void OpenFileDialog() {
-            using (var diag = new OpenFileDialog()) {
-                diag.Filter = "JSON File|*.json";
-                diag.Title = "Open HSV Preset from File";
-                var res = diag.ShowDialog();
-                if (res == DialogResult.OK) {
-                    LoadHsvFromFile(diag.FileName);
-                }
-            }
-        }
-
-        // saving and loading disabled write now until we decide how to handle this
-
-        public void SaveHsvToFile(string path) {
-            var json = JsonConvert.SerializeObject(Detectables, JsonSettings);
-            File.WriteAllText(path, json);
-        }
-
-        public void LoadHsvFromFile(string path) {
-            var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), JsonSettings);
-            // for all availale colors, we update them
-            Detectables.Clear();
-            foreach (var d in ser)
-                Detectables.Add(d);
-            if (Detectables.Count > 0)
-                ColorPicker.Text = Detectables.First().Name;
         }
     }
 }

@@ -1,19 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using Emgu;
 using Emgu.CV;
+using Emgu.CV.UI;
+using Emgu.CV.Util;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
 using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 using EwuTeals.Draw;
+using System.Collections.ObjectModel;
+using EwuTeals.Draw.Game;
 
-namespace EWU_TEALS_Draw
-{
-    public partial class MainForm : Form
-    {
+namespace EWU_TEALS_Draw {
+    public partial class MainForm : Form {
         private VideoCapture VideoCapture;
         private bool IsRunning;
 
@@ -30,8 +38,10 @@ namespace EWU_TEALS_Draw
         #endregion
 
         private ObservableCollection<Detectable> Detectables = new ObservableCollection<Detectable>();
-        
+
         private AutoColor AutoColor;
+
+        private GameState Game;
 
         #region Re-used Objects for saving memory
         Queue<Mat> DisposableQueue = new Queue<Mat>();
@@ -43,7 +53,7 @@ namespace EWU_TEALS_Draw
         private const Keys KeySave = Keys.S;
         private const Keys KeyOpen = Keys.O;
         private const Keys KeyToggleAuto = Keys.A;
-        private const Keys KeyCaptureColor = Keys.Space;
+        private const Keys KeyCaptureColor = Keys.P;
         private const Keys KeyClearDetectables = Keys.C;
         #endregion
 
@@ -51,8 +61,7 @@ namespace EWU_TEALS_Draw
             TypeNameHandling = TypeNameHandling.All
         };
 
-        public MainForm()
-        {
+        public MainForm() {
             InitializeComponent();
 
             FormBorderStyle = FormBorderStyle.None;
@@ -61,8 +70,7 @@ namespace EWU_TEALS_Draw
             Startup();
         }
 
-        private void Startup()
-        {
+        private void Startup() {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             AutoColor = new AutoColor(ImageBox_VideoCapture);
@@ -73,13 +81,13 @@ namespace EWU_TEALS_Draw
             this.KeyDown += MainForm_KeyDown;
             ColorPicker.SelectedIndex = 0;
 
-            Detectables.Add(new DetectableColor("Red",     true,  inkColor: new MCvScalar(60, 60, 230),   minHsv: new MCvScalar(0, 125, 180),   maxHsv: new MCvScalar(6, 255, 255)));
-            Detectables.Add(new DetectableColor("Orange",  true,  inkColor: new MCvScalar(60, 140, 255),  minHsv: new MCvScalar(10, 175, 65),   maxHsv: new MCvScalar(18, 255, 255)));
-            Detectables.Add(new DetectableColor("Yellow",  true,  inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195),   maxHsv: new MCvScalar(35, 255, 255)));
-            Detectables.Add(new DetectableColor("Green",   true,  inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75),    maxHsv: new MCvScalar(95, 255, 255)));
-            Detectables.Add(new DetectableColor("Blue",    true,  inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66),   maxHsv: new MCvScalar(117, 255, 255)));
-            Detectables.Add(new DetectableColor("Purple",  true,  inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
-            Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0),       minHsv: new MCvScalar(0, 0, 0),       maxHsv: new MCvScalar(180, 255, 255)));
+            Detectables.Add(new DetectableColor("Red", true, inkColor: new MCvScalar(60, 60, 230), minHsv: new MCvScalar(0, 125, 180), maxHsv: new MCvScalar(6, 255, 255)));
+            Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));
+            Detectables.Add(new DetectableColor("Yellow", true, inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195), maxHsv: new MCvScalar(35, 255, 255)));
+            Detectables.Add(new DetectableColor("Green", true, inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75), maxHsv: new MCvScalar(95, 255, 255)));
+            Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
+            Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
+            Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
 
             Detectables.CollectionChanged += (sender, e) => {
                 ColorPicker.Items.Clear();
@@ -90,24 +98,23 @@ namespace EWU_TEALS_Draw
             AutoColor.OnColorCapture += (sender, e) => {
                 Detectables.Add(e.Color);
             };
+
+            Game = new MostColorGame(this, ImageBox_Drawing, GamePanel);
         }
 
-        private void SetupVideoCapture()
-        {
+        private void SetupVideoCapture() {
             // attempt to use this type; if it fails, we go to default
             VideoCapture = new VideoCapture(1 + CaptureType.DShow); // Need DShow backend for Logitech Webcam
             if (VideoCapture.Width == 0 || VideoCapture.Height == 0)
                 VideoCapture = new VideoCapture(0);
-            
+
             VideoCapture.SetCaptureProperty(CapProp.FrameWidth, DisplayedCameraWidth);
             VideoCapture.SetCaptureProperty(CapProp.FrameHeight, DisplayedCameraHeight);
             VideoCapture.SetCaptureProperty(CapProp.Autofocus, 0);
         }
 
-        private void ProcessFrame(object sender, EventArgs e)
-        {
-            if (VideoCapture != null)
-            {
+        private void ProcessFrame(object sender, EventArgs e) {
+            if (VideoCapture != null) {
                 Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
@@ -117,6 +124,8 @@ namespace EWU_TEALS_Draw
                 DisposableQueue.Enqueue(combinedThreshImage);
 
                 AutoColor.Update(videoFrame);
+                if (Game != null)
+                    Game.Update(1000 / FPS, videoFrame);
 
                 foreach (var d in Detectables) {
                     if (d.IsEnabled) {
@@ -127,60 +136,58 @@ namespace EWU_TEALS_Draw
 
                 ImageBox_VideoCapture_Gray.Image = combinedThreshImage;
 
-                if (DisposableQueue.Count > 8)
-                {
+                if (DisposableQueue.Count > 8) {
                     DisposableQueue.Dequeue().Dispose();
                     DisposableQueue.Dequeue().Dispose();
                 }
             }
         }
 
-        private IImage GetGrayImage(Mat color_image)
-        {
+        private IImage GetGrayImage(Mat color_image) {
             Image<Gray, byte> grayImage = new Image<Gray, byte>(color_image.Bitmap);
 
             return grayImage;
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (DisposableQueue != null) {
                 foreach (IDisposable disposable in DisposableQueue) {
                     if (disposable != null) disposable.Dispose();
                 }
             }
         }
-        
+
         void MainForm_KeyDown(object sender, KeyEventArgs e) {
-            switch (e.KeyCode) {
-                case KeyToggleAuto:
-                    AutoColor.IsActive = !AutoColor.IsActive;
-                    break;
-                case KeyCaptureColor:
-                    AutoColor.CaptureNextUpdate = true;
-                    break;
-                case KeyReset:
-                    btnReset.PerformClick();
-                    break;
-                case KeyExit:
-                    btnExit.PerformClick();
-                    break;
-                case KeySave:
-                    SaveFileDialog();
-                    break;
-                case KeyOpen:
-                    OpenFileDialog();
-                    break;
-                case KeyClearDetectables:
-                    Detectables.Clear();
-                    break;
+            // if the Game is requesting all key input, then we won't run this
+            if (Game.ShouldYieldKeys) {
+                switch (e.KeyCode) {
+                    case KeyToggleAuto:
+                        AutoColor.IsActive = !AutoColor.IsActive;
+                        break;
+                    case KeyCaptureColor:
+                        AutoColor.CaptureNextUpdate = true;
+                        break;
+                    case KeyReset:
+                        btnReset.PerformClick();
+                        break;
+                    case KeyExit:
+                        btnExit.PerformClick();
+                        break;
+                    case KeySave:
+                        SaveFileDialog();
+                        break;
+                    case KeyOpen:
+                        OpenFileDialog();
+                        break;
+                    case KeyClearDetectables:
+                        Detectables.Clear();
+                        break;
+                }
             }
         }
 
-        private void btnPlay_Click(object sender, EventArgs e)
-        {
-            if (IsRunning == false)
-            {
+        private void btnPlay_Click(object sender, EventArgs e) {
+            if (IsRunning == false) {
                 Application.Idle += ProcessFrame;
                 IsRunning = true;
                 btnPlay.Text = "Pause";
@@ -195,23 +202,20 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private void btnExit_Click(object sender, EventArgs e)
-        {
+        private void btnExit_Click(object sender, EventArgs e) {
             DialogResult result = MessageBox.Show("Do you want to exit the beautiful application?",
                     "Important Question",
                     MessageBoxButtons.YesNo);
-            if(result == DialogResult.Yes)
+            if (result == DialogResult.Yes)
                 Application.Exit();
         }
 
-        private void btnReset_Click(object sender, EventArgs e)
-        {
+        private void btnReset_Click(object sender, EventArgs e) {
             ImageBox_Drawing.Image.Dispose();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
         }
 
-        private void btnEdit_Click(object sender, EventArgs e)
-        {
+        private void btnEdit_Click(object sender, EventArgs e) {
             tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
         }
 
@@ -224,32 +228,28 @@ namespace EWU_TEALS_Draw
             }
         }
 
-        private void HSlider_ValueChanged(object sender, EventArgs e)
-        {
+        private void HSlider_ValueChanged(object sender, EventArgs e) {
             TrackBar bar = (TrackBar)sender;
             lblH.Text = "H(" + bar.Value + ")";
 
             UpdateHSVCodes();
         }
 
-        private void SSlider_ValueChanged(object sender, EventArgs e)
-        {
+        private void SSlider_ValueChanged(object sender, EventArgs e) {
             TrackBar bar = (TrackBar)sender;
             lblS.Text = "S(" + bar.Value + ")";
 
             UpdateHSVCodes();
         }
 
-        private void VSlider_ValueChanged(object sender, EventArgs e)
-        {
+        private void VSlider_ValueChanged(object sender, EventArgs e) {
             TrackBar bar = (TrackBar)sender;
             lblV.Text = "V(" + bar.Value + ")";
 
             UpdateHSVCodes();
         }
 
-        private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e)
-        {
+        private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e) {
             if (ColorPicker.SelectedIndex < Detectables.Count)
                 Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }

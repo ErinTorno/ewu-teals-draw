@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace EwuTeals.Draw.Game {
    abstract class GameState : IDisposable {
-        private const int TicksToAllowToggle = 15; // a half second, as we run at 30 fps right now
+        private const double SecondsToAllowToggle = 0.5; // a half second
 
         /// <summary>
         /// If true, all key inputs will be ignored so that the container for this can address them
@@ -22,7 +22,7 @@ namespace EwuTeals.Draw.Game {
         protected ImageBox canvas;
         protected Form form;
         // this key, when pressed, will toggle ShouldYieldKeys
-        private int lastToggleTick = 0;
+        private double lastToggleTime = 0.0;
 
         protected GameState(Form form, ImageBox canvas) {
             this.canvas = canvas;
@@ -36,8 +36,8 @@ namespace EwuTeals.Draw.Game {
         }
 
         protected virtual void OnKeyPress(object sender, KeyEventArgs e) {
-            if (e.KeyCode == ToggleYieldKey && logicTime >= lastToggleTick + TicksToAllowToggle) {
-                lastToggleTick = logicTime;
+            if (e.KeyCode == ToggleYieldKey && logicTime >= lastToggleTime + SecondsToAllowToggle) {
+                lastToggleTime = logicTime;
                 ShouldYieldKeys = !ShouldYieldKeys;
             }
         }
