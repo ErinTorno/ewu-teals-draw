@@ -18,6 +18,7 @@ using System.IO;
 using Newtonsoft.Json;
 using EwuTeals.Draw;
 using System.Collections.ObjectModel;
+using EwuTeals.Draw.Game;
 
 namespace EWU_TEALS_Draw
 {
@@ -42,6 +43,8 @@ namespace EWU_TEALS_Draw
         
         private AutoColor AutoColor;
 
+        private GameState Game;
+
         #region Re-used Objects for saving memory
         Queue<Mat> DisposableQueue = new Queue<Mat>();
         #endregion
@@ -52,7 +55,7 @@ namespace EWU_TEALS_Draw
         private const Keys KeySave = Keys.S;
         private const Keys KeyOpen = Keys.O;
         private const Keys KeyToggleAuto = Keys.A;
-        private const Keys KeyCaptureColor = Keys.Space;
+        private const Keys KeyCaptureColor = Keys.P;
         private const Keys KeyClearDetectables = Keys.C;
         #endregion
 
@@ -99,6 +102,8 @@ namespace EWU_TEALS_Draw
             AutoColor.OnColorCapture += (sender, e) => {
                 Detectables.Add(e.Color);
             };
+
+            Game = new MostColorGame(this, ImageBox_Drawing, GamePanel);
         }
 
         private void SetupVideoCapture()
@@ -126,6 +131,8 @@ namespace EWU_TEALS_Draw
                 DisposableQueue.Enqueue(combinedThreshImage);
 
                 AutoColor.Update(videoFrame);
+                if (Game != null)
+                    Game.Update(1000 / FPS, videoFrame);
 
                 foreach (var d in Detectables) {
                     if (d.IsEnabled) {
@@ -161,28 +168,31 @@ namespace EWU_TEALS_Draw
         }
         
         void MainForm_KeyDown(object sender, KeyEventArgs e) {
-            switch (e.KeyCode) {
-                case KeyToggleAuto:
-                    AutoColor.IsActive = !AutoColor.IsActive;
-                    break;
-                case KeyCaptureColor:
-                    AutoColor.CaptureNextUpdate = true;
-                    break;
-                case KeyReset:
-                    btnReset.PerformClick();
-                    break;
-                case KeyExit:
-                    btnExit.PerformClick();
-                    break;
-                case KeySave:
-                    SaveFileDialog();
-                    break;
-                case KeyOpen:
-                    OpenFileDialog();
-                    break;
-                case KeyClearDetectables:
-                    Detectables.Clear();
-                    break;
+            // if the Game is requesting all key input, then we won't run this
+            if (Game.ShouldYieldKeys) {
+                switch (e.KeyCode) {
+                    case KeyToggleAuto:
+                        AutoColor.IsActive = !AutoColor.IsActive;
+                        break;
+                    case KeyCaptureColor:
+                        AutoColor.CaptureNextUpdate = true;
+                        break;
+                    case KeyReset:
+                        btnReset.PerformClick();
+                        break;
+                    case KeyExit:
+                        btnExit.PerformClick();
+                        break;
+                    case KeySave:
+                        SaveFileDialog();
+                        break;
+                    case KeyOpen:
+                        OpenFileDialog();
+                        break;
+                    case KeyClearDetectables:
+                        Detectables.Clear();
+                        break;
+                }
             }
         }
 

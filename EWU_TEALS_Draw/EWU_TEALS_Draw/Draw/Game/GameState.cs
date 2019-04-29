@@ -14,40 +14,37 @@ namespace EwuTeals.Draw.Game {
         /// <summary>
         /// If true, all key inputs will be ignored so that the container for this can address them
         /// </summary>
-        public Boolean ShouldYieldKeys { get; set; }
+        public Boolean ShouldYieldKeys { get; private set; }
+        public Keys ToggleYieldKey = Keys.Space;
 
-        protected int logicTime = 0, renderTime = 0;
-        protected ImageBox canvas, videoBox;
+        protected int logicTime = 0;
+        protected int logicTicks = 0;
+        protected ImageBox canvas;
         protected Form form;
         // this key, when pressed, will toggle ShouldYieldKeys
-        protected Keys yieldKeysKey = Keys.Tab;
         private int lastToggleTick = 0;
 
-        protected GameState(Form form, ImageBox canvas, ImageBox videoBox) {
+        protected GameState(Form form, ImageBox canvas) {
             this.canvas = canvas;
-            this.videoBox = videoBox;
             ShouldYieldKeys = true;
             this.form = form;
             form.KeyDown += OnKeyPress;
         }
 
-        public void Dispose() {
+        public virtual void Dispose() {
             form.KeyDown -= OnKeyPress;
         }
 
         protected virtual void OnKeyPress(object sender, KeyEventArgs e) {
-            if (e.KeyCode == yieldKeysKey && logicTime >= lastToggleTick + TicksToAllowToggle) {
+            if (e.KeyCode == ToggleYieldKey && logicTime >= lastToggleTick + TicksToAllowToggle) {
                 lastToggleTick = logicTime;
                 ShouldYieldKeys = !ShouldYieldKeys;
             }
         }
 
         public virtual void Update(int dT, Mat input) {
+            ++logicTicks;
             logicTime += dT;
-        }
-
-        public virtual void Render(int dT) {
-            renderTime += dT;
         }
     }
 }

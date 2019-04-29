@@ -71,6 +71,8 @@
     <Compile Include="Draw\ContourUtils.cs" />
     <Compile Include="Draw\DetectableColor.cs" />
     <Compile Include="Draw\Detectable.cs" />
+    <Compile Include="Draw\Game\GameState.cs" />
+    <Compile Include="Draw\Game\MostColorGame.cs" />
     <Compile Include="Draw\MCvScalarUtils.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
