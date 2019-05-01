@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Detectables\DetectableHand.cs" />
     <Compile Include="Utils\AutoColor.cs" />
     <Compile Include="Utils\ContourUtils.cs" />
     <Compile Include="Detectables\DetectableColor.cs" />
