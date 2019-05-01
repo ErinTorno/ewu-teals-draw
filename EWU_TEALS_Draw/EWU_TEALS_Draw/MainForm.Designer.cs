@@ -124,7 +124,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_Drawing.RowCount = 2;
             this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75F));
             this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 749);
+            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 1041);
             this.tableLayoutPanel_Drawing.TabIndex = 8;
             this.tableLayoutPanel_Drawing.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel_Drawing_Paint);
             // 
@@ -133,7 +133,7 @@ namespace EWU_TEALS_Draw {
             this.ImageBox_Drawing.Location = new System.Drawing.Point(4, 81);
             this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(4, 81, 0, 0);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
-            this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 480);
+            this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 573);
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_Drawing.TabIndex = 3;
             this.ImageBox_Drawing.TabStop = false;
@@ -146,12 +146,12 @@ namespace EWU_TEALS_Draw {
             this.GamePanel.ColumnCount = 1;
             this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Location = new System.Drawing.Point(3, 564);
+            this.GamePanel.Location = new System.Drawing.Point(3, 783);
             this.GamePanel.Name = "GamePanel";
             this.GamePanel.RowCount = 1;
             this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Size = new System.Drawing.Size(478, 182);
+            this.GamePanel.Size = new System.Drawing.Size(478, 255);
             this.GamePanel.TabIndex = 4;
             // 
             // tableLayoutPanel_VideoFeeds
@@ -165,7 +165,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture, 0, 0);
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture_Gray, 0, 1);
             this.tableLayoutPanel_VideoFeeds.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1036, 0);
+            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1576, 0);
             this.tableLayoutPanel_VideoFeeds.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel_VideoFeeds.MinimumSize = new System.Drawing.Size(240, 0);
             this.tableLayoutPanel_VideoFeeds.Name = "tableLayoutPanel_VideoFeeds";
@@ -175,7 +175,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 749);
+            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 1041);
             this.tableLayoutPanel_VideoFeeds.TabIndex = 9;
             // 
             // tableLayoutPanel_Sliders
@@ -412,7 +412,7 @@ namespace EWU_TEALS_Draw {
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
-            this.ClientSize = new System.Drawing.Size(1364, 749);
+            this.ClientSize = new System.Drawing.Size(1904, 1041);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
             this.Controls.Add(this.tableLayoutPanel_VideoFeeds);
