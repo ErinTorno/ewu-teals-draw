@@ -19,7 +19,7 @@ namespace EwuTeals.Draw {
         public MCvScalar InkColor { get; set; }
 
         [JsonIgnore]
-        private Mat threshMat = new Mat();
+        protected Mat threshMat = new Mat();
         [JsonIgnore]
         protected Point lastPosition = InvalidPoint;
 
