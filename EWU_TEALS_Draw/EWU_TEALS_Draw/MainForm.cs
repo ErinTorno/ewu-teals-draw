@@ -99,7 +99,7 @@ namespace EWU_TEALS_Draw {
                 Detectables.Add(e.Color);
             };
 
-            Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
+            Game = new MostColorGame(this, ImageBox_Drawing, GamePanel);
         }
 
         private void SetupVideoCapture() {

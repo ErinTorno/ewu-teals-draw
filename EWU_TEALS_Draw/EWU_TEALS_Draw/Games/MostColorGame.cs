@@ -8,15 +8,15 @@ using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
-using static EwuTeals.Draw.AutoColor;
 
 namespace EwuTeals.Draw.Game {
     class MostColorGame : GameState {
-        private const int MinPlayers = 2;
         private const string TextIntro = "Starting Color Game!";
-        private const string TextAddPlayerNone      = "Fill the box with a color; press P to add as a player";
-        private const string TextAddPlayerLessThan2 = "Press P to add another player!";
-        private const string TextAddPlayerReady     = "Added player! Press P to add another, or S to start";
+        private const string TextAddPlayer = "Press S to start!";
+        // clunky way of doing this, but it works for now
+        private const string TextOrder2 = "1st {0} ({1}%), 2nd {2} ({3}%)";
+        private const string TextOrder3 = "1st {0} ({1}%), 2nd {2} ({3}%), 3rd {4} ({5}%)";
+        private const string TextOrderTie = "It's a tied";
         private enum CGState { AddPlayer, Running, EndGame };
 
         private List<Player> players = new List<Player>();
@@ -24,17 +24,10 @@ namespace EwuTeals.Draw.Game {
         private CGState CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
 
         private const Keys KeyStart = Keys.S;
-        private const Keys KeyAddPlayer = Keys.P;
 
-        private TableLayoutPanel table;
         private TextBox prompt;
-        private IList<Detectable> detectables;
-        private AutoColor autoColor;
 
-        public MostColorGame(Form form, ImageBox canvas, ImageBox video, TableLayoutPanel panel, IList<Detectable> detects) : base(form, canvas) {
-            this.detectables = detects;
-            this.autoColor = new AutoColor(video);
-
+        public MostColorGame(Form form, ImageBox canvas, TableLayoutPanel panel) : base(form, canvas) {
             prompt = new TextBox {
                 ReadOnly = true,
                 Text = TextIntro,
@@ -44,16 +37,10 @@ namespace EwuTeals.Draw.Game {
                 TextAlign = HorizontalAlignment.Center
             };
             prompt.Font = new Font(prompt.Font.FontFamily, 24);
+            panel.Controls.Add(prompt);
 
-            table = new TableLayoutPanel {
-                RowCount = 2,
-                Dock = DockStyle.Fill,
-                AutoSize = true
-            };
-            table.Controls.Add(prompt, 0, 1);
-            panel.Controls.Add(table);
-
-            CurState = CGState.AddPlayer;
+            players.Add(new Player("Jane", Color.FromArgb(135, 250, 250)));
+            players.Add(new Player("Tom", Color.FromArgb(250, 250, 120)));
         }
 
         public override void Dispose() {
@@ -63,21 +50,11 @@ namespace EwuTeals.Draw.Game {
 
         public override void Update(double dT, Mat input) {
             base.Update(dT, input);
-            autoColor.Update(input);
-
             // we don't update every frame to make it easier on the computer
             if (logicTicks % 2 == 0) {
                 switch (CurState) {
                     case CGState.AddPlayer:
-                        switch (players.Count) {
-                            case 0:
-                                UpdatePrompt(TextAddPlayerNone); break;
-                            case int n when n < MinPlayers:
-                                UpdatePrompt(TextAddPlayerLessThan2); break;
-                            default:
-                                UpdatePrompt(TextAddPlayerReady); break;
-                        }
-
+                        prompt.Text = TextAddPlayer;
                         break;
                     case CGState.Running:
                         var bmp = input.Bitmap;
@@ -102,7 +79,7 @@ namespace EwuTeals.Draw.Game {
                             }
                         }
 
-                        // UpdatePlayerOrder(totalPixels);
+                        UpdatePlayerOrder(totalPixels);
                         break;
                 }
             }
@@ -115,13 +92,7 @@ namespace EwuTeals.Draw.Game {
                     case CGState.AddPlayer:
                         switch (e.KeyCode) {
                             case KeyStart:
-                                // we only let it change if we have enough players
-                                if (players.Count >= MinPlayers)
-                                    CurState = CGState.Running;
-                                break;
-
-                            case KeyAddPlayer:
-                                autoColor.CaptureNextUpdate = true;
+                                CurState = CGState.Running;
                                 break;
                         }
                         break;
@@ -130,14 +101,8 @@ namespace EwuTeals.Draw.Game {
         }
 
         private void InitState() {
-            // we always will wish to clear the prompt
-            UpdatePrompt(String.Empty);
             switch (CurState) {
                 case CGState.AddPlayer:
-                    // we clear the detectables, as we need fresh ones from the new players
-                    detectables.Clear();
-                    autoColor.IsActive = true;
-                    autoColor.OnColorCapture += OnColorCapture;
 
                     break;
             }
@@ -146,61 +111,35 @@ namespace EwuTeals.Draw.Game {
         private void FinalizeState() {
             switch (CurState) {
                 case CGState.AddPlayer:
-                    autoColor.IsActive = false;
-                    autoColor.OnColorCapture -= OnColorCapture;
+
                     break;
             }
         }
 
-        /// <summary>
-        /// Called whenever we are adding players and the AutoColor captures a color
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void OnColorCapture(object sender, ColorCaptureArgs args) {
-            var detect = args.Color;
-            var ink = detect.InkColor.ToColor();
-            players.Add(new Player(ink));
-            detectables.Add(detect);
-            
-            var content = new TableLayoutPanel {
-                RowCount = players.Count,
-                Dock = DockStyle.Fill,
-                AutoSize = true,
-            };
-            for (int i = 0; i < players.Count; ++i) {
-                var player = players[i];
-                var bitmap = new Bitmap(256, 256);
-                using (var g = Graphics.FromImage(bitmap)) {
-                    g.Clear(player.InkColor);
-                }
-
-                // for some reason none of these are displaying, but they are still adjusting the spacing of other elements
-                var picture = new PictureBox {
-                    InitialImage = bitmap,
-                    Dock = DockStyle.Fill,
-                    Visible = true
-                };
-                picture.Refresh();
+        private void UpdatePlayerOrder(int totalPixels) {
+            Func<Player, double> toPercent = p => p.Pixels / totalPixels * 100.0;
+            var order = players.OrderBy(p => p.Pixels).Reverse().ToList();
+            var str = "";
+            // if both in lead have same pixels, report it as a tie
+            if (players.Count >= 2 && order[0].Pixels == order[1].Pixels) {
+                str = TextOrderTie;
             }
-            SetGuiContent(content);
-        }
-
-        private void UpdatePrompt(String t) {
-            prompt.Text = t;
-        }
-        
-        private void SetGuiContent(Control c) {
-            table.Controls.Clear();
-            table.Controls.Add(prompt, 0, 1);
-            table.Controls.Add(c, 0, 0);
+            else {
+                if (players.Count == 2)
+                    str = String.Format(TextOrder2, order[0].Name, toPercent(order[0]), order[1].Name, toPercent(order[1]));
+                else if (players.Count > 2)
+                    str = String.Format(TextOrder3, order[0].Name, toPercent(order[0]), order[1].Name, toPercent(order[1]), order[2].Name, toPercent(order[2]));
+            }
+            prompt.Text = str;
         }
 
         class Player {
+            public string Name { get; }
             public int Pixels { get; set; }
             public Color InkColor;
 
-            public Player(Color inkColor) {
+            public Player(string name, Color inkColor) {
+                Name = name;
                 Pixels = 0;
                 InkColor = inkColor;
             }
