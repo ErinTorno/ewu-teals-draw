@@ -79,8 +79,9 @@ namespace EWU_TEALS_Draw {
         private void Startup() {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            //Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
-            Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
+            // Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
+            // Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
+            Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
@@ -107,7 +108,7 @@ namespace EWU_TEALS_Draw {
                 ImageBox_VideoCapture.Image = videoFrame;
                 DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
                 
-                Game.Update(1000 / FPS, videoFrame);
+                Game.Update(1.0 / FPS, videoFrame);
                 
                 if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();

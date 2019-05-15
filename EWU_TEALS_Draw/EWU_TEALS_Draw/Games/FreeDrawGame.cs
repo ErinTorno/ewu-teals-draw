@@ -17,6 +17,8 @@ namespace EwuTeals.Games {
 
         public FreeDrawGame(Form form, ImageBox canvas, ImageBox video) : base(form, canvas) {
             this.video = video;
+            // we want to yield, since this game does nothing with keys
+            ShouldYieldKeys = true;
             // this is a simple drawing mode, with these colors in it by default
             Detectables.Add(new DetectableColor("Red", true, inkColor: new MCvScalar(60, 60, 230), minHsv: new MCvScalar(0, 125, 180), maxHsv: new MCvScalar(6, 255, 255)));
             Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));

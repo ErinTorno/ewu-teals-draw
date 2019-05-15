@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Games\WhackAMoleGame.cs" />
     <Compile Include="Games\FreeDrawGame.cs" />
     <Compile Include="Utils\AutoColor.cs" />
     <Compile Include="Utils\ContourUtils.cs" />

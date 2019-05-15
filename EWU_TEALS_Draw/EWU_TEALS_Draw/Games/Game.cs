@@ -16,7 +16,7 @@ namespace EwuTeals.Games {
         /// <summary>
         /// If true, all key inputs will be ignored so that the container for this can address them
         /// </summary>
-        public Boolean ShouldYieldKeys { get; private set; }
+        public Boolean ShouldYieldKeys { get; protected set; }
         public Keys ToggleYieldKey = Keys.Space;
 
         public ObservableCollection<Detectable> Detectables { get; protected set; }
@@ -30,7 +30,7 @@ namespace EwuTeals.Games {
 
         protected Game(Form form, ImageBox canvas) {
             this.canvas = canvas;
-            ShouldYieldKeys = true;
+            ShouldYieldKeys = false;
             this.form = form;
             form.KeyDown += OnKeyPress;
             Detectables = new ObservableCollection<Detectable>();
