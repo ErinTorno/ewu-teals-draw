@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EwuTeals.Draw {
+namespace EwuTeals.Utils {
     static class ContourExtension {
         private const int MaxPointsToAnalyze = 50;
 

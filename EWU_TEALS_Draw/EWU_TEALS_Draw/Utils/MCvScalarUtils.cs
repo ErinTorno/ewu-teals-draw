@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EwuTeals.Draw {
+namespace EwuTeals.Utils {
     static class MCvScalarUtils {
         private static double Max3(double a, double b, double c) {
             return Math.Max(a, Math.Max(b, c));
@@ -24,7 +24,8 @@ namespace EwuTeals.Draw {
         }
 
         public static Color ToColor(this MCvScalar bgr) {
-            return Color.FromArgb((byte)bgr.V3, (byte)bgr.V2, (byte)bgr.V1, (byte)bgr.V0);
+            // for MCvScalar, 0 alpha is opaque; for color, 0 is fully transparent, and 255 is opaque
+            return Color.FromArgb(255 - (int)bgr.V3, (int)bgr.V2, (int)bgr.V1, (int)bgr.V0);
         }
 
         public static MCvScalar ToHsv(this MCvScalar bgr) {

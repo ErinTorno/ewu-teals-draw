@@ -67,12 +67,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Detectables\DetectableHand.cs" />
+    <Compile Include="Games\FreeDrawGame.cs" />
     <Compile Include="Utils\AutoColor.cs" />
     <Compile Include="Utils\ContourUtils.cs" />
     <Compile Include="Detectables\DetectableColor.cs" />
     <Compile Include="Detectables\Detectable.cs" />
-    <Compile Include="Games\GameState.cs" />
+    <Compile Include="Games\Game.cs" />
     <Compile Include="Utils\MCvScalarUtils.cs" />
     <Compile Include="Games\MostColorGame.cs" />
     <Compile Include="MainForm.cs">
@@ -111,7 +111,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Detectables\Haar\haarcascade_lefteye_2splits.xml" />
     <Content Include="License-LGPL.txt" />
     <None Include="Resources\logo_uh_color.jpg" />
   </ItemGroup>

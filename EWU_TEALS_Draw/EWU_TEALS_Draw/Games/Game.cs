@@ -1,14 +1,16 @@
 ﻿using Emgu.CV;
 using Emgu.CV.UI;
+using EwuTeals.Detectables;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace EwuTeals.Draw.Game {
-   abstract class GameState : IDisposable {
+namespace EwuTeals.Games {
+   abstract class Game : IDisposable {
         private const double SecondsToAllowToggle = 0.5; // a half second
 
         /// <summary>
@@ -17,6 +19,8 @@ namespace EwuTeals.Draw.Game {
         public Boolean ShouldYieldKeys { get; private set; }
         public Keys ToggleYieldKey = Keys.Space;
 
+        public ObservableCollection<Detectable> Detectables { get; protected set; }
+
         protected double logicTime = 0;
         protected int logicTicks = 0;
         protected ImageBox canvas;
@@ -24,11 +28,12 @@ namespace EwuTeals.Draw.Game {
         // this key, when pressed, will toggle ShouldYieldKeys
         private double lastToggleTime = 0.0;
 
-        protected GameState(Form form, ImageBox canvas) {
+        protected Game(Form form, ImageBox canvas) {
             this.canvas = canvas;
             ShouldYieldKeys = true;
             this.form = form;
             form.KeyDown += OnKeyPress;
+            Detectables = new ObservableCollection<Detectable>();
         }
 
         public virtual void Dispose() {

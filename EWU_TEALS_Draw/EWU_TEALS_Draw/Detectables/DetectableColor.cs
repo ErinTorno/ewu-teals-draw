@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EwuTeals.Draw {
+namespace EwuTeals.Detectables {
     public class DetectableColor : Detectable {
         // set to correspond to the "600 pixels" constant in the mainform, so that scaling will work consistently
         private const double PercentOfScreenToDetect = 0.0078125;

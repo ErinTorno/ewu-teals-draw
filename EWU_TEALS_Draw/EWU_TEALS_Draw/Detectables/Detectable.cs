@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EwuTeals.Draw {
+namespace EwuTeals.Detectables {
     public abstract class Detectable {
         protected static readonly Point InvalidPoint = new Point(-255, -255);
 
@@ -19,7 +19,7 @@ namespace EwuTeals.Draw {
         public MCvScalar InkColor { get; set; }
 
         [JsonIgnore]
-        protected Mat threshMat = new Mat();
+        private Mat threshMat = new Mat();
         [JsonIgnore]
         protected Point lastPosition = InvalidPoint;
 

@@ -16,9 +16,10 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
 using Newtonsoft.Json;
-using EwuTeals.Draw;
 using System.Collections.ObjectModel;
-using EwuTeals.Draw.Game;
+using EwuTeals.Detectables;
+using EwuTeals.Utils;
+using EwuTeals.Games;
 
 namespace EWU_TEALS_Draw {
     public partial class MainForm : Form {
@@ -37,11 +38,19 @@ namespace EWU_TEALS_Draw {
         private int CanvasHeight = (int)Math.Floor(DisplayedCameraHeight * 3.76);
         #endregion
 
-        private ObservableCollection<Detectable> Detectables = new ObservableCollection<Detectable>();
-
-        private AutoColor AutoColor;
-
-        private GameState Game;
+        private Game _game;
+        private Game Game {
+            get => _game;
+            set {
+                _game = value;
+                // we need to update the menu options for each new game
+                _game.Detectables.CollectionChanged += (sender, e) => {
+                    ColorPicker.Items.Clear();
+                    foreach (var d in _game.Detectables)
+                        ColorPicker.Items.Add(d.Name);
+                };
+            }
+        }
 
         #region Re-used Objects for saving memory
         Queue<Mat> DisposableQueue = new Queue<Mat>();
@@ -52,9 +61,6 @@ namespace EWU_TEALS_Draw {
         private const Keys KeyExit = Keys.Q;
         private const Keys KeySave = Keys.S;
         private const Keys KeyOpen = Keys.O;
-        private const Keys KeyToggleAuto = Keys.A;
-        private const Keys KeyCaptureColor = Keys.P;
-        private const Keys KeyClearDetectables = Keys.C;
         #endregion
 
         JsonSerializerSettings JsonSettings = new JsonSerializerSettings() {
@@ -73,33 +79,14 @@ namespace EWU_TEALS_Draw {
         private void Startup() {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            AutoColor = new AutoColor(ImageBox_VideoCapture);
+            //Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
+            Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
             this.KeyPreview = true;
             this.KeyDown += MainForm_KeyDown;
             ColorPicker.SelectedIndex = 0;
-
-            Detectables.Add(new DetectableColor("Red", true, inkColor: new MCvScalar(60, 60, 230), minHsv: new MCvScalar(0, 125, 180), maxHsv: new MCvScalar(6, 255, 255)));
-            Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));
-            Detectables.Add(new DetectableColor("Yellow", true, inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195), maxHsv: new MCvScalar(35, 255, 255)));
-            Detectables.Add(new DetectableColor("Green", true, inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75), maxHsv: new MCvScalar(95, 255, 255)));
-            Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
-            Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
-            Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
-
-            Detectables.CollectionChanged += (sender, e) => {
-                ColorPicker.Items.Clear();
-                foreach (var d in Detectables)
-                    ColorPicker.Items.Add(d.Name);
-            };
-
-            AutoColor.OnColorCapture += (sender, e) => {
-                Detectables.Add(e.Color);
-            };
-
-            Game = new MostColorGame(this, ImageBox_Drawing, GamePanel);
         }
 
         private void SetupVideoCapture() {
@@ -119,25 +106,10 @@ namespace EWU_TEALS_Draw {
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
                 DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
-
-                Mat combinedThreshImage = Mat.Zeros(videoFrame.Rows, videoFrame.Cols, DepthType.Cv8U, 1);
-                DisposableQueue.Enqueue(combinedThreshImage);
-
-                AutoColor.Update(videoFrame);
-                if (Game != null)
-                    Game.Update(1000 / FPS, videoFrame);
-
-                foreach (var d in Detectables) {
-                    if (d.IsEnabled) {
-                        Mat curThresh = d.Draw(ImageBox_Drawing, videoFrame);
-                        CvInvoke.Add(curThresh, combinedThreshImage, combinedThreshImage);
-                    }
-                }
-
-                ImageBox_VideoCapture_Gray.Image = combinedThreshImage;
-
-                if (DisposableQueue.Count > 8) {
-                    DisposableQueue.Dequeue().Dispose();
+                
+                Game.Update(1000 / FPS, videoFrame);
+                
+                if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();
                 }
             }
@@ -161,12 +133,6 @@ namespace EWU_TEALS_Draw {
             // if the Game is requesting all key input, then we won't run this
             if (Game.ShouldYieldKeys) {
                 switch (e.KeyCode) {
-                    case KeyToggleAuto:
-                        AutoColor.IsActive = !AutoColor.IsActive;
-                        break;
-                    case KeyCaptureColor:
-                        AutoColor.CaptureNextUpdate = true;
-                        break;
                     case KeyReset:
                         btnReset.PerformClick();
                         break;
@@ -178,9 +144,6 @@ namespace EWU_TEALS_Draw {
                         break;
                     case KeyOpen:
                         OpenFileDialog();
-                        break;
-                    case KeyClearDetectables:
-                        Detectables.Clear();
                         break;
                 }
             }
@@ -198,7 +161,7 @@ namespace EWU_TEALS_Draw {
                 btnPlay.Text = "Play";
 
                 // we reset each of these to prevent weird line issues when unpausing at far away locations
-                foreach (var d in Detectables) d.ResetLastPosition();
+                foreach (var d in Game.Detectables) d.ResetLastPosition();
             }
         }
 
@@ -220,11 +183,11 @@ namespace EWU_TEALS_Draw {
         }
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
+            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
                 CheckBox_IsMin.Checked = true;
                 UpdateSliderValues(sender, e);
 
-                CheckBox_ColorOn.Checked = Detectables[ColorPicker.SelectedIndex].IsEnabled;
+                CheckBox_ColorOn.Checked = Game.Detectables[ColorPicker.SelectedIndex].IsEnabled;
             }
         }
 
@@ -250,13 +213,13 @@ namespace EWU_TEALS_Draw {
         }
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count)
-                Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
+            if (ColorPicker.SelectedIndex < Game.Detectables.Count)
+                Game.Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }
 
         private void UpdateSliderValues(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
-                var drawable = Detectables[ColorPicker.SelectedIndex];
+            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
+                var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;
                     double[] hsvValues = null;
@@ -276,8 +239,8 @@ namespace EWU_TEALS_Draw {
         }
 
         private void UpdateHSVCodes() {
-            if (ColorPicker.SelectedIndex < Detectables.Count) {
-                var drawable = Detectables[ColorPicker.SelectedIndex];
+            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
+                var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;
                     if (CheckBox_IsMin.Checked)
@@ -313,18 +276,18 @@ namespace EWU_TEALS_Draw {
         // saving and loading disabled write now until we decide how to handle this
 
         public void SaveHsvToFile(string path) {
-            var json = JsonConvert.SerializeObject(Detectables, JsonSettings);
+            var json = JsonConvert.SerializeObject(Game.Detectables, JsonSettings);
             File.WriteAllText(path, json);
         }
 
         public void LoadHsvFromFile(string path) {
             var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), JsonSettings);
             // for all availale colors, we update them
-            Detectables.Clear();
+            Game.Detectables.Clear();
             foreach (var d in ser)
-                Detectables.Add(d);
-            if (Detectables.Count > 0)
-                ColorPicker.Text = Detectables.First().Name;
+                Game.Detectables.Add(d);
+            if (Game.Detectables.Count > 0)
+                ColorPicker.Text = Game.Detectables.First().Name;
         }
     }
 }
