@@ -67,13 +67,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Games\WhackAMoleGame.cs" />
+    <Compile Include="Games\WhackAMole\Target.cs" />
+    <Compile Include="Games\WhackAMole\WhackAMoleGame.cs" />
     <Compile Include="Games\FreeDrawGame.cs" />
     <Compile Include="Utils\AutoColor.cs" />
     <Compile Include="Utils\ContourUtils.cs" />
     <Compile Include="Detectables\DetectableColor.cs" />
     <Compile Include="Detectables\Detectable.cs" />
     <Compile Include="Games\Game.cs" />
+    <Compile Include="Utils\Maybe.cs" />
     <Compile Include="Utils\MCvScalarUtils.cs" />
     <Compile Include="Games\MostColorGame.cs" />
     <Compile Include="MainForm.cs">
@@ -84,6 +86,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\V2.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

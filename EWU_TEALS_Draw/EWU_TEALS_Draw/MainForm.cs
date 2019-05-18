@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using EwuTeals.Detectables;
 using EwuTeals.Utils;
 using EwuTeals.Games;
+using EwuTeals.Games.WhackAMole;
 
 namespace EWU_TEALS_Draw {
     public partial class MainForm : Form {
