@@ -16,6 +16,10 @@ namespace EwuTeals.Utils {
             return Math.Min(a, Math.Min(b, c));
         }
 
+        public static bool IsEqualTo(this MCvScalar a, MCvScalar b) {
+            return a.V0 == b.V0 && a.V1 == b.V1 && a.V2 == b.V2 && a.V3 == b.V3;
+        }
+
         public static MCvScalar RestrictHsvRanges(this MCvScalar s) {
             var hue = s.V0 < 0.0 ? 0.0 : s.V0 > 179.0 ? 179.0 : s.V0;
             var sat = s.V1 < 0.0 ? 0.0 : s.V1 > 255.0 ? 255.0 : s.V1;

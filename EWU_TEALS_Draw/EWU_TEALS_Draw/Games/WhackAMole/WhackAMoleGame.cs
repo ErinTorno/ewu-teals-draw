@@ -21,10 +21,12 @@ namespace EwuTeals.Games.WhackAMole {
         private const string TextAddFirst = "Player {0}, put first object in center of box and press Enter";
         private const string TextAddSecond = "Player {0}, put second object in center of box and press Enter";
         private const string TextReady = "Press Enter to start the game";
+        private const string TextTimeRemaining = "Time Remaining {0:0.00} seconds";
 
         private const double TimeToShowIntro = 2.0; // in seconds
-        private const double TargetRadiusPercent = 0.1; // mult by height to get radius
-        private const int PlayerCount = 2;
+        private const double NormalMatchLength = 30.0; // in seconds
+        private const double TargetRadiusPercent = 0.1, TargetRadiusR2Percent = 0.7, TargetRadiusR3Percent = 0.35; // mult by height to get radius
+        private const int PlayerCount = 1;
 
         private const Keys KeyCaptureColor = Keys.Enter;
         private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
@@ -34,10 +36,12 @@ namespace EwuTeals.Games.WhackAMole {
 
         private AutoColor autoColor;
         private List<Player> players = new List<Player>();
+        private List<(MCvScalar color, int count)> colorCounts = new List<(MCvScalar color, int count)>();
         private List<Target> targets;
         private Player unfinishedPlayer;
         private TextBox prompt;
         private double lastSwitchTime = 0;
+        private double timeRemaining = 0;
 
         public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel) : base(form, canvas, videoGrey) {
             autoColor = new AutoColor(video);
@@ -66,8 +70,12 @@ namespace EwuTeals.Games.WhackAMole {
 
             // we draw targets every state, so during set up people can prepare for the game
             var tarRadis = (int)(TargetRadiusPercent * canvas.Height);
+            var tarRadis2 = (int)(TargetRadiusR2Percent * tarRadis);
+            var tarRadis3 = (int)(TargetRadiusR3Percent * tarRadis);
             foreach (var t in targets) {
                 CvInvoke.Circle(canvas.Image, t.Position, tarRadis, t.InkColor, -1);
+                CvInvoke.Circle(canvas.Image, t.Position, tarRadis2, t.InnerInkColor, -1);
+                CvInvoke.Circle(canvas.Image, t.Position, tarRadis3, t.InkColor, -1);
             }
 
             switch (CurState) {
@@ -77,18 +85,15 @@ namespace EwuTeals.Games.WhackAMole {
                         CurState = State.AddFirstDetect;
                     break;
                 case State.Playing:
+                    UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
+                    
+                    timeRemaining -= dT;
                     foreach (var t in targets) {
-                        var isExpired = t.Update(dT);
-                        if (isExpired)
-                            t.Color = GetNewTargetColor().ToMaybe();
+                        t.Update(dT, colorCounts);
                     }
                     break;
             }
             canvas.Refresh();
-        }
-
-        private MCvScalar GetNewTargetColor() {
-            throw new NotImplementedException();
         }
 
         protected override void OnKeyPress(object sender, KeyEventArgs e) {
@@ -127,6 +132,15 @@ namespace EwuTeals.Games.WhackAMole {
                     break;
                 case State.Ready:
                     UpdatePrompt(TextReady);
+                    break;
+                case State.Playing:
+                    timeRemaining = NormalMatchLength;
+                    colorCounts = new List<(MCvScalar, int)>(players.Count * 2);
+                    foreach (var t in targets) t.TimeRemaining = 0;
+                    foreach (var p in players) {
+                        colorCounts.Add((p.PaddleA.InkColor, 0));
+                        colorCounts.Add((p.PaddleB.InkColor, 0));
+                    }
                     break;
             }
         }
@@ -171,18 +185,6 @@ namespace EwuTeals.Games.WhackAMole {
                     else
                         CurState = State.AddFirstDetect;
                 }
-            }
-        }
-
-        private class Player {
-            public Detectable PaddleA, PaddleB;
-            // the player loses if this reaches 0
-            // the number of points the player has reached so far
-            public int Points;
-
-            public Player(Detectable a, Detectable b) {
-                PaddleA = a;
-                PaddleB = b;
             }
         }
     }

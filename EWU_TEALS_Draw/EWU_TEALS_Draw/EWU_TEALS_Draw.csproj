@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Games\WhackAMole\Player.cs" />
     <Compile Include="Games\WhackAMole\Target.cs" />
     <Compile Include="Games\WhackAMole\WhackAMoleGame.cs" />
     <Compile Include="Games\FreeDrawGame.cs" />
