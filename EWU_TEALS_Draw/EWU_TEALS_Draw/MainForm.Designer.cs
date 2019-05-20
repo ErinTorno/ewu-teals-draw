@@ -46,9 +46,11 @@ namespace EWU_TEALS_Draw {
             this.lblV = new System.Windows.Forms.Label();
             this.tableLayoutPanel_Buttons = new System.Windows.Forms.TableLayoutPanel();
             this.btnEdit = new System.Windows.Forms.Button();
+            this.GameSelector = new System.Windows.Forms.ComboBox();
             this.ImageBox_VideoCapture = new Emgu.CV.UI.ImageBox();
             this.ImageBox_VideoCapture_Gray = new Emgu.CV.UI.ImageBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.HelpButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel_Drawing.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_Drawing)).BeginInit();
             this.tableLayoutPanel_VideoFeeds.SuspendLayout();
@@ -124,7 +126,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_Drawing.RowCount = 2;
             this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 75F));
             this.tableLayoutPanel_Drawing.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 1041);
+            this.tableLayoutPanel_Drawing.Size = new System.Drawing.Size(484, 749);
             this.tableLayoutPanel_Drawing.TabIndex = 8;
             this.tableLayoutPanel_Drawing.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel_Drawing_Paint);
             // 
@@ -133,7 +135,7 @@ namespace EWU_TEALS_Draw {
             this.ImageBox_Drawing.Location = new System.Drawing.Point(4, 81);
             this.ImageBox_Drawing.Margin = new System.Windows.Forms.Padding(4, 81, 0, 0);
             this.ImageBox_Drawing.Name = "ImageBox_Drawing";
-            this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 573);
+            this.ImageBox_Drawing.Size = new System.Drawing.Size(480, 480);
             this.ImageBox_Drawing.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.ImageBox_Drawing.TabIndex = 3;
             this.ImageBox_Drawing.TabStop = false;
@@ -146,12 +148,12 @@ namespace EWU_TEALS_Draw {
             this.GamePanel.ColumnCount = 1;
             this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.GamePanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Location = new System.Drawing.Point(3, 783);
+            this.GamePanel.Location = new System.Drawing.Point(3, 564);
             this.GamePanel.Name = "GamePanel";
             this.GamePanel.RowCount = 1;
             this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.GamePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.GamePanel.Size = new System.Drawing.Size(478, 255);
+            this.GamePanel.Size = new System.Drawing.Size(478, 182);
             this.GamePanel.TabIndex = 4;
             // 
             // tableLayoutPanel_VideoFeeds
@@ -165,7 +167,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture, 0, 0);
             this.tableLayoutPanel_VideoFeeds.Controls.Add(this.ImageBox_VideoCapture_Gray, 0, 1);
             this.tableLayoutPanel_VideoFeeds.Dock = System.Windows.Forms.DockStyle.Right;
-            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1576, 0);
+            this.tableLayoutPanel_VideoFeeds.Location = new System.Drawing.Point(1036, 0);
             this.tableLayoutPanel_VideoFeeds.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel_VideoFeeds.MinimumSize = new System.Drawing.Size(240, 0);
             this.tableLayoutPanel_VideoFeeds.Name = "tableLayoutPanel_VideoFeeds";
@@ -175,7 +177,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
             this.tableLayoutPanel_VideoFeeds.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 1041);
+            this.tableLayoutPanel_VideoFeeds.Size = new System.Drawing.Size(328, 749);
             this.tableLayoutPanel_VideoFeeds.TabIndex = 9;
             // 
             // tableLayoutPanel_Sliders
@@ -195,7 +197,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblH, 0, 1);
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblS, 0, 2);
             this.tableLayoutPanel_Sliders.Controls.Add(this.lblV, 0, 3);
-            this.tableLayoutPanel_Sliders.Location = new System.Drawing.Point(2, 563);
+            this.tableLayoutPanel_Sliders.Location = new System.Drawing.Point(2, 583);
             this.tableLayoutPanel_Sliders.Margin = new System.Windows.Forms.Padding(2);
             this.tableLayoutPanel_Sliders.Name = "tableLayoutPanel_Sliders";
             this.tableLayoutPanel_Sliders.RowCount = 4;
@@ -203,7 +205,7 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 58.88889F));
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel_Sliders.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
-            this.tableLayoutPanel_Sliders.Size = new System.Drawing.Size(324, 55);
+            this.tableLayoutPanel_Sliders.Size = new System.Drawing.Size(324, 155);
             this.tableLayoutPanel_Sliders.TabIndex = 15;
             this.tableLayoutPanel_Sliders.Visible = false;
             // 
@@ -217,7 +219,7 @@ namespace EWU_TEALS_Draw {
             this.CheckBox_IsMin.Location = new System.Drawing.Point(45, 0);
             this.CheckBox_IsMin.Margin = new System.Windows.Forms.Padding(0);
             this.CheckBox_IsMin.Name = "CheckBox_IsMin";
-            this.CheckBox_IsMin.Size = new System.Drawing.Size(45, 1);
+            this.CheckBox_IsMin.Size = new System.Drawing.Size(45, 33);
             this.CheckBox_IsMin.TabIndex = 13;
             this.CheckBox_IsMin.Text = "Min";
             this.CheckBox_IsMin.UseVisualStyleBackColor = true;
@@ -235,7 +237,7 @@ namespace EWU_TEALS_Draw {
             "Orange",
             "Purple",
             "Special"});
-            this.ColorPicker.Location = new System.Drawing.Point(92, 2);
+            this.ColorPicker.Location = new System.Drawing.Point(92, 6);
             this.ColorPicker.Margin = new System.Windows.Forms.Padding(2);
             this.ColorPicker.Name = "ColorPicker";
             this.ColorPicker.Size = new System.Drawing.Size(230, 21);
@@ -246,11 +248,11 @@ namespace EWU_TEALS_Draw {
             // 
             this.VSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel_Sliders.SetColumnSpan(this.VSlider, 2);
-            this.VSlider.Location = new System.Drawing.Point(47, 21);
+            this.VSlider.Location = new System.Drawing.Point(47, 119);
             this.VSlider.Margin = new System.Windows.Forms.Padding(2);
             this.VSlider.Maximum = 255;
             this.VSlider.Name = "VSlider";
-            this.VSlider.Size = new System.Drawing.Size(275, 33);
+            this.VSlider.Size = new System.Drawing.Size(275, 34);
             this.VSlider.TabIndex = 14;
             this.VSlider.TickFrequency = 5;
             this.VSlider.ValueChanged += new System.EventHandler(this.VSlider_ValueChanged);
@@ -259,7 +261,7 @@ namespace EWU_TEALS_Draw {
             // 
             this.SSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel_Sliders.SetColumnSpan(this.SSlider, 2);
-            this.SSlider.Location = new System.Drawing.Point(47, -15);
+            this.SSlider.Location = new System.Drawing.Point(47, 83);
             this.SSlider.Margin = new System.Windows.Forms.Padding(2);
             this.SSlider.Maximum = 255;
             this.SSlider.Name = "SSlider";
@@ -272,11 +274,11 @@ namespace EWU_TEALS_Draw {
             // 
             this.HSlider.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel_Sliders.SetColumnSpan(this.HSlider, 2);
-            this.HSlider.Location = new System.Drawing.Point(47, -5);
+            this.HSlider.Location = new System.Drawing.Point(47, 35);
             this.HSlider.Margin = new System.Windows.Forms.Padding(2);
             this.HSlider.Maximum = 180;
             this.HSlider.Name = "HSlider";
-            this.HSlider.Size = new System.Drawing.Size(275, 1);
+            this.HSlider.Size = new System.Drawing.Size(275, 44);
             this.HSlider.TabIndex = 12;
             this.HSlider.TickFrequency = 5;
             this.HSlider.ValueChanged += new System.EventHandler(this.HSlider_ValueChanged);
@@ -287,10 +289,10 @@ namespace EWU_TEALS_Draw {
             this.CheckBox_ColorOn.AutoSize = true;
             this.CheckBox_ColorOn.Checked = true;
             this.CheckBox_ColorOn.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckBox_ColorOn.Location = new System.Drawing.Point(2, 2);
+            this.CheckBox_ColorOn.Location = new System.Drawing.Point(2, 8);
             this.CheckBox_ColorOn.Margin = new System.Windows.Forms.Padding(2);
             this.CheckBox_ColorOn.Name = "CheckBox_ColorOn";
-            this.CheckBox_ColorOn.Size = new System.Drawing.Size(40, 1);
+            this.CheckBox_ColorOn.Size = new System.Drawing.Size(40, 17);
             this.CheckBox_ColorOn.TabIndex = 12;
             this.CheckBox_ColorOn.Text = "On";
             this.CheckBox_ColorOn.UseVisualStyleBackColor = true;
@@ -300,10 +302,10 @@ namespace EWU_TEALS_Draw {
             // 
             this.lblH.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblH.AutoSize = true;
-            this.lblH.Location = new System.Drawing.Point(2, -7);
+            this.lblH.Location = new System.Drawing.Point(2, 50);
             this.lblH.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblH.Name = "lblH";
-            this.lblH.Size = new System.Drawing.Size(27, 1);
+            this.lblH.Size = new System.Drawing.Size(27, 13);
             this.lblH.TabIndex = 15;
             this.lblH.Text = "H(0)";
             // 
@@ -311,7 +313,7 @@ namespace EWU_TEALS_Draw {
             // 
             this.lblS.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblS.AutoSize = true;
-            this.lblS.Location = new System.Drawing.Point(2, -6);
+            this.lblS.Location = new System.Drawing.Point(2, 92);
             this.lblS.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblS.Name = "lblS";
             this.lblS.Size = new System.Drawing.Size(26, 13);
@@ -322,7 +324,7 @@ namespace EWU_TEALS_Draw {
             // 
             this.lblV.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblV.AutoSize = true;
-            this.lblV.Location = new System.Drawing.Point(2, 31);
+            this.lblV.Location = new System.Drawing.Point(2, 129);
             this.lblV.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblV.Name = "lblV";
             this.lblV.Size = new System.Drawing.Size(26, 13);
@@ -340,17 +342,18 @@ namespace EWU_TEALS_Draw {
             this.tableLayoutPanel_Buttons.Controls.Add(this.btnEdit, 0, 3);
             this.tableLayoutPanel_Buttons.Controls.Add(this.btnExit, 0, 2);
             this.tableLayoutPanel_Buttons.Controls.Add(this.btnReset, 0, 1);
+            this.tableLayoutPanel_Buttons.Controls.Add(this.GameSelector, 0, 4);
             this.tableLayoutPanel_Buttons.Location = new System.Drawing.Point(4, 449);
             this.tableLayoutPanel_Buttons.Margin = new System.Windows.Forms.Padding(4, 4, 0, 0);
             this.tableLayoutPanel_Buttons.Name = "tableLayoutPanel_Buttons";
-            this.tableLayoutPanel_Buttons.RowCount = 4;
+            this.tableLayoutPanel_Buttons.RowCount = 5;
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel_Buttons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel_Buttons.Size = new System.Drawing.Size(324, 112);
+            this.tableLayoutPanel_Buttons.Size = new System.Drawing.Size(324, 132);
             this.tableLayoutPanel_Buttons.TabIndex = 10;
             // 
             // btnEdit
@@ -367,6 +370,21 @@ namespace EWU_TEALS_Draw {
             this.btnEdit.Text = "Edit Detection";
             this.btnEdit.UseVisualStyleBackColor = true;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
+            // 
+            // GameSelector
+            // 
+            this.GameSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.GameSelector.FormattingEnabled = true;
+            this.GameSelector.Items.AddRange(new object[] {
+            "Free Draw",
+            "Whack-A-Mole",
+            "Color Fill Game"});
+            this.GameSelector.Location = new System.Drawing.Point(3, 115);
+            this.GameSelector.Name = "GameSelector";
+            this.GameSelector.Size = new System.Drawing.Size(318, 21);
+            this.GameSelector.TabIndex = 8;
+            this.GameSelector.Text = "Select a Game";
+            this.GameSelector.SelectedIndexChanged += new System.EventHandler(this.GameSelector_SelectedIndexChanged);
             // 
             // ImageBox_VideoCapture
             // 
@@ -402,17 +420,30 @@ namespace EWU_TEALS_Draw {
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1897, 71);
+            this.pictureBox1.Size = new System.Drawing.Size(1357, 71);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 10;
             this.pictureBox1.TabStop = false;
+            // 
+            // HelpButton
+            // 
+            this.HelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.HelpButton.BackColor = System.Drawing.Color.SlateGray;
+            this.HelpButton.Location = new System.Drawing.Point(1338, 723);
+            this.HelpButton.Name = "HelpButton";
+            this.HelpButton.Size = new System.Drawing.Size(23, 23);
+            this.HelpButton.TabIndex = 11;
+            this.HelpButton.Text = "?";
+            this.HelpButton.UseVisualStyleBackColor = false;
+            this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
-            this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.ClientSize = new System.Drawing.Size(1364, 749);
+            this.Controls.Add(this.HelpButton);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
             this.Controls.Add(this.tableLayoutPanel_VideoFeeds);
@@ -468,6 +499,8 @@ namespace EWU_TEALS_Draw {
         private System.Windows.Forms.CheckBox CheckBox_IsMin;
         private System.Windows.Forms.ComboBox ColorPicker;
         private System.Windows.Forms.TableLayoutPanel GamePanel;
+        private ComboBox GameSelector;
+        private Button HelpButton;
     }
 }
 

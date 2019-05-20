@@ -291,5 +291,26 @@ namespace EWU_TEALS_Draw {
             if (Game.Detectables.Count > 0)
                 ColorPicker.Text = Game.Detectables.First().Name;
         }
+
+        private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.Text == "Free Draw")
+            {
+
+            }
+            else if (this.Text == "Whack-A-Mole")
+            {
+
+            }
+            else if (this.Text == "Color Fill Game")
+            {
+
+            }
+        }
+
+        private void HelpButton_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
