@@ -29,6 +29,30 @@ namespace EwuTeals.Games {
             Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
         }
 
+        public override void DetectColor()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void DisplayIntro()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void DisplayResults()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Exit()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void PromptAddPlayer()
+        {
+            throw new NotImplementedException();
+        }
 
         public override void Update(double dT, Mat input) {
             base.Update(dT, input);

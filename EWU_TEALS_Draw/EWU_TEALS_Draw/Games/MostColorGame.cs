@@ -202,6 +202,31 @@ namespace EwuTeals.Games {
             table.Controls.Add(c, 0, 0);
         }
 
+        public override void DisplayIntro()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void DetectColor()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void PromptAddPlayer()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void DisplayResults()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Exit()
+        {
+            throw new NotImplementedException();
+        }
+
         class Player {
             public int Pixels { get; set; }
             public Color InkColor;

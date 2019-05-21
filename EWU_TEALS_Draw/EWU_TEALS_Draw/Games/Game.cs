@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.UI;
 using EwuTeals.Detectables;
+using EwuTeals.Games.States;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,6 +22,14 @@ namespace EwuTeals.Games {
 
         public ObservableCollection<Detectable> Detectables { get; protected set; }
 
+        public readonly State Intro;
+        public readonly State Detect;
+        public readonly State Ready;
+        public readonly State Running;
+        public readonly State Result;
+        public readonly State End;
+        private State CurState;
+
         protected double logicTime = 0;
         protected int logicTicks = 0;
         protected ImageBox canvas;
@@ -34,6 +43,17 @@ namespace EwuTeals.Games {
             this.form = form;
             form.KeyDown += OnKeyPress;
             Detectables = new ObservableCollection<Detectable>();
+        }
+
+        abstract public void DisplayIntro();
+        abstract public void DetectColor();
+        abstract public void PromptAddPlayer();
+        abstract public void DisplayResults();
+        abstract public void Exit();
+
+        public void SetState (State state)
+        {
+            this.CurState = state;
         }
 
         public virtual void Dispose() {
