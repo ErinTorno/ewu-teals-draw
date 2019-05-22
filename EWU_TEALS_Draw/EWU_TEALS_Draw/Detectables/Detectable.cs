@@ -21,10 +21,11 @@ namespace EwuTeals.Detectables {
         [JsonIgnore]
         private Mat threshMat = new Mat();
         [JsonIgnore]
-        protected Point lastPosition = InvalidPoint;
+        public Point LastPosition { get; protected set; }
 
         public Detectable(string name) {
             Name = name;
+            LastPosition = InvalidPoint;
         }
 
         public abstract void ResetLastPosition();

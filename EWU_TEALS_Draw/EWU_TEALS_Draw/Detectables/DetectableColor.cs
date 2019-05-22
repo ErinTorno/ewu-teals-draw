@@ -36,7 +36,7 @@ namespace EwuTeals.Detectables {
         }
 
         public override void ResetLastPosition() {
-            base.lastPosition = InvalidPoint;
+            base.LastPosition = InvalidPoint;
         }
 
         public override Mat Draw(ImageBox canvas, Mat videoCapture) {
@@ -80,17 +80,17 @@ namespace EwuTeals.Detectables {
 
                     // Draw on canvas using contour center
                     contourCenter = ScaleToFit(contourCenter, videoCapture.Width, videoCapture.Height, canvas.Width, canvas.Height);
-                    int width = GetWidthBySpeed(lastPosition, contourCenter);
+                    int width = GetWidthBySpeed(LastPosition, contourCenter);
 
                     //don't want to draw or change state if this hasn't been enabled
                     if (IsEnabled) {
-                        DrawLineTo(canvas, lastPosition, contourCenter, InkColor, width);
+                        DrawLineTo(canvas, LastPosition, contourCenter, InkColor, width);
 
-                        lastPosition = contourCenter;
+                        LastPosition = contourCenter;
                     }
                 }
                 else if (IsEnabled) {
-                    lastPosition = InvalidPoint;
+                    LastPosition = InvalidPoint;
                 }
             }
 

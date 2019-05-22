@@ -25,7 +25,6 @@ namespace EwuTeals.Games.WhackAMole {
 
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double NormalMatchLength = 30.0; // in seconds
-        private const double TargetRadiusPercent = 0.1, TargetRadiusR2Percent = 0.7, TargetRadiusR3Percent = 0.35; // mult by height to get radius
         private const int PlayerCount = 1;
 
         private const Keys KeyCaptureColor = Keys.Enter;
@@ -69,14 +68,8 @@ namespace EwuTeals.Games.WhackAMole {
             autoColor.Update(input);
 
             // we draw targets every state, so during set up people can prepare for the game
-            var tarRadis = (int)(TargetRadiusPercent * canvas.Height);
-            var tarRadis2 = (int)(TargetRadiusR2Percent * tarRadis);
-            var tarRadis3 = (int)(TargetRadiusR3Percent * tarRadis);
-            foreach (var t in targets) {
-                CvInvoke.Circle(canvas.Image, t.Position, tarRadis, t.InkColor, -1);
-                CvInvoke.Circle(canvas.Image, t.Position, tarRadis2, t.InnerInkColor, -1);
-                CvInvoke.Circle(canvas.Image, t.Position, tarRadis3, t.InkColor, -1);
-            }
+            foreach (var t in targets)
+                t.Draw(canvas);
 
             switch (CurState) {
                 case State.Intro:
@@ -85,12 +78,16 @@ namespace EwuTeals.Games.WhackAMole {
                         CurState = State.AddFirstDetect;
                     break;
                 case State.Playing:
-                    UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
-                    
-                    timeRemaining -= dT;
-                    foreach (var t in targets) {
-                        t.Update(dT, colorCounts);
+                    if (timeRemaining > 0) {
+                        timeRemaining -= dT;
+                        foreach (var t in targets) {
+                            t.Update(dT, players, colorCounts);
+                        }
+                        break;
+                    } else {
+                        timeRemaining = 0;
                     }
+                    UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
                     break;
             }
             canvas.Refresh();
