@@ -26,6 +26,7 @@ namespace EWU_TEALS_Draw {
     public partial class MainForm : Form {
         private VideoCapture VideoCapture;
         private bool IsRunning;
+        private DateTime LastTime;
 
         #region Resolution Properties
         private const int FPS = 30;
@@ -89,6 +90,8 @@ namespace EWU_TEALS_Draw {
             this.KeyPreview = true;
             this.KeyDown += MainForm_KeyDown;
             ColorPicker.SelectedIndex = 0;
+
+            LastTime = DateTime.Now;
         }
 
         private void SetupVideoCapture() {
@@ -108,8 +111,12 @@ namespace EWU_TEALS_Draw {
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
                 DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
-                
-                Game.Update(1.0 / FPS, videoFrame);
+
+                var curTime = DateTime.Now;
+                var span = curTime.Subtract(LastTime);
+                LastTime = curTime;
+
+                Game.Update(span.TotalSeconds, videoFrame);
                 
                 if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();

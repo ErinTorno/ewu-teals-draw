@@ -30,7 +30,7 @@ namespace EwuTeals.Detectables {
 
         public abstract void ResetLastPosition();
 
-        public abstract Mat Draw(ImageBox canvas, Mat videoCapture);
+        public abstract Mat Draw(ImageBox canvas, Mat videoCapture, bool drawOnCanvas = true);
 
         protected void DrawLineTo(ImageBox canvas, Point orig, Point desti, MCvScalar color, int strokeWidth) {
             if (orig == InvalidPoint || desti == InvalidPoint)

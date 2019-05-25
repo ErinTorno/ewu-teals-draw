@@ -15,6 +15,8 @@ namespace EwuTeals.Games {
         private ImageBox video;
         private Queue<Mat> disposableQueue = new Queue<Mat>();
 
+        protected bool ShouldDraw { get; set; }
+
         public FreeDrawGame(Form form, ImageBox canvas, ImageBox video) : base(form, canvas) {
             this.video = video;
             // we want to yield, since this game does nothing with keys
@@ -62,7 +64,7 @@ namespace EwuTeals.Games {
 
             foreach (var d in Detectables) {
                 if (d.IsEnabled) {
-                    Mat curThresh = d.Draw(canvas, input);
+                    Mat curThresh = d.Draw(canvas, input, drawOnCanvas: ShouldDraw);
                     CvInvoke.Add(curThresh, combinedThreshImage, combinedThreshImage);
                 }
             }

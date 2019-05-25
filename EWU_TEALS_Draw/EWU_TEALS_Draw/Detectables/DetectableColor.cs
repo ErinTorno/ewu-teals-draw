@@ -39,7 +39,7 @@ namespace EwuTeals.Detectables {
             base.LastPosition = InvalidPoint;
         }
 
-        public override Mat Draw(ImageBox canvas, Mat videoCapture) {
+        public override Mat Draw(ImageBox canvas, Mat videoCapture, bool drawOnCanvas = true) {
             CvInvoke.CvtColor(videoCapture, HsvImageTemp, ColorConversion.Bgr2Hsv);
 
             // Convert pixels to white that are in specified color range, black otherwise, save to thresh_image
@@ -84,7 +84,8 @@ namespace EwuTeals.Detectables {
 
                     //don't want to draw or change state if this hasn't been enabled
                     if (IsEnabled) {
-                        DrawLineTo(canvas, LastPosition, contourCenter, InkColor, width);
+                        if (drawOnCanvas)
+                            DrawLineTo(canvas, LastPosition, contourCenter, InkColor, width);
 
                         LastPosition = contourCenter;
                     }

@@ -17,18 +17,25 @@ namespace EwuTeals.Games.WhackAMole {
     /// A game where in two players will move their paddle between different points on the field
     /// </summary>
     class WhackAMoleGame : FreeDrawGame {
+        // these describe how the state of the game flows, and controls what behaviors the game is doing
+        // Intro -> (AddFirstDetect <-> AddSecondDetect) -> Ready -> Playing -> Results
+        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
+        
         private const string TextIntro = "Welcome to Whack-a-mole!";
         private const string TextAddFirst = "Player {0}, put first object in center of box and press Enter";
         private const string TextAddSecond = "Player {0}, put second object in center of box and press Enter";
         private const string TextReady = "Press Enter to start the game";
         private const string TextTimeRemaining = "Time Remaining {0:0.00} seconds";
+        private const string TextResults = "Player {0} won with {1} point(s)!";
+        private const string TextResultsSP = "Game over! You got {0} point(s)!";
 
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double NormalMatchLength = 30.0; // in seconds
         private const int PlayerCount = 1;
 
+        private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
+
         private const Keys KeyCaptureColor = Keys.Enter;
-        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
 
         private State _curState = State.Intro;
         private State CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
@@ -48,8 +55,9 @@ namespace EwuTeals.Games.WhackAMole {
             autoColor.OnColorCapture += this.OnColorCapture;
             Detectables.Clear();
             ShouldYieldKeys = false;
+            ShouldDraw = false;
 
-            targets = TargetSet.PlaceTargets(canvas.Width, canvas.Height, TargetSet.Default);
+            targets = TargetSet.PlaceTargets(canvas.Image.Bitmap.Width, canvas.Image.Bitmap.Height, TargetSet.Default);
 
             prompt = new TextBox {
                 ReadOnly = true,
@@ -67,9 +75,16 @@ namespace EwuTeals.Games.WhackAMole {
             base.Update(dT, input);
             autoColor.Update(input);
 
+            // For some unknowable reason, calling .Rectangle does nothing, so we draw a huge circle instead
+            // alternatives tried: calling SetPixel through a for loop, which takes 30 seconds to run a single frame
+            // CvInvoke.Rectangle(canvas.Image, new Rectangle(0, 0, canvas.Width, canvas.Height), CanvasColor);
+            CvInvoke.Circle(canvas.Image, new Point(canvas.Width / 2, canvas.Height / 2), canvas.Width, CanvasColor, -1);
+
             // we draw targets every state, so during set up people can prepare for the game
             foreach (var t in targets)
                 t.Draw(canvas);
+            foreach (var p in players)
+                p.Draw(canvas);
 
             switch (CurState) {
                 case State.Intro:
@@ -83,11 +98,10 @@ namespace EwuTeals.Games.WhackAMole {
                         foreach (var t in targets) {
                             t.Update(dT, players, colorCounts);
                         }
-                        break;
+                        UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
                     } else {
-                        timeRemaining = 0;
+                        CurState = State.Results;
                     }
-                    UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
                     break;
             }
             canvas.Refresh();
@@ -137,6 +151,22 @@ namespace EwuTeals.Games.WhackAMole {
                     foreach (var p in players) {
                         colorCounts.Add((p.PaddleA.InkColor, 0));
                         colorCounts.Add((p.PaddleB.InkColor, 0));
+                    }
+                    break;
+                case State.Results:
+                    if (players.Count == 1) {
+                        UpdatePrompt(String.Format(TextResultsSP, players[0].Points));
+                    }
+                    else if (players.Count > 0) {
+                        int winner = -1;
+                        int points = -1;
+                        for (int i = 0; i < players.Count; ++i) {
+                            if (players[i].Points > points) {
+                                winner = i;
+                                points = players[i].Points;
+                            }
+                        }
+                        UpdatePrompt(String.Format(TextResults, winner + 1, points));
                     }
                     break;
             }

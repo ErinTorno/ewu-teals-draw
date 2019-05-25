@@ -1,4 +1,5 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using EwuTeals.Detectables;
@@ -14,11 +15,12 @@ namespace EwuTeals.Games.WhackAMole {
     class Target {
         private static readonly MCvScalar InnerRingColor = new MCvScalar(0, 0, 0);
         private static readonly MCvScalar EmptyColor = new MCvScalar(230, 230, 230);
+        private static readonly Random Rng = new Random();
 
         private const double TargetRadiusPercent = 0.1, TargetRadiusR2Percent = 0.7, TargetRadiusR3Percent = 0.35; // mult by height to get radius
         public const double TimeLimit = 5.0;
         private const double MaximumDistToHitTarget = 0.1;
-
+        
         public Point Position;
         // we use this color to match up to players; if it is not Nothing, then if a player draws over it with the same color, it will be tallied
         public Maybe<MCvScalar> Color { get; set; }
@@ -26,7 +28,9 @@ namespace EwuTeals.Games.WhackAMole {
         public double TimeRemaining;
         public MCvScalar InkColor { get => Color.GetOrElse(EmptyColor); }
         public MCvScalar InnerInkColor { get => InnerRingColor; }
-
+        
+        // whenever true, the target won't choose a color for a frame, so that other targets have a chance to claim them
+        private bool isWaitingToChoose = false;
         private int width, height;
 
         public Target(int x, int y, int width, int height) {
@@ -38,23 +42,29 @@ namespace EwuTeals.Games.WhackAMole {
         }
 
         private void InvalidateTarget(IList<(MCvScalar color, int count)> colorLegend) {
-            int colWithZero = -1;
-            for (int i = 0; i < colorLegend.Count(); ++i) {
-                var (color, count) = colorLegend[i];
-                if (count == 0)
-                    colWithZero = i;
-                if (color.IsEqualTo(InkColor))
-                    colorLegend[i] = (color, count - 1);
-            }
-            if (colWithZero >= 0) {
-                var (color, count) = colorLegend[colWithZero];
-                this.Color = color.ToMaybe();
-                colorLegend[colWithZero] = (color, count + 1);
+            if (!isWaitingToChoose && Rng.NextDouble() < 0.5) {
+                isWaitingToChoose = true;
+            } else {
+                isWaitingToChoose = false;
+                var colWithZero = new List<int>();
+                for (int i = 0; i < colorLegend.Count(); ++i) {
+                    var (color, count) = colorLegend[i];
+                    if (count == 0)
+                        colWithZero.Add(i);
+                    if (color.IsEqualTo(InkColor))
+                        colorLegend[i] = (color, count - 1);
+                }
+                if (colWithZero.Count > 0) {
+                    var choice = colWithZero[Rng.Next(0, colWithZero.Count)];
+                    var (color, count) = colorLegend[choice];
+                    this.Color = color.ToMaybe();
+                    colorLegend[choice] = (color, count + 1);
 
-                TimeRemaining = TimeLimit;
+                    TimeRemaining = TimeLimit;
+                }
+                else
+                    this.Color = Maybe<MCvScalar>.Nothing;
             }
-            else
-                this.Color = Maybe<MCvScalar>.Nothing;
         }
 
         private bool IsValidDetectable(Detectable d) {
@@ -76,8 +86,9 @@ namespace EwuTeals.Games.WhackAMole {
         /// <returns>True if the target is expired</returns>
         public void Update(double dT, IList<Player> players, IList<(MCvScalar color, int count)> colorLegend) {
             TimeRemaining -= dT;
-            if (TimeRemaining < 0)
+            if (TimeRemaining < 0) {
                 InvalidateTarget(colorLegend);
+            }
 
             foreach (var p in players) {
                 if (IsValidDetectable(p.PaddleA) || IsValidDetectable(p.PaddleB)) {
@@ -94,20 +105,28 @@ namespace EwuTeals.Games.WhackAMole {
             CvInvoke.Circle(canvas.Image, Position, tarRadis, InkColor, -1);
             CvInvoke.Circle(canvas.Image, Position, tarRadis2, InnerInkColor, -1);
             CvInvoke.Circle(canvas.Image, Position, tarRadis3, InkColor, -1);
+
+            if (Color.IsPresent) {
+                var fontSize = 1.25;
+                var dX = (int)(-17 * fontSize);
+                var dY = (int)(6 * fontSize);
+                var num = String.Format("{0:0.0}", TimeRemaining);
+                CvInvoke.PutText(canvas.Image, num, new Point(Position.X + dX, Position.Y + dY), FontFace.HersheyComplexSmall, fontSize, InnerInkColor, 3);
+            }
         }
     }
 
     static class TargetSet {
         public static readonly List<V2<double>> Default = new List<V2<double>> {
-            new V2<double>(0.25, 0.30),
-            new V2<double>(0.50, 0.15),
-            new V2<double>(0.75, 0.30),
-            new V2<double>(0.25, 0.70),
-            new V2<double>(0.50, 0.85),
-            new V2<double>(0.75, 0.70),
-            new V2<double>(0.15, 0.50),
+            new V2<double>(0.325, 0.30),
+            new V2<double>(0.50, 0.20),
+            new V2<double>(0.675, 0.30),
+            new V2<double>(0.325, 0.70),
+            new V2<double>(0.50, 0.80),
+            new V2<double>(0.675, 0.70),
+            new V2<double>(0.20, 0.50),
             new V2<double>(0.50, 0.50),
-            new V2<double>(0.85, 0.50)
+            new V2<double>(0.80, 0.50)
         };
 
         /// <summary>
