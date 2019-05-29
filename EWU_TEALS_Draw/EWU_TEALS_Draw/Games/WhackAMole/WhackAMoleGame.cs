@@ -28,9 +28,11 @@ namespace EwuTeals.Games.WhackAMole {
         private const string TextTimeRemaining = "Time Remaining {0:0.00} seconds";
         private const string TextResults = "Player {0} won with {1} point(s)!";
         private const string TextResultsSP = "Game over! You got {0} point(s)!";
-
+        private const string TextRestart = "Press Enter to play again!";
+            
         private const double TimeToShowIntro = 2.0; // in seconds
-        private const double NormalMatchLength = 30.0; // in seconds
+        private const double ResultsCycleTime = 4.0; // in seconds
+        private const double NormalMatchLength = 20.0; // in seconds
         private const int PlayerCount = 1;
 
         private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
@@ -40,6 +42,7 @@ namespace EwuTeals.Games.WhackAMole {
         private State _curState = State.Intro;
         private State CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
 
+        private ImageBox video;
         private AutoColor autoColor;
         private List<Player> players = new List<Player>();
         private List<(MCvScalar color, int count)> colorCounts = new List<(MCvScalar color, int count)>();
@@ -50,6 +53,7 @@ namespace EwuTeals.Games.WhackAMole {
         private double timeRemaining = 0;
 
         public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel) : base(form, canvas, videoGrey) {
+            this.video = video;
             autoColor = new AutoColor(video);
             autoColor.IsActive = false;
             autoColor.OnColorCapture += this.OnColorCapture;
@@ -107,7 +111,7 @@ namespace EwuTeals.Games.WhackAMole {
             canvas.Refresh();
         }
 
-        protected override void OnKeyPress(object sender, KeyEventArgs e) {
+        public override void OnKeyPress(object sender, KeyEventArgs e) {
             base.OnKeyPress(sender, e);
             var kc = e.KeyCode;
             if (!ShouldYieldKeys) {
@@ -120,6 +124,10 @@ namespace EwuTeals.Games.WhackAMole {
                     case State.Ready:
                         if (kc == KeyCaptureColor)
                             CurState = State.Playing;
+                        break;
+                    case State.Results:
+                        if (kc == KeyCaptureColor)
+                            Reset();
                         break;
                 }
             }
@@ -154,6 +162,7 @@ namespace EwuTeals.Games.WhackAMole {
                     }
                     break;
                 case State.Results:
+                    // else we show the score
                     if (players.Count == 1) {
                         UpdatePrompt(String.Format(TextResultsSP, players[0].Points));
                     }
@@ -179,6 +188,18 @@ namespace EwuTeals.Games.WhackAMole {
                 case State.Intro:
                     break;
             }
+        }
+
+        public override void Reset() {
+            base.Reset();
+            players.Clear();
+            colorCounts.Clear();
+            Detectables.Clear();
+            unfinishedPlayer = null;
+            autoColor.Reset();
+
+            CurState = State.Intro;
+            ShouldYieldKeys = false;
         }
 
         private void UpdatePrompt(string msg) {

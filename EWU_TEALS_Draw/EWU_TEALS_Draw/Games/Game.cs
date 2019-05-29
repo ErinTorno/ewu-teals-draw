@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.UI;
 using EwuTeals.Detectables;
-using EwuTeals.Games.States;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,15 +20,7 @@ namespace EwuTeals.Games {
         public Keys ToggleYieldKey = Keys.Space;
 
         public ObservableCollection<Detectable> Detectables { get; protected set; }
-
-        public readonly State Intro;
-        public readonly State Detect;
-        public readonly State Ready;
-        public readonly State Running;
-        public readonly State Result;
-        public readonly State End;
-        private State CurState;
-
+        
         protected double logicTime = 0;
         protected int logicTicks = 0;
         protected ImageBox canvas;
@@ -45,22 +36,13 @@ namespace EwuTeals.Games {
             Detectables = new ObservableCollection<Detectable>();
         }
 
-        abstract public void DisplayIntro();
-        abstract public void DetectColor();
-        abstract public void PromptAddPlayer();
-        abstract public void DisplayResults();
-        abstract public void Exit();
-
-        public void SetState (State state)
-        {
-            this.CurState = state;
-        }
+        public abstract void Reset();
 
         public virtual void Dispose() {
             form.KeyDown -= OnKeyPress;
         }
 
-        protected virtual void OnKeyPress(object sender, KeyEventArgs e) {
+        public virtual void OnKeyPress(object sender, KeyEventArgs e) {
             if (e.KeyCode == ToggleYieldKey && logicTime >= lastToggleTime + SecondsToAllowToggle) {
                 lastToggleTime = logicTime;
                 ShouldYieldKeys = !ShouldYieldKeys;

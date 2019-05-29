@@ -20,7 +20,7 @@ namespace EwuTeals.Games {
         public FreeDrawGame(Form form, ImageBox canvas, ImageBox video) : base(form, canvas) {
             this.video = video;
             // we want to yield, since this game does nothing with keys
-            ShouldYieldKeys = true;
+            ShouldYieldKeys = false;
             // this is a simple drawing mode, with these colors in it by default
             Detectables.Add(new DetectableColor("Red", true, inkColor: new MCvScalar(60, 60, 230), minHsv: new MCvScalar(0, 125, 180), maxHsv: new MCvScalar(6, 255, 255)));
             Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));
@@ -29,31 +29,6 @@ namespace EwuTeals.Games {
             Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
             Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
             Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
-        }
-
-        public override void DetectColor()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void DisplayIntro()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void DisplayResults()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Exit()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void PromptAddPlayer()
-        {
-            throw new NotImplementedException();
         }
 
         public override void Update(double dT, Mat input) {
@@ -73,6 +48,12 @@ namespace EwuTeals.Games {
 
             if (disposableQueue.Count > 4)
                 disposableQueue.Dequeue().Dispose();
+        }
+
+        public override void Reset() {
+            var s = canvas.Image.Size;
+            canvas.Image.Dispose();
+            canvas.Image = new Image<Bgr, byte>(s.Width, canvas.Height, new Bgr(255, 255, 255));
         }
     }
 }

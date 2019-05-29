@@ -67,13 +67,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Games\States\DetectState.cs" />
-    <Compile Include="Games\States\EndState.cs" />
-    <Compile Include="Games\States\IntroState.cs" />
-    <Compile Include="Games\States\ReadyState.cs" />
-    <Compile Include="Games\States\ResultState.cs" />
-    <Compile Include="Games\States\RunningState.cs" />
-    <Compile Include="Games\States\State.cs" />
     <Compile Include="Games\WhackAMole\Player.cs" />
     <Compile Include="Games\WhackAMole\Target.cs" />
     <Compile Include="Games\WhackAMole\WhackAMoleGame.cs" />
@@ -85,7 +78,6 @@
     <Compile Include="Games\Game.cs" />
     <Compile Include="Utils\Maybe.cs" />
     <Compile Include="Utils\MCvScalarUtils.cs" />
-    <Compile Include="Games\MostColorGame.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

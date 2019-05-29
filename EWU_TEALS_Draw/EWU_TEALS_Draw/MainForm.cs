@@ -183,8 +183,7 @@ namespace EWU_TEALS_Draw {
         }
 
         private void btnReset_Click(object sender, EventArgs e) {
-            ImageBox_Drawing.Image.Dispose();
-            ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
+            Game.Reset();
         }
 
         private void btnEdit_Click(object sender, EventArgs e) {

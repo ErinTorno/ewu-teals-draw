@@ -89,11 +89,12 @@ namespace EwuTeals.Games.WhackAMole {
             if (TimeRemaining < 0) {
                 InvalidateTarget(colorLegend);
             }
-
-            foreach (var p in players) {
-                if (IsValidDetectable(p.PaddleA) || IsValidDetectable(p.PaddleB)) {
-                    InvalidateTarget(colorLegend);
-                    p.Points += 1;
+            else if (Color.IsPresent) {
+                foreach (var p in players) {
+                    if (IsValidDetectable(p.PaddleA) || IsValidDetectable(p.PaddleB)) {
+                        p.Points += 1;
+                        TimeRemaining = 0;
+                    }
                 }
             }
         }
