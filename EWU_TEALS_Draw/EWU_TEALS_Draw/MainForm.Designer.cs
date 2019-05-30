@@ -51,6 +51,7 @@ namespace EWU_TEALS_Draw {
             this.ImageBox_VideoCapture_Gray = new Emgu.CV.UI.ImageBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.HelpButton = new System.Windows.Forms.Button();
+            this.ShortcutMenu = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel_Drawing.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_Drawing)).BeginInit();
             this.tableLayoutPanel_VideoFeeds.SuspendLayout();
@@ -242,6 +243,7 @@ namespace EWU_TEALS_Draw {
             this.ColorPicker.Name = "ColorPicker";
             this.ColorPicker.Size = new System.Drawing.Size(230, 21);
             this.ColorPicker.TabIndex = 11;
+            this.ColorPicker.Text = "Select a Color";
             this.ColorPicker.SelectedIndexChanged += new System.EventHandler(this.ColorPicker_SelectedIndexChanged);
             // 
             // VSlider
@@ -377,8 +379,7 @@ namespace EWU_TEALS_Draw {
             this.GameSelector.FormattingEnabled = true;
             this.GameSelector.Items.AddRange(new object[] {
             "Free Draw",
-            "Whack-A-Mole",
-            "Color Fill Game"});
+            "Whack-A-Mole"});
             this.GameSelector.Location = new System.Drawing.Point(3, 115);
             this.GameSelector.Name = "GameSelector";
             this.GameSelector.Size = new System.Drawing.Size(318, 21);
@@ -437,12 +438,26 @@ namespace EWU_TEALS_Draw {
             this.HelpButton.UseVisualStyleBackColor = false;
             this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
             // 
+            // ShortcutMenu
+            // 
+            this.ShortcutMenu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShortcutMenu.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.ShortcutMenu.Location = new System.Drawing.Point(1201, 685);
+            this.ShortcutMenu.Multiline = true;
+            this.ShortcutMenu.Name = "ShortcutMenu";
+            this.ShortcutMenu.Size = new System.Drawing.Size(136, 61);
+            this.ShortcutMenu.TabIndex = 12;
+            this.ShortcutMenu.Text = "R : Reset\r\nQ : Quit\r\nS : Save Detection Config\r\nO : Open Detection Config";
+            this.ShortcutMenu.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ShortcutMenu.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
             this.ClientSize = new System.Drawing.Size(1364, 749);
+            this.Controls.Add(this.ShortcutMenu);
             this.Controls.Add(this.HelpButton);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
@@ -501,6 +516,7 @@ namespace EWU_TEALS_Draw {
         private System.Windows.Forms.TableLayoutPanel GamePanel;
         private ComboBox GameSelector;
         private Button HelpButton;
+        private TextBox ShortcutMenu;
     }
 }
 

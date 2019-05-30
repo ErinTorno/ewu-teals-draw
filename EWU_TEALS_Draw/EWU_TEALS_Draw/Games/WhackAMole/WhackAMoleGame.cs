@@ -19,7 +19,7 @@ namespace EwuTeals.Games.WhackAMole {
     class WhackAMoleGame : FreeDrawGame {
         // these describe how the state of the game flows, and controls what behaviors the game is doing
         // Intro -> (AddFirstDetect <-> AddSecondDetect) -> Ready -> Playing -> Results
-        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
+        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results, Stopped }
         
         private const string TextIntro = "Welcome to Whack-a-mole!";
         private const string TextAddFirst = "Player {0}, put first object in center of box and press Enter";
@@ -200,6 +200,17 @@ namespace EwuTeals.Games.WhackAMole {
 
             CurState = State.Intro;
             ShouldYieldKeys = false;
+        }
+
+        public override void Quit()
+        {
+            base.Quit();
+            players.Clear();
+            colorCounts.Clear();
+            Detectables.Clear();
+            unfinishedPlayer = null;
+            autoColor.Reset();
+            CurState = State.Stopped;
         }
 
         private void UpdatePrompt(string msg) {

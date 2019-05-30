@@ -116,7 +116,8 @@ namespace EWU_TEALS_Draw {
                 var span = curTime.Subtract(LastTime);
                 LastTime = curTime;
 
-                Game.Update(span.TotalSeconds, videoFrame);
+                if (IsRunning)
+                    Game.Update(span.TotalSeconds, videoFrame);
                 
                 if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();
@@ -300,23 +301,23 @@ namespace EWU_TEALS_Draw {
 
         private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
+            IsRunning = false;
+            Game.Dispose();
             if (this.Text == "Free Draw")
             {
-
+                Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
             }
             else if (this.Text == "Whack-A-Mole")
             {
-
+                Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
             }
-            else if (this.Text == "Color Fill Game")
-            {
-
-            }
+            Game.Reset();
+            IsRunning = true;
         }
 
         private void HelpButton_Click(object sender, EventArgs e)
         {
-
+            ShortcutMenu.Visible = !ShortcutMenu.Visible;
         }
     }
 }

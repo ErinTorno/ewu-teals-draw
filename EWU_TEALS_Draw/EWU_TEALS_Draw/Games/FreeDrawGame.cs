@@ -55,5 +55,14 @@ namespace EwuTeals.Games {
             canvas.Image.Dispose();
             canvas.Image = new Image<Bgr, byte>(s.Width, canvas.Height, new Bgr(255, 255, 255));
         }
+
+        public override void Quit()
+        {
+            foreach (Detectable d in Detectables)
+            {
+                d.IsEnabled = false;
+            }
+            Reset();
+        }
     }
 }
