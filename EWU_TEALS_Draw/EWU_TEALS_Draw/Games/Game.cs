@@ -2,15 +2,12 @@
 using Emgu.CV.UI;
 using EwuTeals.Detectables;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace EwuTeals.Games {
-   abstract class Game : IDisposable {
+   public abstract class Game : IDisposable {
         private const double SecondsToAllowToggle = 0.5; // a half second
 
         /// <summary>
@@ -27,17 +24,34 @@ namespace EwuTeals.Games {
         protected Form form;
         // this key, when pressed, will toggle ShouldYieldKeys
         private double lastToggleTime = 0.0;
+        private TextBox prompt;
+        private TableLayoutPanel panel;
 
-        protected Game(Form form, ImageBox canvas) {
+        protected Game(Form form, ImageBox canvas, TableLayoutPanel panel) {
             this.canvas = canvas;
+            this.panel = panel;
             ShouldYieldKeys = false;
             this.form = form;
             form.KeyDown += OnKeyPress;
             Detectables = new ObservableCollection<Detectable>();
+
+            prompt = new TextBox {
+                ReadOnly = true,
+                Text = "Empty Prompt",
+                Visible = true,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                TextAlign = HorizontalAlignment.Center
+            };
+            prompt.Font = new Font(prompt.Font.FontFamily, 24);
+            panel.Controls.Add(prompt);
         }
 
         public abstract void Reset();
-        public abstract void Quit();
+
+        public virtual void Quit() {
+            panel.Controls.Clear();
+        }
 
         public virtual void Dispose() {
             form.KeyDown -= OnKeyPress;
@@ -53,6 +67,10 @@ namespace EwuTeals.Games {
         public virtual void Update(double dT, Mat input) {
             ++logicTicks;
             logicTime += dT;
+        }
+        
+        protected void UpdatePrompt(string msg) {
+            prompt.Text = msg;
         }
     }
 }

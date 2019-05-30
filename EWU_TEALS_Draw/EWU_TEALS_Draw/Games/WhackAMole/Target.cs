@@ -12,12 +12,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Games.WhackAMole {
-    class Target {
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Target {
         private static readonly MCvScalar InnerRingColor = new MCvScalar(0, 0, 0);
         private static readonly MCvScalar EmptyColor = new MCvScalar(230, 230, 230);
         private static readonly Random Rng = new Random();
 
-        private const double TargetRadiusPercent = 0.1, TargetRadiusR2Percent = 0.7, TargetRadiusR3Percent = 0.35; // mult by height to get radius
+        private const double TargetRadiusPercent = 0.1, TargetRadiusR2Percent = 0.7, TargetRadiusR3Percent = 0.425; // mult by height to get radius
         public const double TimeLimit = 5.0;
         private const double MaximumDistToHitTarget = 0.1;
         

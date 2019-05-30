@@ -16,7 +16,7 @@ namespace EwuTeals.Games.WhackAMole {
     /// <summary>
     /// A game where in two players will move their paddle between different points on the field
     /// </summary>
-    class WhackAMoleGame : FreeDrawGame {
+    public class WhackAMoleGame : FreeDrawGame {
         // these describe how the state of the game flows, and controls what behaviors the game is doing
         // Intro -> (AddFirstDetect <-> AddSecondDetect) -> Ready -> Playing -> Results
         private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
@@ -49,15 +49,12 @@ namespace EwuTeals.Games.WhackAMole {
         private List<(MCvScalar color, int count)> colorCounts = new List<(MCvScalar color, int count)>();
         private List<Target> targets;
         private Player unfinishedPlayer;
-        private TextBox prompt;
         private Label score;
-        private TableLayoutPanel panel;
         private double lastSwitchTime = 0;
         private double timeRemaining = 0;
 
-        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel, int playercount) : base(form, canvas, videoGrey) {
+        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel, int playercount) : base(form, canvas, videoGrey, panel) {
             this.video = video;
-            this.panel = panel;
             this.PlayerCount = playercount;
             autoColor = new AutoColor(video);
             autoColor.IsActive = false;
@@ -68,15 +65,6 @@ namespace EwuTeals.Games.WhackAMole {
 
             targets = TargetSet.PlaceTargets(canvas.Image.Bitmap.Width, canvas.Image.Bitmap.Height, TargetSet.Default);
 
-            prompt = new TextBox {
-                ReadOnly = true,
-                Text = TextIntro,
-                Visible = true,
-                Dock = DockStyle.Fill,
-                AutoSize = true,
-                TextAlign = HorizontalAlignment.Center
-            };
-            prompt.Font = new Font(prompt.Font.FontFamily, 24);
             score = new Label {
                 BackColor = Color.White,
                 ForeColor = Color.Black,
@@ -84,9 +72,9 @@ namespace EwuTeals.Games.WhackAMole {
                 TextAlign = ContentAlignment.MiddleCenter,
                 Anchor = AnchorStyles.Top
             };
-            score.Font = new Font(prompt.Font.FontFamily, 24);
-            panel.Controls.Add(prompt);
+            score.Font = new Font(score.Font.FontFamily, 24);
             panel.Controls.Add(score);
+            CurState = State.Intro;
         }
 
         public override void Update(double dT, Mat input) {
@@ -234,11 +222,6 @@ namespace EwuTeals.Games.WhackAMole {
             Detectables.Clear();
             unfinishedPlayer = null;
             autoColor.Reset();
-            panel.Controls.Clear();
-        }
-
-        private void UpdatePrompt(string msg) {
-            prompt.Text = msg;
         }
 
         public void UpdateScores() {
@@ -246,17 +229,15 @@ namespace EwuTeals.Games.WhackAMole {
                 score.Text = String.Format(TextPointsSP, players[0].Points);
             }
             else if (players.Count > 0) {
-                var sortedPlayers = players.OrderBy(p => p.Points).Reverse().ToList();
-                var sb = new StringBuilder();
-                for (int i = 0; i < sortedPlayers.Count(); ++i) {
-                    var p = sortedPlayers[i];
-                    // we append a bar between for more players
-                    if (i > 0)
-                        sb.Append(" | ");
-                    sb.Append(String.Format(TextPoints, i + 1, p.Points));
-                }
+                var inplayers = new List<(int, Player)>(players.Count);
+                for (int i = 0; i < players.Count; ++i)
+                    inplayers.Add((i, players[i]));
 
-                score.Text = sb.ToString();
+                score.Text = inplayers
+                    .OrderBy(v => v.Item2.Points)
+                    .Reverse()
+                    .Aggregate(new StringBuilder(), (acc, cur) => acc.Append(acc.Length == 0 ? "" : " | ").Append(String.Format(TextPoints, cur.Item1 + 1, cur.Item2.Points)))
+                    .ToString();
             }
         }
 

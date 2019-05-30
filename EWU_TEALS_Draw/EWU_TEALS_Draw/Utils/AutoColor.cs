@@ -6,11 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EwuTeals.Utils {
-    class AutoColor {
+    public class AutoColor {
         private static readonly TimeSpan DelayBetweenCaptures = new TimeSpan(0, 0, 0, 0, 1000);
         private static readonly Point IncorrectPoint = new Point(-255, -255);
         private static readonly MCvScalar RectangleColor = new MCvScalar(255, 230, 230);

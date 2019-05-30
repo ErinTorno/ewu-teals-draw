@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Games.WhackAMole {
-    class Player {
+    public class Player {
         private const double PaddleMarkerRadiusPercent = 0.025;
 
         public Detectable PaddleA, PaddleB;

@@ -3,21 +3,19 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using EwuTeals.Detectables;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace EwuTeals.Games {
-    class FreeDrawGame : Game {
+    public class FreeDrawGame : Game {
+        private const string TextHowTo = "Draw with any of the paddles, or configure them with the side bar";
+
         private ImageBox video;
         private Queue<Mat> disposableQueue = new Queue<Mat>();
 
         protected bool ShouldDraw { get; set; }
 
-        public FreeDrawGame(Form form, ImageBox canvas, ImageBox video) : base(form, canvas) {
+        public FreeDrawGame(Form form, ImageBox canvas, ImageBox video, TableLayoutPanel panel) : base(form, canvas, panel) {
             this.video = video;
             // we want to yield, since this game does nothing with keys
             ShouldYieldKeys = false;
@@ -30,6 +28,7 @@ namespace EwuTeals.Games {
             Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
             Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
             Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
+            UpdatePrompt(TextHowTo);
         }
 
         public override void Update(double dT, Mat input) {
@@ -59,6 +58,7 @@ namespace EwuTeals.Games {
 
         public override void Quit()
         {
+            base.Quit();
             foreach (Detectable d in Detectables)
             {
                 d.IsEnabled = false;

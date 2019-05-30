@@ -1,13 +1,9 @@
 ﻿using Emgu.CV.Structure;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EwuTeals.Utils {
-    static class MCvScalarUtils {
+    public static class MCvScalarUtils {
         private static double Max3(double a, double b, double c) {
             return Math.Max(a, Math.Max(b, c));
         }

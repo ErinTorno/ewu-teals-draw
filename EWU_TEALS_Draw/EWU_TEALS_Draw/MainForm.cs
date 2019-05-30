@@ -1,27 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Emgu;
 using Emgu.CV;
-using Emgu.CV.UI;
-using Emgu.CV.Util;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using EwuTeals.Detectables;
-using EwuTeals.Utils;
 using EwuTeals.Games;
 using EwuTeals.Games.WhackAMole;
-using System.Collections.Specialized;
 
 namespace EWU_TEALS_Draw {
     public partial class MainForm : Form {
@@ -312,13 +302,17 @@ namespace EWU_TEALS_Draw {
             switch (GameSelector.SelectedIndex) {
                 case 0:
                     // Free drawing (the default)
-                    Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
+                    Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray, GamePanel);
                     break;
                 case 1:
+                    // Free drawing using auto color
+                    Game = new AutoFreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
+                    break;
+                case 2:
                     // Whack-a-mole with one player
                     Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 1);
                     break;
-                case 2:
+                case 3:
                     // Two player whack-a-mole
                     Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 2);
                     break;

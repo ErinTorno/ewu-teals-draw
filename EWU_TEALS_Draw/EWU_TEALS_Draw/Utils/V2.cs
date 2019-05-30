@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EwuTeals.Utils {
-    struct V2<A> {
+    public struct V2<A> {
         public A X;
         public A Y;
 
