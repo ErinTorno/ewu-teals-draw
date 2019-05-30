@@ -229,6 +229,7 @@ namespace EWU_TEALS_Draw {
             // ColorPicker
             // 
             this.ColorPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.ColorPicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ColorPicker.FormattingEnabled = true;
             this.ColorPicker.Items.AddRange(new object[] {
             "Blue",
@@ -243,7 +244,6 @@ namespace EWU_TEALS_Draw {
             this.ColorPicker.Name = "ColorPicker";
             this.ColorPicker.Size = new System.Drawing.Size(230, 21);
             this.ColorPicker.TabIndex = 11;
-            this.ColorPicker.Text = "Select a Color";
             this.ColorPicker.SelectedIndexChanged += new System.EventHandler(this.ColorPicker_SelectedIndexChanged);
             // 
             // VSlider
@@ -376,6 +376,7 @@ namespace EWU_TEALS_Draw {
             // GameSelector
             // 
             this.GameSelector.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.GameSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.GameSelector.FormattingEnabled = true;
             this.GameSelector.Items.AddRange(new object[] {
             "Free Draw",
@@ -385,7 +386,6 @@ namespace EWU_TEALS_Draw {
             this.GameSelector.Name = "GameSelector";
             this.GameSelector.Size = new System.Drawing.Size(318, 21);
             this.GameSelector.TabIndex = 8;
-            this.GameSelector.Text = "Select a Game";
             this.GameSelector.SelectedIndexChanged += new System.EventHandler(this.GameSelector_SelectedIndexChanged);
             // 
             // ImageBox_VideoCapture

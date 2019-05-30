@@ -21,6 +21,7 @@ using EwuTeals.Detectables;
 using EwuTeals.Utils;
 using EwuTeals.Games;
 using EwuTeals.Games.WhackAMole;
+using System.Collections.Specialized;
 
 namespace EWU_TEALS_Draw {
     public partial class MainForm : Form {
@@ -46,11 +47,15 @@ namespace EWU_TEALS_Draw {
             set {
                 _game = value;
                 // we need to update the menu options for each new game
-                _game.Detectables.CollectionChanged += (sender, e) => {
+                Action updateSel = () => {
                     ColorPicker.Items.Clear();
                     foreach (var d in _game.Detectables)
                         ColorPicker.Items.Add(d.Name);
+                    if (_game.Detectables.Count == 0)
+                        ColorPicker.Text = "";
                 };
+                _game.Detectables.CollectionChanged += (sender, e) => updateSel();
+                updateSel();
             }
         }
 
@@ -83,7 +88,8 @@ namespace EWU_TEALS_Draw {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             // Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
             // Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
-            Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
+            // we init the first game
+            GameSelector.SelectedIndex = 0;
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
@@ -191,7 +197,7 @@ namespace EWU_TEALS_Draw {
         }
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
                 CheckBox_IsMin.Checked = true;
                 UpdateSliderValues(sender, e);
 
@@ -221,12 +227,12 @@ namespace EWU_TEALS_Draw {
         }
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Game.Detectables.Count)
+            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count)
                 Game.Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }
 
         private void UpdateSliderValues(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
                 var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;
@@ -247,7 +253,7 @@ namespace EWU_TEALS_Draw {
         }
 
         private void UpdateHSVCodes() {
-            if (ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
                 var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;
@@ -300,7 +306,9 @@ namespace EWU_TEALS_Draw {
 
         private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Game.Quit();
+            if (Game != null)
+                Game.Quit();
+
             switch (GameSelector.SelectedIndex) {
                 case 0:
                     // Free drawing (the default)

@@ -29,6 +29,7 @@ namespace EwuTeals.Games.WhackAMole {
         private const string TextRestart = "Press Enter to play again!";
         private const string TextPointsSP = "{0} point(s)";
         private const string TextPoints = "P{0}: {1} point(s)";
+        private const string TextWinner = "P{0} won with {1} points!";
 
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double ResultsCycleTime = 4.0; // in seconds
@@ -121,6 +122,27 @@ namespace EwuTeals.Games.WhackAMole {
                         CurState = State.Results;
                     }
                     UpdateScores();
+                    break;
+                case State.Results:
+                    // we only do this updating if there are more than one players; otherwise it doesn't matter to show the winner
+                    if (PlayerCount > 1) {
+                        timeRemaining -= dT;
+                        if (timeRemaining <= 0)
+                            timeRemaining = ResultsCycleTime;
+                        // second half of cycle: show the winner
+                        if (timeRemaining > 0.5 * ResultsCycleTime) {
+                            int winnerI = -1, winnerPoints = -1;
+                            for (int i = 0; i < players.Count; ++i) {
+                                if (players[i].Points > winnerPoints) {
+                                    winnerI = i;
+                                    winnerPoints = players[i].Points;
+                                }
+                            }
+                            UpdatePrompt(String.Format(TextWinner, winnerI + 1, winnerPoints));
+                        } else {
+                            UpdatePrompt(TextRestart);
+                        }
+                    }
                     break;
             }
             canvas.Refresh();
@@ -231,7 +253,7 @@ namespace EwuTeals.Games.WhackAMole {
                     // we append a bar between for more players
                     if (i > 0)
                         sb.Append(" | ");
-                    sb.Append(String.Format(TextPoints, i, p.Points));
+                    sb.Append(String.Format(TextPoints, i + 1, p.Points));
                 }
 
                 score.Text = sb.ToString();
