@@ -442,12 +442,13 @@ namespace EWU_TEALS_Draw {
             // 
             this.ShortcutMenu.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ShortcutMenu.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.ShortcutMenu.Location = new System.Drawing.Point(1201, 685);
+            this.ShortcutMenu.Location = new System.Drawing.Point(1177, 666);
             this.ShortcutMenu.Multiline = true;
             this.ShortcutMenu.Name = "ShortcutMenu";
-            this.ShortcutMenu.Size = new System.Drawing.Size(136, 61);
+            this.ShortcutMenu.Size = new System.Drawing.Size(160, 80);
             this.ShortcutMenu.TabIndex = 12;
-            this.ShortcutMenu.Text = "R : Reset\r\nQ : Quit\r\nS : Save Detection Config\r\nO : Open Detection Config";
+            this.ShortcutMenu.Text = "Space : Toggle game controls\r\nR : Reset\r\nQ : Quit\r\nS : Save Detection Config\r\nO :" +
+    " Open Detection Config";
             this.ShortcutMenu.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.ShortcutMenu.Visible = false;
             // 

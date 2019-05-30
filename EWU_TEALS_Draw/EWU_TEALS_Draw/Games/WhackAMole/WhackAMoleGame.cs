@@ -211,6 +211,7 @@ namespace EwuTeals.Games.WhackAMole {
             unfinishedPlayer = null;
             autoColor.Reset();
             CurState = State.Stopped;
+            prompt.Visible = false;
         }
 
         private void UpdatePrompt(string msg) {

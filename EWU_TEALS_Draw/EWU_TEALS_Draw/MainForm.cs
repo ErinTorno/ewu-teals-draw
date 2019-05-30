@@ -115,9 +115,8 @@ namespace EWU_TEALS_Draw {
                 var curTime = DateTime.Now;
                 var span = curTime.Subtract(LastTime);
                 LastTime = curTime;
-
-                if (IsRunning)
-                    Game.Update(span.TotalSeconds, videoFrame);
+                
+                Game.Update(span.TotalSeconds, videoFrame);
                 
                 if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();
@@ -301,18 +300,15 @@ namespace EWU_TEALS_Draw {
 
         private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
-            IsRunning = false;
-            Game.Dispose();
-            if (this.Text == "Free Draw")
+            Game.Quit();
+            if (GameSelector.Text == "Free Draw")
             {
                 Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
             }
-            else if (this.Text == "Whack-A-Mole")
+            else if (GameSelector.Text == "Whack-A-Mole")
             {
                 Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
             }
-            Game.Reset();
-            IsRunning = true;
         }
 
         private void HelpButton_Click(object sender, EventArgs e)
