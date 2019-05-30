@@ -33,7 +33,7 @@ namespace EwuTeals.Games.WhackAMole {
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double ResultsCycleTime = 4.0; // in seconds
         private const double NormalMatchLength = 20.0; // in seconds
-        private const int PlayerCount = 2;
+        private int PlayerCount { get; set; }
 
         private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
 
@@ -54,9 +54,10 @@ namespace EwuTeals.Games.WhackAMole {
         private double lastSwitchTime = 0;
         private double timeRemaining = 0;
 
-        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel) : base(form, canvas, videoGrey) {
+        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel, int playercount) : base(form, canvas, videoGrey) {
             this.video = video;
             this.panel = panel;
+            this.PlayerCount = playercount;
             autoColor = new AutoColor(video);
             autoColor.IsActive = false;
             autoColor.OnColorCapture += this.OnColorCapture;

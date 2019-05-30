@@ -379,7 +379,8 @@ namespace EWU_TEALS_Draw {
             this.GameSelector.FormattingEnabled = true;
             this.GameSelector.Items.AddRange(new object[] {
             "Free Draw",
-            "Whack-A-Mole"});
+            "Whack-A-Mole (Single Player)",
+            "Whack-A-Mole (Two Player)"});
             this.GameSelector.Location = new System.Drawing.Point(3, 115);
             this.GameSelector.Name = "GameSelector";
             this.GameSelector.Size = new System.Drawing.Size(318, 21);

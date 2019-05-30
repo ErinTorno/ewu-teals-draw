@@ -83,7 +83,7 @@ namespace EWU_TEALS_Draw {
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
             // Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
             // Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
-            Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
+            Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
 
             Application.Idle += ProcessFrame;
             IsRunning = true;
@@ -301,13 +301,21 @@ namespace EWU_TEALS_Draw {
         private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
             Game.Quit();
-            if (GameSelector.Text == "Free Draw")
-            {
-                Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
-            }
-            else if (GameSelector.Text == "Whack-A-Mole")
-            {
-                Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
+            switch (GameSelector.SelectedIndex) {
+                case 0:
+                    // Free drawing (the default)
+                    Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
+                    break;
+                case 1:
+                    // Whack-a-mole with one player
+                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 1);
+                    break;
+                case 2:
+                    // Two player whack-a-mole
+                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 2);
+                    break;
+                default:
+                    throw new InvalidOperationException("Attempted to change to an invalid Game");
             }
         }
 
