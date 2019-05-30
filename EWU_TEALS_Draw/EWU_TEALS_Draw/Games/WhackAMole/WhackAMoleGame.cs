@@ -19,21 +19,21 @@ namespace EwuTeals.Games.WhackAMole {
     class WhackAMoleGame : FreeDrawGame {
         // these describe how the state of the game flows, and controls what behaviors the game is doing
         // Intro -> (AddFirstDetect <-> AddSecondDetect) -> Ready -> Playing -> Results
-        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results, Stopped }
-        
+        private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
+
         private const string TextIntro = "Welcome to Whack-a-mole!";
         private const string TextAddFirst = "Player {0}, put first object in center of box and press Enter";
         private const string TextAddSecond = "Player {0}, put second object in center of box and press Enter";
         private const string TextReady = "Press Enter to start the game";
         private const string TextTimeRemaining = "Time Remaining {0:0.00} seconds";
-        private const string TextResults = "Player {0} won with {1} point(s)!";
-        private const string TextResultsSP = "Game over! You got {0} point(s)!";
         private const string TextRestart = "Press Enter to play again!";
-            
+        private const string TextPointsSP = "{0} point(s)";
+        private const string TextPoints = "P{0}: {1} point(s)";
+
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double ResultsCycleTime = 4.0; // in seconds
         private const double NormalMatchLength = 20.0; // in seconds
-        private const int PlayerCount = 1;
+        private const int PlayerCount = 2;
 
         private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
 
@@ -49,11 +49,14 @@ namespace EwuTeals.Games.WhackAMole {
         private List<Target> targets;
         private Player unfinishedPlayer;
         private TextBox prompt;
+        private Label score;
+        private TableLayoutPanel panel;
         private double lastSwitchTime = 0;
         private double timeRemaining = 0;
 
         public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel) : base(form, canvas, videoGrey) {
             this.video = video;
+            this.panel = panel;
             autoColor = new AutoColor(video);
             autoColor.IsActive = false;
             autoColor.OnColorCapture += this.OnColorCapture;
@@ -72,7 +75,16 @@ namespace EwuTeals.Games.WhackAMole {
                 TextAlign = HorizontalAlignment.Center
             };
             prompt.Font = new Font(prompt.Font.FontFamily, 24);
+            score = new Label {
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                AutoSize = true,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Anchor = AnchorStyles.Top
+            };
+            score.Font = new Font(prompt.Font.FontFamily, 24);
             panel.Controls.Add(prompt);
+            panel.Controls.Add(score);
         }
 
         public override void Update(double dT, Mat input) {
@@ -103,9 +115,11 @@ namespace EwuTeals.Games.WhackAMole {
                             t.Update(dT, players, colorCounts);
                         }
                         UpdatePrompt(String.Format(TextTimeRemaining, timeRemaining));
-                    } else {
+                    }
+                    else {
                         CurState = State.Results;
                     }
+                    UpdateScores();
                     break;
             }
             canvas.Refresh();
@@ -160,23 +174,10 @@ namespace EwuTeals.Games.WhackAMole {
                         colorCounts.Add((p.PaddleA.InkColor, 0));
                         colorCounts.Add((p.PaddleB.InkColor, 0));
                     }
+                    UpdateScores();
                     break;
                 case State.Results:
-                    // else we show the score
-                    if (players.Count == 1) {
-                        UpdatePrompt(String.Format(TextResultsSP, players[0].Points));
-                    }
-                    else if (players.Count > 0) {
-                        int winner = -1;
-                        int points = -1;
-                        for (int i = 0; i < players.Count; ++i) {
-                            if (players[i].Points > points) {
-                                winner = i;
-                                points = players[i].Points;
-                            }
-                        }
-                        UpdatePrompt(String.Format(TextResults, winner + 1, points));
-                    }
+                    UpdatePrompt(TextRestart);
                     break;
             }
         }
@@ -184,10 +185,7 @@ namespace EwuTeals.Games.WhackAMole {
         private void FinalizeState() {
             autoColor.IsActive = false;
             UpdatePrompt(String.Empty);
-            switch (CurState) {
-                case State.Intro:
-                    break;
-            }
+            score.Text = String.Empty;
         }
 
         public override void Reset() {
@@ -197,27 +195,47 @@ namespace EwuTeals.Games.WhackAMole {
             Detectables.Clear();
             unfinishedPlayer = null;
             autoColor.Reset();
+            foreach (var t in targets) {
+                t.TimeRemaining = 0;
+                t.Color = Maybe<MCvScalar>.Nothing;
+            }
 
             CurState = State.Intro;
             ShouldYieldKeys = false;
         }
 
-        public override void Quit()
-        {
+        public override void Quit() {
             base.Quit();
             players.Clear();
             colorCounts.Clear();
             Detectables.Clear();
             unfinishedPlayer = null;
             autoColor.Reset();
-            CurState = State.Stopped;
-            prompt.Visible = false;
+            panel.Controls.Clear();
         }
 
         private void UpdatePrompt(string msg) {
             prompt.Text = msg;
         }
 
+        public void UpdateScores() {
+            if (players.Count == 1) {
+                score.Text = String.Format(TextPointsSP, players[0].Points);
+            }
+            else if (players.Count > 0) {
+                var sortedPlayers = players.OrderBy(p => p.Points).Reverse().ToList();
+                var sb = new StringBuilder();
+                for (int i = 0; i < sortedPlayers.Count(); ++i) {
+                    var p = sortedPlayers[i];
+                    // we append a bar between for more players
+                    if (i > 0)
+                        sb.Append(" | ");
+                    sb.Append(String.Format(TextPoints, i, p.Points));
+                }
+
+                score.Text = sb.ToString();
+            }
+        }
 
         /// <summary>
         /// Called whenever we are adding players and the AutoColor captures a color
