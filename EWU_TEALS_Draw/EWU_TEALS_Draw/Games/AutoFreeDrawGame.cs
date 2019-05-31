@@ -11,7 +11,7 @@ using static EwuTeals.Utils.AutoColor;
 
 namespace EwuTeals.Games {
     class AutoFreeDrawGame : FreeDrawGame {
-        private const string TextHowTo = "Put an object in the square and press Enter to draw with it";
+        private const string TextHowTo = "Put an object in the square and press Enter to draw with it!";
         private const Keys KeyCaptureColor = Keys.Enter;
 
         private AutoColor autoColor;

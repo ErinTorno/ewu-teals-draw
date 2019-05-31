@@ -27,7 +27,7 @@ namespace EwuTeals.Games.WhackAMole {
         public Point Position;
         // we use this color to match up to players; if it is not Nothing, then if a player draws over it with the same color, it will be tallied
         public Maybe<MCvScalar> Color { get; set; }
-        // time left until the target is invalidatedC:\Users\rin\Documents\GitHub\ewu-teals-draw\EWU_TEALS_Draw\EWU_TEALS_Draw\Games\WhackAMole\Target.cs
+        // time left until the target is invalidated
         public double TimeRemaining;
         public MCvScalar InkColor { get => Color.GetOrElse(EmptyColor); }
         public MCvScalar InnerInkColor { get => InnerRingColor; }

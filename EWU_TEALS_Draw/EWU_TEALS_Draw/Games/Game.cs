@@ -49,11 +49,16 @@ namespace EwuTeals.Games {
 
         public abstract void Reset();
 
+        public virtual void Pause() {
+            // we reset each of these to prevent weird line issues when unpausing at far away locations
+            foreach (var d in Detectables) d.ResetLastPosition();
+        }
+
         public virtual void Quit() {
             panel.Controls.Clear();
         }
 
-        public virtual void Dispose() {
+        public void Dispose() {
             form.KeyDown -= OnKeyPress;
         }
 

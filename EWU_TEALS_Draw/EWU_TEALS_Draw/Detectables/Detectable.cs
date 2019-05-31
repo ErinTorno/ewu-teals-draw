@@ -3,10 +3,11 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using Newtonsoft.Json;
+using System;
 using System.Drawing;
 
 namespace EwuTeals.Detectables {
-    public abstract class Detectable {
+    public abstract class Detectable : IDisposable {
         protected static readonly Point InvalidPoint = new Point(-255, -255);
 
         public string Name { get; }
@@ -40,6 +41,10 @@ namespace EwuTeals.Detectables {
             point.Y = (int)(point.Y * newH / oldH);
 
             return point;
+        }
+
+        public void Dispose() {
+            threshMat.Dispose();
         }
     }
 }

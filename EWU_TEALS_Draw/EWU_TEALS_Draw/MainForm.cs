@@ -76,9 +76,8 @@ namespace EWU_TEALS_Draw {
         private void Startup() {
             SetupVideoCapture();
             ImageBox_Drawing.Image = new Image<Bgr, byte>(CanvasWidth, CanvasHeight, new Bgr(255, 255, 255));
-            // Game = new MostColorGame(this, ImageBox_Drawing, ImageBox_VideoCapture, GamePanel, Detectables);
-            // Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray);
-            // we init the first game
+
+            // we init the first game in the selection
             GameSelector.SelectedIndex = 0;
 
             Application.Idle += ProcessFrame;
@@ -119,13 +118,7 @@ namespace EWU_TEALS_Draw {
                 }
             }
         }
-
-        private IImage GetGrayImage(Mat color_image) {
-            Image<Gray, byte> grayImage = new Image<Gray, byte>(color_image.Bitmap);
-
-            return grayImage;
-        }
-
+        
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (DisposableQueue != null) {
                 foreach (IDisposable disposable in DisposableQueue) {
@@ -164,9 +157,7 @@ namespace EWU_TEALS_Draw {
                 Application.Idle -= ProcessFrame;
                 IsRunning = false;
                 btnPlay.Text = "Play";
-
-                // we reset each of these to prevent weird line issues when unpausing at far away locations
-                foreach (var d in Game.Detectables) d.ResetLastPosition();
+                Game.Pause();
             }
         }
 
