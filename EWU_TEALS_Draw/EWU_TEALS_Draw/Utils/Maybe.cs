@@ -19,7 +19,13 @@ namespace EwuTeals.Utils {
                 return Maybe<T>.Of(val);
         }
 
-        public static IEnumerable<T> CatMaybe<T>(this IEnumerable<Maybe<T>> inputs) {
+        /// <summary>
+        /// Transforms a list of Maybe<typeparamref name="T"/> into a List<typeparamref name="T"/> by dropping Nothing and unwrapping Just
+        /// </summary>
+        /// <typeparam name="T">The type of the value held by each Maybe</typeparam>
+        /// <param name="inputs">The list of Maybe<typeparamref name="T"/></param>
+        /// <returns>The List<typeparamref name="T"/></returns>
+        public static IEnumerable<T> CatMaybes<T>(this IEnumerable<Maybe<T>> inputs) {
             return from m in inputs where m.IsPresent select m.Value;
         }
     }

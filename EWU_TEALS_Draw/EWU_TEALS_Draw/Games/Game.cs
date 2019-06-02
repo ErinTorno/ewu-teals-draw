@@ -59,6 +59,11 @@ namespace EwuTeals.Games {
         }
 
         public void Dispose() {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool callFromDispose) {
             form.KeyDown -= OnKeyPress;
         }
 

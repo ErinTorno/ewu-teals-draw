@@ -7,18 +7,7 @@ namespace EWU_TEALS_Draw {
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
+        
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -50,7 +39,7 @@ namespace EWU_TEALS_Draw {
             this.ImageBox_VideoCapture = new Emgu.CV.UI.ImageBox();
             this.ImageBox_VideoCapture_Gray = new Emgu.CV.UI.ImageBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.HelpButton = new System.Windows.Forms.Button();
+            this.HelperButton = new System.Windows.Forms.Button();
             this.ShortcutMenu = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel_Drawing.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ImageBox_Drawing)).BeginInit();
@@ -428,17 +417,17 @@ namespace EWU_TEALS_Draw {
             this.pictureBox1.TabIndex = 10;
             this.pictureBox1.TabStop = false;
             // 
-            // HelpButton
+            // HelperButton
             // 
-            this.HelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.HelpButton.BackColor = System.Drawing.Color.SlateGray;
-            this.HelpButton.Location = new System.Drawing.Point(1338, 723);
-            this.HelpButton.Name = "HelpButton";
-            this.HelpButton.Size = new System.Drawing.Size(23, 23);
-            this.HelpButton.TabIndex = 11;
-            this.HelpButton.Text = "?";
-            this.HelpButton.UseVisualStyleBackColor = false;
-            this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
+            this.HelperButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.HelperButton.BackColor = System.Drawing.Color.SlateGray;
+            this.HelperButton.Location = new System.Drawing.Point(1338, 723);
+            this.HelperButton.Name = "HelperButton";
+            this.HelperButton.Size = new System.Drawing.Size(23, 23);
+            this.HelperButton.TabIndex = 11;
+            this.HelperButton.Text = "?";
+            this.HelperButton.UseVisualStyleBackColor = false;
+            this.HelperButton.Click += new System.EventHandler(this.HelpButton_Click);
             // 
             // ShortcutMenu
             // 
@@ -461,7 +450,7 @@ namespace EWU_TEALS_Draw {
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(110)))), ((int)(((byte)(130)))));
             this.ClientSize = new System.Drawing.Size(1364, 749);
             this.Controls.Add(this.ShortcutMenu);
-            this.Controls.Add(this.HelpButton);
+            this.Controls.Add(this.HelperButton);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.tableLayoutPanel_Drawing);
             this.Controls.Add(this.tableLayoutPanel_VideoFeeds);
@@ -518,7 +507,7 @@ namespace EWU_TEALS_Draw {
         private System.Windows.Forms.ComboBox ColorPicker;
         private System.Windows.Forms.TableLayoutPanel GamePanel;
         private ComboBox GameSelector;
-        private Button HelpButton;
+        private Button HelperButton;
         private TextBox ShortcutMenu;
     }
 }

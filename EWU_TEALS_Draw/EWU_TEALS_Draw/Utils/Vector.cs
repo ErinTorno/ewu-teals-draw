@@ -14,4 +14,16 @@ namespace EwuTeals.Utils {
             Y = y;
         }
     }
+
+    public struct V3<A> {
+        public A X;
+        public A Y;
+        public A Z;
+
+        public V3(A x, A y, A z) {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
 }

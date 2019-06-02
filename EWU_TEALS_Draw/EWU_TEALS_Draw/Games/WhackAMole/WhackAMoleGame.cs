@@ -16,7 +16,7 @@ namespace EwuTeals.Games.WhackAMole {
     /// <summary>
     /// A game where in two players will move their paddle between different points on the field
     /// </summary>
-    public class WhackAMoleGame : FreeDrawGame {
+    public class WhackAMoleGame : AutoFreeDrawGame {
         // these describe how the state of the game flows, and controls what behaviors the game is doing
         // Intro -> (AddFirstDetect <-> AddSecondDetect) -> Ready -> Playing -> Results
         private enum State { Intro, AddFirstDetect, AddSecondDetect, Ready, Playing, Results }
@@ -29,7 +29,9 @@ namespace EwuTeals.Games.WhackAMole {
         private const string TextRestart = "Press Enter to play again!";
         private const string TextPointsSP = "{0} point(s)";
         private const string TextPoints = "P{0}: {1} point(s)";
-        private const string TextWinner = "P{0} won with {1} points!";
+        private const string TextWinnerName = "P{0}";
+        private const string TextWinnerNameCombo = " and ";
+        private const string TextWinnerDesc = " won with {0} points!";
 
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double ResultsCycleTime = 4.0; // in seconds
@@ -38,13 +40,12 @@ namespace EwuTeals.Games.WhackAMole {
 
         private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
 
-        private const Keys KeyCaptureColor = Keys.Enter;
+        private const Keys KeyAccept = Keys.Enter;
 
         private State _curState = State.Intro;
         private State CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
 
         private ImageBox video;
-        private AutoColor autoColor;
         private List<Player> players = new List<Player>();
         private List<(MCvScalar color, int count)> colorCounts = new List<(MCvScalar color, int count)>();
         private List<Target> targets;
@@ -53,17 +54,17 @@ namespace EwuTeals.Games.WhackAMole {
         private double lastSwitchTime = 0;
         private double timeRemaining = 0;
 
-        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel, int playercount) : base(form, canvas, videoGrey, panel) {
+        public WhackAMoleGame(Form form, ImageBox canvas, ImageBox video, ImageBox videoGrey, TableLayoutPanel panel, int playercount) : base(form, canvas, video, videoGrey, panel) {
             this.video = video;
             this.PlayerCount = playercount;
-            autoColor = new AutoColor(video);
-            autoColor.IsActive = false;
-            autoColor.OnColorCapture += this.OnColorCapture;
+            AutoColor.IsActive = false;
             Detectables.Clear();
             ShouldYieldKeys = false;
             ShouldDraw = false;
 
-            targets = TargetSet.PlaceTargets(canvas.Image.Bitmap.Width, canvas.Image.Bitmap.Height, TargetSet.Default);
+            var ran = new Random();
+            var targetset = TargetSet.AllSets[ran.Next(TargetSet.AllSets.Count)];
+            targets = TargetSet.PlaceTargets(canvas.Image.Bitmap.Width, canvas.Image.Bitmap.Height, targetset);
 
             score = new Label {
                 BackColor = Color.White,
@@ -79,7 +80,6 @@ namespace EwuTeals.Games.WhackAMole {
 
         public override void Update(double dT, Mat input) {
             base.Update(dT, input);
-            autoColor.Update(input);
 
             // For some unknowable reason, calling .Rectangle does nothing, so we draw a huge circle instead
             // alternatives tried: calling SetPixel through a for loop, which takes 30 seconds to run a single frame
@@ -112,25 +112,10 @@ namespace EwuTeals.Games.WhackAMole {
                     UpdateScores();
                     break;
                 case State.Results:
-                    // we only do this updating if there are more than one players; otherwise it doesn't matter to show the winner
-                    if (PlayerCount > 1) {
-                        timeRemaining -= dT;
-                        if (timeRemaining <= 0)
-                            timeRemaining = ResultsCycleTime;
-                        // second half of cycle: show the winner
-                        if (timeRemaining > 0.5 * ResultsCycleTime) {
-                            int winnerI = -1, winnerPoints = -1;
-                            for (int i = 0; i < players.Count; ++i) {
-                                if (players[i].Points > winnerPoints) {
-                                    winnerI = i;
-                                    winnerPoints = players[i].Points;
-                                }
-                            }
-                            UpdatePrompt(String.Format(TextWinner, winnerI + 1, winnerPoints));
-                        } else {
-                            UpdatePrompt(TextRestart);
-                        }
-                    }
+                    timeRemaining -= dT;
+                    if (timeRemaining <= 0)
+                        timeRemaining = ResultsCycleTime;
+                    UpdateResultsPrompt();
                     break;
             }
             canvas.Refresh();
@@ -141,17 +126,13 @@ namespace EwuTeals.Games.WhackAMole {
             var kc = e.KeyCode;
             if (!ShouldYieldKeys) {
                 switch (CurState) {
-                    case State.AddFirstDetect:
-                    case State.AddSecondDetect:
-                        if (kc == KeyCaptureColor)
-                            autoColor.CaptureNextUpdate = true;
-                        break;
+                    // color capture key times not needed, since our subclass will call it for us
                     case State.Ready:
-                        if (kc == KeyCaptureColor)
+                        if (kc == KeyAccept)
                             CurState = State.Playing;
                         break;
                     case State.Results:
-                        if (kc == KeyCaptureColor)
+                        if (kc == KeyAccept)
                             Reset();
                         break;
                 }
@@ -165,12 +146,12 @@ namespace EwuTeals.Games.WhackAMole {
                     lastSwitchTime = logicTime;
                     break;
                 case State.AddFirstDetect:
-                    autoColor.IsActive = true;
+                    AutoColor.IsActive = true;
                     UpdatePrompt(String.Format(TextAddFirst, players.Count + 1));
                     unfinishedPlayer = new Player(null, null);
                     break;
                 case State.AddSecondDetect:
-                    autoColor.IsActive = true;
+                    AutoColor.IsActive = true;
                     // assumes you must have just been in AddFirstDetected State
                     UpdatePrompt(String.Format(TextAddSecond, players.Count + 1));
                     break;
@@ -194,7 +175,7 @@ namespace EwuTeals.Games.WhackAMole {
         }
 
         private void FinalizeState() {
-            autoColor.IsActive = false;
+            AutoColor.IsActive = false;
             UpdatePrompt(String.Empty);
             score.Text = String.Empty;
         }
@@ -205,7 +186,6 @@ namespace EwuTeals.Games.WhackAMole {
             colorCounts.Clear();
             Detectables.Clear();
             unfinishedPlayer = null;
-            autoColor.Reset();
             foreach (var t in targets) {
                 t.TimeRemaining = 0;
                 t.Color = Maybe<MCvScalar>.Nothing;
@@ -221,7 +201,36 @@ namespace EwuTeals.Games.WhackAMole {
             colorCounts.Clear();
             Detectables.Clear();
             unfinishedPlayer = null;
-            autoColor.Reset();
+        }
+
+        public void UpdateResultsPrompt() {
+            // we only do this updating if there are more than one players; otherwise it doesn't matter to show the winner
+            if (PlayerCount > 1) {
+                // second half of cycle: show the winner
+                if (timeRemaining > 0.5 * ResultsCycleTime) {
+                    int winnerPoints = -1;
+                    var winnerIs = new List<int>();
+                    for (int i = 0; i < players.Count; ++i) {
+                        if (players[i].Points > winnerPoints) {
+                            // all in the list previously are less than this, and can be dropped
+                            winnerIs.Clear();
+                            winnerIs.Add(i);
+                            winnerPoints = players[i].Points;
+                        } else if (players[i].Points == winnerPoints) {
+                            winnerIs.Add(i);
+                        }
+                    }
+                    var str = winnerIs.Aggregate(new StringBuilder(), (acc, cur) => acc.Append(String.Format((acc.Length == 0 ? TextWinnerName : TextWinnerNameCombo + TextWinnerName), cur + 1))).ToString();
+                    UpdatePrompt(String.Format(str + TextWinnerDesc, winnerPoints));
+                }
+                else {
+                    UpdatePrompt(TextRestart);
+                }
+            }
+            else {
+                // only one player, no need to inform of winner
+                UpdatePrompt(TextRestart);
+            }
         }
 
         public void UpdateScores() {
@@ -236,7 +245,7 @@ namespace EwuTeals.Games.WhackAMole {
                 score.Text = inplayers
                     .OrderBy(v => v.Item2.Points)
                     .Reverse()
-                    .Aggregate(new StringBuilder(), (acc, cur) => acc.Append(acc.Length == 0 ? "" : " | ").Append(String.Format(TextPoints, cur.Item1 + 1, cur.Item2.Points)))
+                    .Aggregate(new StringBuilder(), (acc, cur) => (acc.Length == 0 ? acc : acc.Append(" | ")).Append(String.Format(TextPoints, cur.Item1 + 1, cur.Item2.Points)))
                     .ToString();
             }
         }
@@ -246,7 +255,7 @@ namespace EwuTeals.Games.WhackAMole {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void OnColorCapture(object sender, ColorCaptureArgs args) {
+        protected override void OnColorCapture(object sender, ColorCaptureArgs args) {
             var detect = args.Color;
             var ink = detect.InkColor.ToColor();
             if (unfinishedPlayer != null) {

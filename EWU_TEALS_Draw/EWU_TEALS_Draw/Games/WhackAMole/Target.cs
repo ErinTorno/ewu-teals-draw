@@ -45,6 +45,8 @@ namespace EwuTeals.Games.WhackAMole {
         }
 
         private void InvalidateTarget(IList<(MCvScalar color, int count)> colorLegend) {
+            // we want to ensure time remaining is at 0, so while waiting a few frames negative numbers won't be drawn
+            TimeRemaining = 0;
             if (!isWaitingToChoose && Rng.NextDouble() < 0.5) {
                 isWaitingToChoose = true;
             } else {
@@ -131,6 +133,24 @@ namespace EwuTeals.Games.WhackAMole {
             new V2<double>(0.20, 0.50),
             new V2<double>(0.50, 0.50),
             new V2<double>(0.80, 0.50)
+        };
+
+        public static readonly List<V2<double>> Star = new List<V2<double>> {
+            new V2<double>(0.500, 0.150),
+            new V2<double>(0.350, 0.350),
+            new V2<double>(0.650, 0.350),
+            new V2<double>(0.200, 0.375),
+            new V2<double>(0.800, 0.375),
+            new V2<double>(0.350, 0.600),
+            new V2<double>(0.650, 0.600),
+            new V2<double>(0.300, 0.825),
+            new V2<double>(0.700, 0.825),
+            new V2<double>(0.500, 0.650)
+        };
+
+        public static readonly List<List<V2<double>>> AllSets = new List<List<V2<double>>> {
+            Default,
+            Star
         };
 
         /// <summary>

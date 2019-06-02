@@ -20,7 +20,6 @@ namespace EWU_TEALS_Draw {
         private DateTime LastTime;
 
         #region Resolution Properties
-        private const int FPS = 30;
         private const int ActualCameraWidth = 1920;
         private const int ActualCameraHeight = 1080;
 
@@ -45,6 +44,7 @@ namespace EWU_TEALS_Draw {
                         ColorPicker.Text = "";
                 };
                 _game.Detectables.CollectionChanged += (sender, e) => updateSel();
+                // we call update anyway here, since the changes to the detectables in the game's constructor need to also update it
                 updateSel();
             }
         }
@@ -101,31 +101,50 @@ namespace EWU_TEALS_Draw {
         }
 
         private void ProcessFrame(object sender, EventArgs e) {
-            if (VideoCapture != null) {
+            // no matter what we update time, just in case we are paused
+            // this was added to prevent game logic issues where the dT was suddenly absurdly high after pausing
+            var curTime = DateTime.Now;
+            var span = curTime.Subtract(LastTime);
+            LastTime = curTime;
+
+            if (IsRunning && VideoCapture != null) {
                 Mat videoFrame = VideoCapture.QueryFrame(); // If not managed, video frame causes .2mb/s Loss, does not get cleaned up by GC. Must manually dispose.
                 CvInvoke.Flip(videoFrame, videoFrame, FlipType.Horizontal);
                 ImageBox_VideoCapture.Image = videoFrame;
                 DisposableQueue.Enqueue(videoFrame); // Add Video Frames to a queue to be disposed when NOT in use
 
-                var curTime = DateTime.Now;
-                var span = curTime.Subtract(LastTime);
-                LastTime = curTime;
-                
                 Game.Update(span.TotalSeconds, videoFrame);
-                
+
                 if (DisposableQueue.Count > 4) {
                     DisposableQueue.Dequeue().Dispose();
                 }
             }
         }
-        
+
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+            this.Dispose();
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
             if (DisposableQueue != null) {
                 foreach (IDisposable disposable in DisposableQueue) {
                     if (disposable != null) disposable.Dispose();
                 }
             }
+            VideoCapture.Dispose();
+            base.Dispose(disposing);
         }
+
+        /********************/
+        /* Buttons and Keys */
+        /********************/
 
         void MainForm_KeyDown(object sender, KeyEventArgs e) {
             // if the Game is requesting all key input, then we won't run this
@@ -149,12 +168,10 @@ namespace EWU_TEALS_Draw {
 
         private void btnPlay_Click(object sender, EventArgs e) {
             if (IsRunning == false) {
-                Application.Idle += ProcessFrame;
                 IsRunning = true;
                 btnPlay.Text = "Pause";
             }
             else {
-                Application.Idle -= ProcessFrame;
                 IsRunning = false;
                 btnPlay.Text = "Play";
                 Game.Pause();
@@ -176,6 +193,14 @@ namespace EWU_TEALS_Draw {
         private void btnEdit_Click(object sender, EventArgs e) {
             tableLayoutPanel_Sliders.Visible = !tableLayoutPanel_Sliders.Visible;
         }
+
+        private void HelpButton_Click(object sender, EventArgs e) {
+            ShortcutMenu.Visible = !ShortcutMenu.Visible;
+        }
+
+        /*******************/
+        /* Slider Updating */
+        /*******************/
 
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
             if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
@@ -246,6 +271,40 @@ namespace EWU_TEALS_Draw {
             }
         }
 
+        /********/
+        /* Game */
+        /********/
+
+        private void GameSelector_SelectedIndexChanged(object sender, EventArgs e) {
+            if (Game != null)
+                Game.Quit();
+
+            switch (GameSelector.SelectedIndex) {
+                case 0:
+                    // Free drawing (the default)
+                    Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray, GamePanel);
+                    break;
+                case 1:
+                    // Free drawing using auto color
+                    Game = new AutoFreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
+                    break;
+                case 2:
+                    // Whack-a-mole with one player
+                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 1);
+                    break;
+                case 3:
+                    // Two player whack-a-mole
+                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 2);
+                    break;
+                default:
+                    throw new InvalidOperationException("Attempted to change to an invalid Game");
+            }
+        }
+
+        /*****************/
+        /* Serialization */
+        /*****************/
+
         public void SaveFileDialog() {
             using (var diag = new SaveFileDialog()) {
                 diag.Filter = "JSON File|*.json";
@@ -283,38 +342,6 @@ namespace EWU_TEALS_Draw {
                 Game.Detectables.Add(d);
             if (Game.Detectables.Count > 0)
                 ColorPicker.Text = Game.Detectables.First().Name;
-        }
-
-        private void GameSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (Game != null)
-                Game.Quit();
-
-            switch (GameSelector.SelectedIndex) {
-                case 0:
-                    // Free drawing (the default)
-                    Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray, GamePanel);
-                    break;
-                case 1:
-                    // Free drawing using auto color
-                    Game = new AutoFreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
-                    break;
-                case 2:
-                    // Whack-a-mole with one player
-                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 1);
-                    break;
-                case 3:
-                    // Two player whack-a-mole
-                    Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 2);
-                    break;
-                default:
-                    throw new InvalidOperationException("Attempted to change to an invalid Game");
-            }
-        }
-
-        private void HelpButton_Click(object sender, EventArgs e)
-        {
-            ShortcutMenu.Visible = !ShortcutMenu.Visible;
         }
     }
 }
