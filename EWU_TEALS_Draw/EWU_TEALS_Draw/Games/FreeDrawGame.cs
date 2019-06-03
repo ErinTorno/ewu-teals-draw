@@ -25,8 +25,8 @@ namespace EwuTeals.Games {
             Detectables.Add(new DetectableColor("Orange", true, inkColor: new MCvScalar(60, 140, 255), minHsv: new MCvScalar(10, 175, 65), maxHsv: new MCvScalar(18, 255, 255)));
             Detectables.Add(new DetectableColor("Yellow", true, inkColor: new MCvScalar(100, 240, 240), minHsv: new MCvScalar(19, 50, 195), maxHsv: new MCvScalar(35, 255, 255)));
             Detectables.Add(new DetectableColor("Green", true, inkColor: new MCvScalar(135, 230, 135), minHsv: new MCvScalar(70, 70, 75), maxHsv: new MCvScalar(95, 255, 255)));
-            Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
-            Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 135, 135), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
+            Detectables.Add(new DetectableColor("Blue", true, inkColor: new MCvScalar(244, 134, 66), minHsv: new MCvScalar(99, 111, 66), maxHsv: new MCvScalar(117, 255, 255)));
+            Detectables.Add(new DetectableColor("Purple", true, inkColor: new MCvScalar(255, 140, 185), minHsv: new MCvScalar(125, 100, 100), maxHsv: new MCvScalar(140, 255, 255)));
             Detectables.Add(new DetectableColor("Special", false, inkColor: new MCvScalar(0, 0, 0), minHsv: new MCvScalar(0, 0, 0), maxHsv: new MCvScalar(180, 255, 255)));
             UpdatePrompt(TextHowTo);
         }
