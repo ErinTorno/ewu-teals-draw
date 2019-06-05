@@ -60,6 +60,11 @@ namespace EWU_TEALS_Draw {
         private const Keys KeyOpen = Keys.O;
         #endregion
 
+        private const int GameIndexFreeDraw = 0;
+        private const int GameIndexAutoFreeDraw = 1;
+        private const int GameIndexWhackAMoleSP = 2;
+        private const int GameIndexWhackAMole2P = 3;
+
         JsonSerializerSettings JsonSettings = new JsonSerializerSettings() {
             TypeNameHandling = TypeNameHandling.All
         };
@@ -288,19 +293,19 @@ namespace EWU_TEALS_Draw {
                 Game.Quit();
 
             switch (GameSelector.SelectedIndex) {
-                case 0:
+                case GameIndexFreeDraw:
                     // Free drawing (the default)
                     Game = new FreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture_Gray, GamePanel);
                     break;
-                case 1:
+                case GameIndexAutoFreeDraw:
                     // Free drawing using auto color
                     Game = new AutoFreeDrawGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel);
                     break;
-                case 2:
+                case GameIndexWhackAMoleSP:
                     // Whack-a-mole with one player
                     Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 1);
                     break;
-                case 3:
+                case GameIndexWhackAMole2P:
                     // Two player whack-a-mole
                     Game = new WhackAMoleGame(this, ImageBox_Drawing, ImageBox_VideoCapture, ImageBox_VideoCapture_Gray, GamePanel, 2);
                     break;
@@ -335,18 +340,47 @@ namespace EWU_TEALS_Draw {
             }
         }
 
+        private class MainFormConfig {
+            public int GameIndex;
+            public IList<Detectable> Detectables;
+
+            public MainFormConfig(int gameIndex, IList<Detectable> detectables) {
+                GameIndex = gameIndex;
+                Detectables = detectables;
+            }
+        }
+
         // saving and loading disabled write now until we decide how to handle this
 
         public void SaveHsvToFile(string path) {
-            var json = JsonConvert.SerializeObject(Game.Detectables, JsonSettings);
-            File.WriteAllText(path, json);
+            if (Game.CanSerialize) {
+                var config = new MainFormConfig(GameSelector.SelectedIndex, Game.Detectables);
+                var json = JsonConvert.SerializeObject(config, JsonSettings);
+                File.WriteAllText(path, json);
+            }
         }
 
         public void LoadHsvFromFile(string path) {
-            var ser = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), JsonSettings);
+            IList<Detectable> detectables = null;
+            try {
+                var ser = JsonConvert.DeserializeObject<MainFormConfig>(File.ReadAllText(path), JsonSettings);
+                GameSelector.SelectedIndex = ser.GameIndex;
+                detectables = ser.Detectables;
+            } catch (Exception) {
+                // if null, must have had serialization issues
+                // if so, we attempt to deserialize as previous version
+                // if we fail, we throw exception
+                detectables = JsonConvert.DeserializeObject<ObservableCollection<Detectable>>(File.ReadAllText(path), JsonSettings);
+                if (detectables == null)
+                    throw new InvalidDataException("Unable to parse serialized game");
+                // since for older versions, FreeDrawGame is the only option, we set it to that
+                GameSelector.SelectedIndex = GameIndexFreeDraw;
+            }
+            if (!Game.CanSerialize)
+                throw new InvalidDataException("Attempted to load serialized game state that has been marked as non-serializable");
             // for all availale colors, we update them
             Game.Detectables.Clear();
-            foreach (var d in ser)
+            foreach (var d in detectables)
                 Game.Detectables.Add(d);
             if (Game.Detectables.Count > 0)
                 ColorPicker.Text = Game.Detectables.First().Name;

@@ -82,6 +82,9 @@ namespace EwuTeals.Games {
             ++logicTicks;
             logicTime += dT;
         }
+
+        // if we could work more, this would likely be changed to a Serialize method of some kind, rather than relying on the MainForm to do it for us
+        public virtual bool CanSerialize { get => false; }
         
         protected void UpdatePrompt(string msg) {
             prompt.Text = msg;

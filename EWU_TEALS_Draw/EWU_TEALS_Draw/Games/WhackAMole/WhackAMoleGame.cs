@@ -45,6 +45,9 @@ namespace EwuTeals.Games.WhackAMole {
         private State _curState = State.Intro;
         private State CurState { get => _curState; set { FinalizeState(); _curState = value; InitState(); } }
 
+        // since we hold more State than our parent, we want to prevent it from serializing improperly
+        public override bool CanSerialize => false;
+
         private ImageBox video;
         private List<Player> players = new List<Player>();
         private List<(MCvScalar color, int count)> colorCounts = new List<(MCvScalar color, int count)>();

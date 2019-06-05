@@ -15,6 +15,9 @@ namespace EwuTeals.Games {
 
         protected bool ShouldDraw { get; set; }
 
+        // we want to be able to serialize this, as we can save all of the state in it
+        public override bool CanSerialize => true;
+
         public FreeDrawGame(Form form, ImageBox canvas, ImageBox video, TableLayoutPanel panel) : base(form, canvas, panel) {
             this.video = video;
             // we want to yield, since this game does nothing with keys

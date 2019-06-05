@@ -34,7 +34,7 @@ namespace EwuTeals.Utils {
         // returns the name that the next color will have
         // since we don't need to write something that will determine a color's English name from RGB
         // and so we can just use indices
-        private string NextColorName { get => "Auto Color #" + colors.Count + 1; }
+        private string NextColorName { get => "Auto Color #" + (colors.Count + 1); }
 
         public AutoColor(ImageBox video) {
             VideoCapture = video;
