@@ -10,6 +10,7 @@ using System.Linq;
 namespace EwuTeals.Utils {
     public class AutoColor {
         private static readonly TimeSpan DelayBetweenCaptures = new TimeSpan(0, 0, 0, 0, 1000);
+        // a point that is marked as an incorrect value; -255 has no special purpose, just far enough out of range that it can't happen naturally in the window
         private static readonly Point IncorrectPoint = new Point(-255, -255);
         private static readonly MCvScalar RectangleColor = new MCvScalar(255, 230, 230);
         private const double PointDistPercent = 0.19, DrawSquareDimPercent = 0.20;
@@ -21,6 +22,7 @@ namespace EwuTeals.Utils {
 
         public event EventHandler<ColorCaptureArgs> OnColorCapture;
 
+        // we don't want anyone else messing with what colors we've generated
         public IReadOnlyList<DetectableColor> Colors { get => colors.AsReadOnly(); }
 
         public ImageBox VideoCapture { get; set; }
@@ -29,7 +31,10 @@ namespace EwuTeals.Utils {
 
         public bool CaptureNextUpdate { get; set; }
 
-        private string NextColorName { get => "Auto Color #" + colors.Count; }
+        // returns the name that the next color will have
+        // since we don't need to write something that will determine a color's English name from RGB
+        // and so we can just use indices
+        private string NextColorName { get => "Auto Color #" + colors.Count + 1; }
 
         public AutoColor(ImageBox video) {
             VideoCapture = video;

@@ -202,8 +202,16 @@ namespace EWU_TEALS_Draw {
         /* Slider Updating */
         /*******************/
 
+        /// <summary>
+        /// Tells us if it is valid to read or modify the ColorPicker at this time
+        /// </summary>
+        /// <returns>true if the selected color is valid; false otherwise</returns>
+        private bool IsColorSelectionValid() {
+            return ColorPicker.SelectedIndex >= 0 && ColorPicker.SelectedIndex < Game.Detectables.Count;
+        }
+
         private void ColorPicker_SelectedIndexChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (IsColorSelectionValid()) {
                 CheckBox_IsMin.Checked = true;
                 UpdateSliderValues(sender, e);
 
@@ -233,12 +241,12 @@ namespace EWU_TEALS_Draw {
         }
 
         private void CheckBox_ColorOn_CheckedChanged(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count)
+            if (IsColorSelectionValid())
                 Game.Detectables[ColorPicker.SelectedIndex].IsEnabled = CheckBox_ColorOn.Checked;
         }
 
         private void UpdateSliderValues(object sender, EventArgs e) {
-            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (IsColorSelectionValid()) {
                 var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;
@@ -259,7 +267,7 @@ namespace EWU_TEALS_Draw {
         }
 
         private void UpdateHSVCodes() {
-            if (ColorPicker.SelectedIndex > 0 && ColorPicker.SelectedIndex < Game.Detectables.Count) {
+            if (IsColorSelectionValid()) {
                 var drawable = Game.Detectables[ColorPicker.SelectedIndex];
                 if (drawable is DetectableColor) {
                     var hsv = (DetectableColor)drawable;

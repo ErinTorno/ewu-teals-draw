@@ -14,16 +14,20 @@ namespace EwuTeals.Games {
         /// If true, all key inputs will be ignored so that the container for this can address them
         /// </summary>
         public Boolean ShouldYieldKeys { get; protected set; }
+        // this key, when pressed, will toggle ShouldYieldKeys
         public Keys ToggleYieldKey = Keys.Space;
 
         public ObservableCollection<Detectable> Detectables { get; protected set; }
         
+        // the time (in seconds) that have passed since the game started
         protected double logicTime = 0;
+        // the number of updates performed since the game started
         protected int logicTicks = 0;
         protected ImageBox canvas;
         protected Form form;
-        // this key, when pressed, will toggle ShouldYieldKeys
+        // last time we toggle the controls; if too low, we won't toggle yet to prevent fast back and forth toggling
         private double lastToggleTime = 0.0;
+
         private TextBox prompt;
         private TableLayoutPanel panel;
 

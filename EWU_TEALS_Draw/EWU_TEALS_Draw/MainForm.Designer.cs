@@ -220,14 +220,6 @@ namespace EWU_TEALS_Draw {
             this.ColorPicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.ColorPicker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ColorPicker.FormattingEnabled = true;
-            this.ColorPicker.Items.AddRange(new object[] {
-            "Blue",
-            "Red",
-            "Yellow",
-            "Green",
-            "Orange",
-            "Purple",
-            "Special"});
             this.ColorPicker.Location = new System.Drawing.Point(92, 6);
             this.ColorPicker.Margin = new System.Windows.Forms.Padding(2);
             this.ColorPicker.Name = "ColorPicker";
