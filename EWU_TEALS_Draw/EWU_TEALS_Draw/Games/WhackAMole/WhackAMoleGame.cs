@@ -36,7 +36,6 @@ namespace EwuTeals.Games.WhackAMole {
         private const double TimeToShowIntro = 2.0; // in seconds
         private const double ResultsCycleTime = 4.0; // in seconds
         private const double NormalMatchLength = 20.0; // in seconds
-        private int PlayerCount { get; set; }
 
         private static readonly MCvScalar CanvasColor = new MCvScalar(255, 255, 255);
 
@@ -47,6 +46,9 @@ namespace EwuTeals.Games.WhackAMole {
 
         // since we hold more State than our parent, we want to prevent it from serializing improperly
         public override bool CanSerialize => false;
+
+        // the number of players to be used when running this
+        private int PlayerCount { get; set; }
 
         private ImageBox video;
         private List<Player> players = new List<Player>();
@@ -206,7 +208,7 @@ namespace EwuTeals.Games.WhackAMole {
             unfinishedPlayer = null;
         }
 
-        public void UpdateResultsPrompt() {
+        private void UpdateResultsPrompt() {
             // we only do this updating if there are more than one players; otherwise it doesn't matter to show the winner
             if (PlayerCount > 1) {
                 // second half of cycle: show the winner
@@ -236,7 +238,7 @@ namespace EwuTeals.Games.WhackAMole {
             }
         }
 
-        public void UpdateScores() {
+        private void UpdateScores() {
             if (players.Count == 1) {
                 score.Text = String.Format(TextPointsSP, players[0].Points);
             }

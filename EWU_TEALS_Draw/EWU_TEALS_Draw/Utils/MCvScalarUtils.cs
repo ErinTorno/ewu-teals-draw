@@ -1,4 +1,5 @@
 ﻿using Emgu.CV.Structure;
+using EwuTeals.Detectables;
 using System;
 using System.Drawing;
 
@@ -26,6 +27,15 @@ namespace EwuTeals.Utils {
         public static Color ToColor(this MCvScalar bgr) {
             // for MCvScalar, 0 alpha is opaque; for color, 0 is fully transparent, and 255 is opaque
             return Color.FromArgb(255 - (int)bgr.V3, (int)bgr.V2, (int)bgr.V1, (int)bgr.V0);
+        }
+        
+        public static DetectableColor GenerateDetectable(this MCvScalar bgrColor, string name) {
+            var hsv = bgrColor.ToHsv();
+            // we increase the saturation, since it appears duller on camera
+            var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
+            var minHsv = new MCvScalar(hsv.V0 - 6.0, hsv.V1 * 0.5, 80.0);
+            var maxHsv = new MCvScalar(hsv.V0 + 6.0, 255.0, 255.0);
+            return new DetectableColor(name, true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
 
         public static MCvScalar ToHsv(this MCvScalar bgr) {
