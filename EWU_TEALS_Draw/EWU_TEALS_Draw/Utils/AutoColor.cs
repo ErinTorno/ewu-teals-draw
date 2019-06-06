@@ -54,9 +54,10 @@ namespace EwuTeals.Utils {
                     if (lastCapure.Add(DelayBetweenCaptures) < DateTime.Now) {
                         lastCapure = DateTime.Now;
                         var avgC = GetColorFromSurrounding(source, new Point(source.Width / 2, source.Height / 2));
-                        colors.Add(GenerateHsvConfig(NextColorName, avgC));
+                        colors.Add(avgC.GenerateDetectable(NextColorName));
                         var ev = OnColorCapture;
-                        if (ev != null) ev(this, new ColorCaptureArgs(colors.Last()));
+                        if (ev != null)
+                            ev(this, new ColorCaptureArgs(colors.Last()));
                     }
                 }
 
@@ -98,15 +99,6 @@ namespace EwuTeals.Utils {
                 }
             }
             return new MCvScalar(b / points, g / points, r / points);
-        }
-
-        public static DetectableColor GenerateHsvConfig(string name, MCvScalar bgrColor) {
-            var hsv = bgrColor.ToHsv();
-            // we increase the saturation, since it appears duller on camera
-            var ink = new MCvScalar(hsv.V0, Math.Min(255.0, hsv.V1 * 1.75), Math.Min(hsv.V2 * 1.75, 255.0)).ToBgr();
-            var minHsv = new MCvScalar(hsv.V0 - 6.0, hsv.V1 * 0.5, 80.0);
-            var maxHsv = new MCvScalar(hsv.V0 + 6.0, 255.0, 255.0);
-            return new DetectableColor(name, true, ink, minHsv.RestrictHsvRanges(), maxHsv.RestrictHsvRanges());
         }
 
         public class ColorCaptureArgs : EventArgs {

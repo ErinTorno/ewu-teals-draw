@@ -68,6 +68,7 @@ namespace EwuTeals.Games {
         }
 
         protected virtual void Dispose(bool callFromDispose) {
+            this.Quit();
             form.KeyDown -= OnKeyPress;
         }
 
